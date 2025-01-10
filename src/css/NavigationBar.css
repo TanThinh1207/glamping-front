@@ -1,0 +1,20 @@
+.nav-link {
+    position: relative;
+    padding-bottom: 3px;
+  }
+.nav-link::before {
+    content: "";
+    position: absolute;
+    bottom: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 4px;
+    background-color: #d50032;
+    visibility: hidden;
+    transition: 0.3s ease-in-out;
+}
+.nav-link:hover::before {
+    width: 100%;
+    visibility: visible;
+}
