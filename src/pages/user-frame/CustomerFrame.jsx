@@ -11,7 +11,7 @@ const CustomerFrame = () => {
     <div>
       <Toaster position='bottom-right' expand={false}></Toaster>
       <NavigationBar />
-      <div className={`${isHomePage ? "" : "pt-[73.23px]"}`}>
+      <div className={`${isHomePage ? "" : "pt-[70px]"}`}>
         <Outlet />
       </div>
       <Footer></Footer>

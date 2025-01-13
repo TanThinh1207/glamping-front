@@ -50,7 +50,7 @@ const NavigationBar = () => {
                     </div>
                     {!isMinimized && (
                         <ul
-                            className={`flex uppercase font-montserrat justify-center items-center space-x-5 list-none pt-2 pb-3`}
+                            className={`flex uppercase font-montserrat justify-center items-center space-x-7 list-none pt-2 pb-3`}
                         >
                             {[
                                 { name: "glamping", link: "/" },
@@ -58,7 +58,7 @@ const NavigationBar = () => {
                                 { name: "about", link: "/about" },
                                 { name: "become a host", link: "/become-a-host" },
                             ].map((menuItem, i) => (
-                                <li key={i} className="nav-link font-montserrat text-sm cursor-pointer">
+                                <li key={i} className="nav-link font-montserrat text-xs cursor-pointer">
                                     <Link to={menuItem.link}>{menuItem.name}</Link>
                                 </li>
                             ))}
@@ -108,7 +108,7 @@ const NavigationBar = () => {
                 </div>
                 <div className="right-container flex justify-end space-x-5 w-1/2">
                     <div className="flex items-center">
-                        <Link to="/" className="font-montserrat uppercase text-sm hidden xl:inline-block">
+                        <Link to="/" className="font-montserrat uppercase text-xs hidden xl:inline-block">
                             <FontAwesomeIcon
                                 className="cursor-pointer hover:scale-110 transition-transform duration-200"
                                 icon={faUser}
@@ -117,7 +117,7 @@ const NavigationBar = () => {
                         </Link>
                     </div>
                     <div className="flex items-center">
-                        <Link to="/" className="font-montserrat uppercase text-sm hidden xl:inline-block">
+                        <Link to="/" className="font-montserrat uppercase text-xs hidden xl:inline-block">
                             <FontAwesomeIcon
                                 className="cursor-pointer hover:scale-110 transition-transform duration-200 pr-1"
                                 icon={faHeadphonesSimple}
@@ -125,7 +125,7 @@ const NavigationBar = () => {
                             <span className=""> Contact us</span>
                         </Link>
                     </div>
-                    <div className="bg-black text-white text-sm border-black border uppercase mb-2 p-4 transform 
+                    <div className="bg-black text-white text-xs border-black border uppercase mb-2 p-4 transform 
                         duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black 
                         mr-2">
                         <button className="uppercase">Check availability</button>
