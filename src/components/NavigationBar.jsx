@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeadphonesSimple, faBars, faUser, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
@@ -9,6 +10,9 @@ const NavigationBar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const [isMinimized, setIsMinimized] = useState(window.innerWidth < 1280);
+    const location = useLocation();
+
+    const isHomePage = location.pathname === "/";
 
     const toggleMenu = () => {
         setMenuOpen(!menuOpen);
@@ -34,7 +38,7 @@ const NavigationBar = () => {
 
     return (
         <div
-            className={`fixed w-full z-10 transition-colors duration-500 ${isScrolled ? "bg-gray-100" : "bg-transparent"
+            className={`fixed w-full z-10 transition-colors duration-500 ${isScrolled || !isHomePage ? "bg-white" : "bg-transparent"
                 }`}
         >
             <div className="flex items-center px-3 pt-3 font-montserrat">
@@ -49,15 +53,16 @@ const NavigationBar = () => {
                             className={`flex uppercase font-montserrat justify-center items-center space-x-5 list-none pt-2 pb-3`}
                         >
                             {[
-                                { name: "glamping", link: "" },
-                                { name: "accomodations", link: "" },
-                                { name: "about", link: "" },
-                                { name: "become a host", link: "" },
+                                { name: "glamping", link: "/" },
+                                { name: "accomodations", link: "/accommodations" },
+                                { name: "about", link: "/about" },
+                                { name: "become a host", link: "/become-a-host" },
                             ].map((menuItem, i) => (
-                                <li key={i} className="nav-link text-sm cursor-pointer">
-                                    <a href={menuItem.link}>{menuItem.name}</a>
+                                <li key={i} className="nav-link font-montserrat text-sm cursor-pointer">
+                                    <Link to={menuItem.link}>{menuItem.name}</Link>
                                 </li>
                             ))}
+
                         </ul>
                     )}
                     <div className="flex justify-end items-center pr-5 text-2xl">
@@ -84,19 +89,20 @@ const NavigationBar = () => {
                                 <img className="w-1/2 mb-12" src={logo} alt="Logo AstroGlampé" />
                             </div>
                         </div>
-                        <ul className="flex flex-col items-center space-y-8 text-xl">
+                        <ul className="flex flex-col items-center uppercase pt-10 space-y-16 text-xl">
                             {[
-                                { name: "BOOKING", link: "/booking/service" },
-                                { name: "SERVICE", link: "/blog-service" },
-                                { name: "STYLIST", link: "/blog-stylist" },
-                                { name: "REWARD", link: "/reward" },
-                                { name: "CONTACT", link: "/contact" },
-                                { name: "ABOUT US", link: "/about-us" },
+                                { name: "glamping", link: "/" },
+                                { name: "accomodations", link: "/accommodations" },
+                                { name: "about", link: "/about" },
+                                { name: "become a host", link: "/become-a-host" },
+                                { name: "my account", link: "/my-account" },
+                                { name: "contact us", link: "/contact-us" },
                             ].map((menuItem, i) => (
-                                <li key={i} className="nav-link font-normal text-sm cursor-pointer">
-                                    <a href={menuItem.link}>{menuItem.name}</a>
+                                <li key={i} className="nav-link font-normal text-base cursor-pointer">
+                                    <Link to={menuItem.link}>{menuItem.name}</Link>
                                 </li>
                             ))}
+
                         </ul>
                     </div>
                 </div>
