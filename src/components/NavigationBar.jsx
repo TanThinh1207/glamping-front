@@ -125,11 +125,11 @@ const NavigationBar = () => {
                             <span className=""> Contact us</span>
                         </Link>
                     </div>
-                    <div className="bg-black text-white text-xs border-black border uppercase mb-2 p-4 transform 
+                    <button className="bg-black text-white text-xs border-black border uppercase mb-2 p-4 transform 
                         duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black 
                         mr-2">
-                        <button className="uppercase">Check availability</button>
-                    </div>
+                            Check availability
+                    </button>
                 </div>
             </div>
         </div>
