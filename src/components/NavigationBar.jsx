@@ -11,7 +11,7 @@ const NavigationBar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [isMinimized, setIsMinimized] = useState(window.innerWidth < 1280);
     const location = useLocation();
-
+    const isHostingPage = location.pathname === "/hosting";
     const isHomePage = location.pathname === "/";
 
     const toggleMenu = () => {
@@ -35,7 +35,18 @@ const NavigationBar = () => {
             window.removeEventListener("resize", handleResize);
         };
     }, []);
-
+    const menuItems = isHostingPage
+        ? [
+            { name: "Today", link: "/hosting" },
+            { name: "Calendar", link: "/calendar" },
+            { name: "Listings", link: "/listings" },
+        ]
+        : [
+            { name: "Glamping", link: "/" },
+            { name: "Accommodations", link: "/accommodations" },
+            { name: "About", link: "/about" },
+            { name: "Become a Host", link: "/hosting" },
+        ];
     return (
         <div
             className={`fixed w-full z-10 transition-colors duration-500 ${isScrolled || !isHomePage ? "bg-white" : "bg-transparent"
@@ -48,21 +59,33 @@ const NavigationBar = () => {
                             <img src={logo} alt="Logo AstroGlampé" />
                         </Link>
                     </div>
-                    {!isMinimized && (
+                    {/* {!isMinimized && (
                         <ul
                             className={`flex uppercase font-montserrat justify-center items-center space-x-7 list-none pt-2 pb-3`}
                         >
+               
                             {[
                                 { name: "glamping", link: "/" },
                                 { name: "accomodations", link: "/accommodations" },
                                 { name: "about", link: "/about" },
-                                { name: "become a host", link: "/become-a-host" },
+                                { name: "become a host", link: "/hosting" },
                             ].map((menuItem, i) => (
                                 <li key={i} className="nav-link font-montserrat text-xs cursor-pointer">
                                     <Link to={menuItem.link}>{menuItem.name}</Link>
                                 </li>
                             ))}
 
+                        </ul>
+                    )} */}
+                    {!isMinimized && (
+                        <ul
+                            className={`flex uppercase font-montserrat justify-center items-center space-x-7 list-none pt-2 pb-3`}
+                        >
+                            {menuItems.map((menuItem, i) => (
+                                <li key={i} className="nav-link font-montserrat text-xs cursor-pointer">
+                                    <Link to={menuItem.link}>{menuItem.name}</Link>
+                                </li>
+                            ))}
                         </ul>
                     )}
                     <div className="flex justify-end items-center pr-5 text-2xl">
@@ -94,7 +117,7 @@ const NavigationBar = () => {
                                 { name: "glamping", link: "/" },
                                 { name: "accomodations", link: "/accommodations" },
                                 { name: "about", link: "/about" },
-                                { name: "become a host", link: "/become-a-host" },
+                                { name: "become a host", link: "/hosting" },
                                 { name: "my account", link: "/my-account" },
                                 { name: "contact us", link: "/contact-us" },
                             ].map((menuItem, i) => (
