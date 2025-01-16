@@ -59,24 +59,6 @@ const NavigationBar = () => {
                             <img src={logo} alt="Logo AstroGlampé" />
                         </Link>
                     </div>
-                    {/* {!isMinimized && (
-                        <ul
-                            className={`flex uppercase font-montserrat justify-center items-center space-x-7 list-none pt-2 pb-3`}
-                        >
-               
-                            {[
-                                { name: "glamping", link: "/" },
-                                { name: "accomodations", link: "/accommodations" },
-                                { name: "about", link: "/about" },
-                                { name: "become a host", link: "/hosting" },
-                            ].map((menuItem, i) => (
-                                <li key={i} className="nav-link font-montserrat text-xs cursor-pointer">
-                                    <Link to={menuItem.link}>{menuItem.name}</Link>
-                                </li>
-                            ))}
-
-                        </ul>
-                    )} */}
                     {!isMinimized && (
                         <ul
                             className={`flex uppercase font-montserrat justify-center items-center space-x-7 list-none pt-2 pb-3`}
@@ -113,14 +95,7 @@ const NavigationBar = () => {
                             </div>
                         </div>
                         <ul className="flex flex-col items-center uppercase pt-10 space-y-16 text-xl">
-                            {[
-                                { name: "glamping", link: "/" },
-                                { name: "accomodations", link: "/accommodations" },
-                                { name: "about", link: "/about" },
-                                { name: "become a host", link: "/hosting" },
-                                { name: "my account", link: "/my-account" },
-                                { name: "contact us", link: "/contact-us" },
-                            ].map((menuItem, i) => (
+                            {menuItems.map((menuItem, i) => (
                                 <li key={i} className="nav-link font-normal text-base cursor-pointer">
                                     <Link to={menuItem.link}>{menuItem.name}</Link>
                                 </li>
@@ -129,7 +104,8 @@ const NavigationBar = () => {
                         </ul>
                     </div>
                 </div>
-                <div className="right-container flex justify-end space-x-5 w-1/2">
+                {!isHostingPage ? (
+                    <div className="right-container flex justify-end space-x-5 w-1/2">
                     <div className="flex items-center">
                         <Link to="/" className="font-montserrat uppercase text-xs hidden xl:inline-block">
                             <FontAwesomeIcon
@@ -154,6 +130,15 @@ const NavigationBar = () => {
                             Check availability
                     </button>
                 </div>
+                ) : (
+                <div className="right-container flex justify-end w-1/2">
+                    <button className="bg-black text-white text-xs border-black border uppercase mb-2 p-4 transform 
+                        duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black 
+                        mr-2">
+                            Switch to customer
+                    </button>
+                </div>
+                )}
             </div>
         </div>
     );

@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
+
 const Hosting = () => {
   const [activeTab, setActiveTab] = useState("");
+  
   return (
     <div className="w-full h-screen bg-white">
       <div className="mx-auto px-30 max-w-7xl text-left">
