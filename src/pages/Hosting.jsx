@@ -264,7 +264,7 @@ const Hosting = () => {
             slidesPerView={4}
             navigation
           >
-            {hostInfo.reservation[activeTab].map((info) => (
+            {hostInfo.reservation[activeTab]?.map((info) => (
               <SwiperSlide>
                 <div className="relative flex flex-col my-6 bg-white shadow-sm border border-slate-200 rounded-xl">
                   <div className="px-5 py-2">
