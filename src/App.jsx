@@ -6,6 +6,7 @@ import HomePage from './pages/HomePage';
 import About from './pages/About';
 import Hosting from './pages/Hosting';
 import HostFrame from './pages/host-frame/HostFrame';
+import Calendar from './pages/Calendar';
 
 function App() {
   const router = createBrowserRouter([
@@ -18,10 +19,11 @@ function App() {
       ]
     },
     {
-      path: "/", 
+      path: "/hosting", 
       element: <HostFrame/>,
       children: [
-        { path: "hosting", element: <Hosting/> },
+        { path: "", element: <Hosting/> },
+        { path: "calendar", element: <Calendar/> },
       ]
     }
   ])

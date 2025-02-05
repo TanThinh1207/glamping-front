@@ -48,7 +48,7 @@ const NavigationBar = () => {
     const menuItems = isHostingPage
         ? [
             { name: "Today", link: "/hosting" },
-            { name: "Calendar", link: "/calendar" },
+            { name: "Calendar", link: "/hosting/calendar" },
             { name: "Listings", link: "/listings" },
         ]
         : [
