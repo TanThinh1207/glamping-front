@@ -29,7 +29,7 @@ const Modal = ({ isOpen, onClose, children }) => {
       >
         <button
           onClick={onClose}
-          className="absolute top-2 right-2"
+          className="absolute top-2 right-2 pr-2"
         >
           ✕
         </button>

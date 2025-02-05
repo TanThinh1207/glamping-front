@@ -1,6 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import AOS from "aos";
-import "aos/dist/aos.css";
 import { Link } from "react-router-dom";
 import thumb from "../assets/thumb.jpg";
 import feature1 from "../assets/feature1.jpg";
@@ -16,13 +14,6 @@ import { faArrowRight, faUserFriends, faMagnifyingGlass } from "@fortawesome/fre
 import Modal from "../components/Modal";
 
 const HomePage = () => {
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    });
-  }, []);
-
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
   const [isCheckOutOpen, setIsCheckOutOpen] = useState(false);
   const [checkInDate, setCheckInDate] = useState(null);
@@ -35,13 +26,10 @@ const HomePage = () => {
   const [dropDownDirection, setDropDownDirection] = useState("down");
   const buttonRef = useRef(null);
 
-  const [adults, setAdults] = useState(1);
-  const [children, setChildren] = useState(0);
+  const [guests, setGuests] = useState(1);
   const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
-  const increaseAdults = () => setAdults((prev) => prev + 1);
-  const decreaseAdults = () => setAdults((prev) => Math.max(1, prev - 1));
-  const increaseChildren = () => setChildren((prev) => prev + 1);
-  const decreaseChildren = () => setChildren((prev) => Math.max(0, prev - 1));
+  const increaseGuest = () => setGuests((prev) => prev + 1);
+  const decreaseGuest = () => setGuests((prev) => Math.max(1, prev - 1));
 
   const handleMonthChange = (direction) => {
     setCurrentDate(currentDate.add(direction, "month"));
@@ -95,7 +83,7 @@ const HomePage = () => {
 
   return (
     <div>
-      <div className="thumb flex relative justify-center w-full" data-aos="fade">
+      <div className="thumb flex relative justify-center w-full">
         <img src={thumb} className="w-full h-auto" alt="Thumbnail" />
       </div>
 
@@ -261,7 +249,7 @@ const HomePage = () => {
           >
             <FontAwesomeIcon icon={faUserFriends} className="text-lg" />
             <p className="text-gray-800">
-              <span>{adults} Adults</span> <span>{children} Children</span>
+              <span>{guests} Guests</span>
             </p>
           </div>
           <Modal isOpen={isGuestModalOpen} onClose={() => setIsGuestModalOpen(false)}>
@@ -269,41 +257,24 @@ const HomePage = () => {
               <h3 className="text-lg font-semibold text-gray-800">Select Guests</h3>
             </div>
             <div className="flex justify-between items-center mb-4">
-              <p className="text-gray-700">Adults</p>
+              <p className="text-gray-700">Guests</p>
               <div className="flex items-center border border-gray-300 rounded-md">
                 <button
-                  onClick={decreaseAdults}
+                  onClick={decreaseGuest}
                   className="px-4 py-2 text-lg border-r border-gray-300 hover:bg-gray-100"
                 >
                   -
                 </button>
-                <span className="px-6 py-2 text-lg">{adults}</span>
+                <span className="px-6 py-2 text-lg">{guests}</span>
                 <button
-                  onClick={increaseAdults}
+                  onClick={increaseGuest}
                   className="px-4 py-2 text-lg border-l border-gray-300 hover:bg-gray-100"
                 >
                   +
                 </button>
               </div>
             </div>
-            <div className="flex justify-between items-center mb-4">
-              <p className="text-gray-700">Children</p>
-              <div className="flex items-center border border-gray-300 rounded-md">
-                <button
-                  onClick={decreaseChildren}
-                  className="px-4 py-2 text-lg border-r border-gray-300 hover:bg-gray-100"
-                >
-                  -
-                </button>
-                <span className="px-6 py-2 text-lg">{children}</span>
-                <button
-                  onClick={increaseChildren}
-                  className="px-4 py-2 text-lg border-l border-gray-300 hover:bg-gray-100"
-                >
-                  +
-                </button>
-              </div>
-            </div>
+            
           </Modal>
           <div className="border-l border-gray-400 h-6"></div>
           <button className="bg-black text-white text-sm rounded-3xl border-black border uppercase px-6 py-3 transform 
@@ -313,9 +284,9 @@ const HomePage = () => {
         </div>
       </div>
       <div className="featured px-4">
-        <p className="uppercase text-2xl font-light pt-5 pb-5">featured properties</p>
+        <p className="uppercase text-2xl font-semibold pt-5 pb-5">featured properties</p>
         <div className="flex flex-col lg:flex-row gap-6 h-auto lg:h-screen">
-          <div className="left-container flex flex-col w-full lg:w-1/2" data-aos="fade-right">
+          <div className="left-container flex flex-col w-full lg:w-1/2">
             <div className="relative flex-1 flex items-stretch">
               <img className="w-full h-full object-cover" src={feature1} alt="Tent Bagolaro" />
               <div className="absolute font-montserrat inset-0 justify-center items-center flex flex-col">
@@ -324,7 +295,7 @@ const HomePage = () => {
               </div>
             </div>
           </div>
-          <div className="right-container flex flex-col w-full lg:w-1/2 space-y-6" data-aos="fade-left">
+          <div className="right-container flex flex-col w-full lg:w-1/2 space-y-6">
             <div className="relative flex-1 flex items-stretch">
               <img className="w-full h-full object-cover" src={feature2} alt="The Swimmingpool" />
               <div className="absolute font-montserrat inset-0 justify-center items-center flex flex-col">
@@ -343,7 +314,7 @@ const HomePage = () => {
         </div>
         <p className="uppercase flex justify-center text-2xl pt-8 pb-8 font-light">BOOK YOUR UNFORGETTABLE EXPERIENCE</p>
         <div className="flex flex-col lg:flex-row gap-6 min-h-screen">
-          <div className="left-container flex flex-col w-full lg:w-1/2 space-y-6" data-aos="fade-right">
+          <div className="left-container flex flex-col w-full lg:w-1/2 space-y-6">
             <div className="relative flex-1 flex items-stretch">
               <img className="w-full h-full object-cover" src={feature4} alt="The Luxury" />
               <div className="absolute font-montserrat inset-0 justify-center items-center flex flex-col">
@@ -359,7 +330,7 @@ const HomePage = () => {
               </div>
             </div>
           </div>
-          <div className="right-container flex w-full lg:w-1/2" data-aos="fade-left">
+          <div className="right-container flex w-full lg:w-1/2">
             <div className="relative flex-1 flex items-stretch">
               <img className="w-full h-full object-cover" src={feature6} alt="Tent Aminta" />
               <div className="absolute font-montserrat inset-0 justify-center items-center flex flex-col">
@@ -372,12 +343,12 @@ const HomePage = () => {
       </div>
       <div className="px-4">
         <div>
-          <h1 className="text-2xl font-light uppercase tracking-wide pt-5 pb-5">
+          <h1 className="text-2xl font-semibold uppercase tracking-wide pt-5 pb-5">
             Featured Glamping Destination
           </h1>
         </div>
         <div className="flex flex-col w-full lg:flex-row items-center lg:items-start space-y-6 lg:space-y-0 lg:space-x-6">
-          <div className="lg:w-2/3 w-full" data-aos="fade-right">
+          <div className="lg:w-2/3 w-full">
             <img src={feature7} alt="Glamping Destination" className="w-full h-auto shadow-md" />
           </div>
           <div className="lg:w-1/3 p-4 bg-white border-2 border-blue-200">
