@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-family: "Canto";
+  src: url("./assets/fonts/Canto-Roman.woff2") format("woff2"),
+    url("./assets/fonts/Canto-Roman.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+}

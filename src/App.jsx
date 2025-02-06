@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import "./index.css";
 import CustomerFrame from './pages/user-frame/CustomerFrame';
@@ -7,6 +6,7 @@ import About from './pages/About';
 import Hosting from './pages/Hosting';
 import HostFrame from './pages/host-frame/HostFrame';
 import Calendar from './pages/Calendar';
+import Glamping from './pages/Glamping';
 
 function App() {
   const router = createBrowserRouter([
@@ -16,6 +16,7 @@ function App() {
       children: [
         {path: "", element: <HomePage/>},
         {path: "/about", element: <About/>},
+        {path: "/glamping", element: <Glamping/>}
       ]
     },
     {

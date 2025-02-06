@@ -11,8 +11,7 @@ export default {
       },
 
       fontFamily: {
-        montserrat: ['Montserrat', 'sans-serif'],
-        aboreto: ["Aboreto", "cursive"],
+        canto : ['Canto']
       }
     },
   },

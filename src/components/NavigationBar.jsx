@@ -37,7 +37,7 @@ const NavigationBar = () => {
     }, []);
 
     const miniItems = [
-        { name: "Glamping", link: "/" },
+        { name: "Glamping", link: "/glamping" },
         { name: "Accommodations", link: "/accommodations" },
         { name: "About", link: "/about" },
         { name: "Become a Host", link: "/hosting" },
@@ -52,7 +52,7 @@ const NavigationBar = () => {
             { name: "Listings", link: "/listings" },
         ]
         : [
-            { name: "Glamping", link: "/" },
+            { name: "Glamping", link: "/glamping" },
             { name: "Accommodations", link: "/accommodations" },
             { name: "About", link: "/about" },
             { name: "Become a Host", link: "/hosting" },
@@ -62,7 +62,7 @@ const NavigationBar = () => {
             className={`fixed w-full z-10 transition-colors duration-500 ${isScrolled || !isHomePage ? "bg-white" : "bg-transparent"
                 }`}
         >
-            <div className="flex items-center px-3 pt-3 font-montserrat">
+            <div className="flex items-center px-3 pt-3">
                 <div className="left-container flex w-1/2">
                     <div className={`flex justify-center items-center lg:justify-start w-2/3 xl:w-1/3`}>
                         <Link className="pr-10" to="/">
@@ -71,10 +71,10 @@ const NavigationBar = () => {
                     </div>
                     {!isMinimized && (
                         <ul
-                            className={`flex uppercase font-montserrat justify-center items-center space-x-7 list-none pt-2 pb-3`}
+                            className={`flex uppercase justify-center items-center space-x-7 list-none pt-3 pb-3`}
                         >
                             {menuItems.map((menuItem, i) => (
-                                <li key={i} className="nav-link font-montserrat text-xs cursor-pointer">
+                                <li key={i} className="nav-link font-canto text-xs cursor-pointer">
                                     <Link to={menuItem.link}>{menuItem.name}</Link>
                                 </li>
                             ))}
@@ -106,7 +106,7 @@ const NavigationBar = () => {
                         </div>
                         <ul className="flex flex-col items-center uppercase pt-10 space-y-16 text-xl">
                             {miniItems.map((menuItem, i) => (
-                                <li key={i} className="nav-link font-normal text-base cursor-pointer">
+                                <li key={i} className="nav-link font-canto text-base cursor-pointer">
                                     <Link to={menuItem.link}>{menuItem.name}</Link>
                                 </li>
                             ))}
@@ -117,7 +117,7 @@ const NavigationBar = () => {
                 {!isHostingPage ? (
                     <div className="right-container flex justify-end space-x-5 w-1/2">
                         <div className="flex items-center">
-                            <Link to="/" className="font-montserrat uppercase text-xs hidden xl:inline-block">
+                            <Link to="/" className="font-canto uppercase text-xs hidden xl:inline-block">
                                 <FontAwesomeIcon
                                     className="cursor-pointer hover:scale-110 transition-transform duration-200"
                                     icon={faUser}
@@ -126,7 +126,7 @@ const NavigationBar = () => {
                             </Link>
                         </div>
                         <div className="flex items-center">
-                            <Link to="/" className="font-montserrat uppercase text-xs hidden xl:inline-block">
+                            <Link to="/" className="font-canto uppercase text-xs hidden xl:inline-block">
                                 <FontAwesomeIcon
                                     className="cursor-pointer hover:scale-110 transition-transform duration-200 pr-1"
                                     icon={faHeadphonesSimple}
