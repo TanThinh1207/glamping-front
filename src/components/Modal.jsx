@@ -25,7 +25,7 @@ const Modal = ({ isOpen, onClose, children }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
       <div
         ref={modalRef}
-        className="bg-white rounded-lg shadow-lg p-6 md:w-1/3 lg:w-1/2 relative"
+        className="bg-white rounded-lg shadow-lg p-6 md:w-1/3 lg:w-2/3 relative"
       >
         <button
           onClick={onClose}

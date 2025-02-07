@@ -21,14 +21,14 @@ const vietnamCities = [
 const SearchBar = () => {
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
   const [isCheckOutOpen, setIsCheckOutOpen] = useState(false);
-  
+
   const [destination, setDestination] = useState(null);
   const [checkInDate, setCheckInDate] = useState(null);
   const [checkOutDate, setCheckOutDate] = useState(null);
   const [guests, setGuests] = useState(1);
 
   const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
-  
+
   const [currentDate, setCurrentDate] = useState(dayjs());
   const daysInMonth = currentDate.daysInMonth();
   const weekdayLabels = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
@@ -57,16 +57,17 @@ const SearchBar = () => {
 
   return (
     <div className="pb-6 pt-10 w-full flex justify-center">
-      <div className="border border-black flex flex-col lg:flex-row w-3/4 gap-4 lg:shadow-lg lg:rounded-md py-4 px-2 lg:px-4 justify-center items-center">
+      <div className="border border-black flex flex-col md:flex-row w-full gap-4 md:shadow-md md:rounded-full py-4 px-2 md:px-4 
+                      justify-center items-center">
         <Dropdown items={vietnamCities} selected={destination} onSelect={setDestination} />
 
-        <div className="flex flex-col lg:flex-row w-full lg:w-auto items-center gap-4">
-          <div className="border-l border-gray-400 h-6 hidden lg:block"></div>
+        <div className="flex flex-col md:flex-row w-full md:w-auto items-center gap-4">
+          <div className="border-l border-gray-400 h-6 hidden md:block"></div>
 
-          <div className="flex flex-col lg:flex-row items-center gap-2 lg:gap-4 w-full">
+          <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 w-full">
             <button
               onClick={() => setIsCheckInOpen(true)}
-              className="w-full lg:w-auto px-4 py-2"
+              className="w-full md:w-auto px-4 py-2"
             >
               <span>
                 {checkInDate ? checkInDate.format("MMM DD, YYYY") : "Check-In"}
@@ -75,7 +76,7 @@ const SearchBar = () => {
             <FontAwesomeIcon icon={faArrowRight} className="mx-3" />
             <button
               onClick={() => setIsCheckOutOpen(true)}
-              className="w-full lg:w-auto px-4 py-2"
+              className="w-full md:w-auto px-4 py-2"
             >
               <span>
                 {checkOutDate ? checkOutDate.format("MMM DD, YYYY") : "Check-Out"}
@@ -85,7 +86,7 @@ const SearchBar = () => {
         </div>
 
         <Modal isOpen={isCheckInOpen} onClose={() => setIsCheckInOpen(false)}>
-          <h2 className="text-lg font-semibold mb-4 space-x-2">
+          <h2 className="text-md font-semibold mb-4 space-x-2">
             <span>Check-in</span><span>{currentDate.format("MMMM YYYY")}</span>
           </h2>
           <div className="flex justify-between mb-4">
@@ -116,7 +117,7 @@ const SearchBar = () => {
                 <button
                   key={day}
                   onClick={() => handleCheckInDate(day + 1)}
-                  className={`p-2 text-sm rounded ${isSelected
+                  className={`p-3 text-sm rounded ${isSelected
                     ? "bg-black text-white"
                     : "hover:bg-gray-200"
                     }`}
@@ -129,7 +130,7 @@ const SearchBar = () => {
         </Modal>
 
         <Modal isOpen={isCheckOutOpen} onClose={() => setIsCheckOutOpen(false)}>
-          <h2 className="text-lg font-semibold mb-4 space-x-2">
+          <h2 className="text-md font-semibold mb-4 space-x-2">
             <span>Check-out</span><span>{currentDate.format("MMMM YYYY")}</span>
           </h2>
           <div className="flex justify-between mb-4">
@@ -161,7 +162,7 @@ const SearchBar = () => {
                 <button
                   key={day}
                   onClick={() => !isBeforeCheckIn && handleCheckOutDate(day + 1)}
-                  className={`p-2 text-sm ${isSelected
+                  className={`p-3 text-sm ${isSelected
                     ? "bg-black text-white"
                     : isBeforeCheckIn
                       ? "bg-gray-300 cursor-not-allowed"
@@ -176,33 +177,33 @@ const SearchBar = () => {
           </div>
         </Modal>
 
-        <div className="border-l border-gray-400 h-6 hidden lg:block"></div>
+        <div className="border-l border-gray-400 h-6 hidden md:block"></div>
         <div
-          className="flex items-center gap-x-4 p-4 rounded-lg cursor-pointer"
+          className="flex items-center gap-x-4 p-4 rounded-md cursor-pointer"
           onClick={() => setIsGuestModalOpen(true)}
         >
-          <FontAwesomeIcon icon={faUserFriends} className="text-lg" />
+          <FontAwesomeIcon icon={faUserFriends} className="text-md" />
           <p className="text-gray-800 gap-1">
             <span>{guests}</span><span>Guests</span>
           </p>
         </div>
         <Modal isOpen={isGuestModalOpen} onClose={() => setIsGuestModalOpen(false)}>
           <div className="border-b pb-3 mb-4">
-            <h3 className="text-lg font-semibold text-gray-800">Select Guests</h3>
+            <h3 className="text-md font-semibold text-gray-800">Select Guests</h3>
           </div>
           <div className="flex justify-between gap-2 items-center mb-4">
             <p className="text-gray-700">Guests</p>
             <div className="flex items-center border border-gray-300 rounded-md">
               <button
                 onClick={decreaseGuest}
-                className="px-4 py-2 text-lg border-r border-gray-300 hover:bg-gray-100"
+                className="px-4 py-2 text-md border-r border-gray-300 hover:bg-gray-100"
               >
                 -
               </button>
-              <span className="px-6 py-2 text-lg">{guests}</span>
+              <span className="px-6 py-2 text-md">{guests}</span>
               <button
                 onClick={increaseGuest}
-                className="px-4 py-2 text-lg border-l border-gray-300 hover:bg-gray-100"
+                className="px-4 py-2 text-md border-l border-gray-300 hover:bg-gray-100"
               >
                 +
               </button>
@@ -210,7 +211,7 @@ const SearchBar = () => {
           </div>
         </Modal>
 
-        <div className="border-l border-gray-400 h-6 hidden lg:block"></div>
+        <div className="border-l border-gray-400 h-6 hidden md:block"></div>
         <button className="bg-black text-white text-sm rounded-3xl border-black border uppercase px-6 py-3 transform 
                       duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black space-x-2">
           <span>Search</span> <FontAwesomeIcon icon={faMagnifyingGlass} />

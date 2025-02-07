@@ -14,7 +14,11 @@ const HomePage = () => {
       <div className="thumb flex relative justify-center w-full">
         <img src={thumb} className="w-full h-auto" alt="Thumbnail" />
       </div>
-      <SearchBar />
+      <div className="flex justify-center ">
+        <div className="w-3/4">
+          <SearchBar />
+        </div>
+      </div>
       <div className="featured px-4">
         <p className="uppercase text-2xl font-semibold pt-5 pb-5">featured properties</p>
         <div className="flex flex-col lg:flex-row gap-6 h-auto lg:h-screen">

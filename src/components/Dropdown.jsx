@@ -21,7 +21,7 @@ const Dropdown = ({ items, selected, onSelect }) => {
   }, []);
 
   return (
-    <div className="relative" style={{minWidth: "200px"}} ref={dropdownRef}>
+    <div className="relative" style={{minWidth: "150px"}} ref={dropdownRef}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
