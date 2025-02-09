@@ -15,7 +15,7 @@ const CampsiteCard = ({ campsite }) => {
             </div>
             <div className='right-container md:w-1/2 w-full'>
                 <p className='uppercase text-lg text-gray-500 font-serif pb-6'>{campsite.location}</p>
-                <p className='text-5xl font-canto pb-6'>{campsite.name}</p>
+                <p className='text-5xl font-canto pb-8'>{campsite.name}</p>
                 <p className='font-serif tracking-wide text-gray-700'>{campsite.description}</p>
                 <button className='bg-gray-800 text-white tracking-tight font-semibold 
                 uppercase px-10 py-4 mt-6 mr-2 rounded-full transition-colors duration-300 hover:bg-gray-500'

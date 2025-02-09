@@ -41,7 +41,7 @@ const NavigationBar = () => {
         { name: "Accommodations", link: "/accommodations" },
         { name: "About", link: "/about" },
         { name: "Become a Host", link: "/hosting" },
-        { name: "My Account", link: "/" },
+        { name: "My Account", link: "/account" },
         { name: "Contact us", link: "/" },
     ]
 
@@ -117,7 +117,7 @@ const NavigationBar = () => {
                 {!isHostingPage ? (
                     <div className="right-container flex justify-end space-x-5 w-1/2">
                         <div className="flex items-center">
-                            <Link to="/" className="font-canto uppercase text-xs hidden xl:inline-block">
+                            <Link to="/account" className="font-canto uppercase text-xs hidden xl:inline-block">
                                 <FontAwesomeIcon
                                     className="cursor-pointer hover:scale-110 transition-transform duration-200"
                                     icon={faUser}

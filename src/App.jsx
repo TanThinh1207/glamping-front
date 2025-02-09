@@ -10,6 +10,7 @@ import Calendar from './pages/Calendar';
 import Glamping from './pages/Glamping';
 import Dashboard from './pages/Dashboard';
 import Campsite from './pages/Campsite';
+import Account from './pages/Account';
 
 function App() {
   const router = createBrowserRouter([
@@ -21,7 +22,8 @@ function App() {
         {path: "", element: <HomePage/>},
         {path: "about", element: <About/>},
         {path: "glamping", element: <Glamping/>},
-        {path: "glamping/:location", element: <Campsite/>}
+        {path: "glamping/:location", element: <Campsite/>},
+        {path: "account", element: <Account/>}
       ]
     },
     {

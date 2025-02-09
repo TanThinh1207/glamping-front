@@ -15,7 +15,7 @@ const HomePage = () => {
         <img src={thumb} className="w-full h-auto" alt="Thumbnail" />
       </div>
       <div className="flex justify-center ">
-        <div className="w-3/4">
+        <div className="mx-auto">
           <SearchBar />
         </div>
       </div>

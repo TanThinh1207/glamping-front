@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faUserFriends, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import Modal from "../components/Modal";
 import Dropdown from "../components/Dropdown";
+import { useMatch } from "react-router-dom";
 
 const vietnamCities = [
   { id: 1, name: "Hà Nội" },
@@ -19,6 +20,8 @@ const vietnamCities = [
 ];
 
 const SearchBar = () => {
+  const isCampsiteRoute = useMatch("/glamping/:location");
+
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
   const [isCheckOutOpen, setIsCheckOutOpen] = useState(false);
 
@@ -57,12 +60,20 @@ const SearchBar = () => {
 
   return (
     <div className="pb-6 pt-10 w-full flex justify-center">
-      <div className="border border-black flex flex-col md:flex-row w-full gap-4 md:shadow-md md:rounded-full py-4 px-2 md:px-4 
-                      justify-center items-center">
-        <Dropdown items={vietnamCities} selected={destination} onSelect={setDestination} />
+      <div className={`border border-black flex flex-col md:flex-row ${isCampsiteRoute ? "w-3/4" : "w-full" } gap-4 md:shadow-md md:rounded-xl py-4 px-2 md:mx-auto 
+                      justify-center items-center`}>
+        {!isCampsiteRoute && (
+          <Dropdown 
+            items={vietnamCities} 
+            selected={destination} 
+            onSelect={setDestination} 
+          />
+        )}
 
         <div className="flex flex-col md:flex-row w-full md:w-auto items-center gap-4">
-          <div className="border-l border-gray-400 h-6 hidden md:block"></div>
+          {!isCampsiteRoute && (
+            <div className="border-l border-gray-400 h-6 hidden md:block"></div>
+          )}
 
           <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 w-full">
             <button
