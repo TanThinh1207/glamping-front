@@ -11,6 +11,8 @@ import Glamping from './pages/Glamping';
 import Dashboard from './pages/Dashboard';
 import Campsite from './pages/Campsite';
 import Account from './pages/Account';
+import Listings from './pages/Listings';
+import ListingEditor from './pages/ListingEditor';
 
 function App() {
   const router = createBrowserRouter([
@@ -32,6 +34,8 @@ function App() {
       children: [
         { path: "", element: <Hosting/> },
         { path: "calendar", element: <Calendar/> },
+        { path: "listings", element: <Listings/> },
+        { path: "editor/:id", element: <ListingEditor/> }
       ]
     },
     {

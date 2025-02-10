@@ -49,7 +49,7 @@ const NavigationBar = () => {
         ? [
             { name: "Today", link: "/hosting" },
             { name: "Calendar", link: "/hosting/calendar" },
-            { name: "Listings", link: "/listings" },
+            { name: "Listings", link: "/hosting/listings" },
         ]
         : [
             { name: "Glamping", link: "/glamping" },
