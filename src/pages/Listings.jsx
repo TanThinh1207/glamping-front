@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import image1 from '../assets/B6D7F1F4-1DB2-4380-94D9-185EF023BE36.jpg';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 const listInfo = [
     {
         id: 1,
@@ -31,7 +32,16 @@ const Listings = () => {
     const navigate = useNavigate();
     return (
         <div className="w-full h-screen bg-white px-20 py-4">
+            <div className='flex justify-between '>
             <h1 className="text-4xl font-semibold py-8">Your listings</h1>
+            <button
+            className='bg-gray-100 rounded-full w-10 h-10 flex items-center justify-center my-8'
+            onClick={() => navigate(`/hosting/create-campsite/1`)}
+            >
+            <FontAwesomeIcon icon={faPlus} className='flex items-center justify-center' />
+            </button>
+            </div>
+            
             <div className="overflow-x-auto">
                 <table className="min-w-full border-collapse">
                     <thead>
@@ -47,7 +57,7 @@ const Listings = () => {
                             <tr
                                 key={listing.id}
                                 className="cursor-pointer hover:bg-gray-100 group"
-                                onClick={() => navigate(`/editor/${listing.id}`)}
+                                onClick={() => navigate(`/hosting/editor/${listing.id}`)}
                             >
                                 <td className="p-4 flex items-center gap-3">
                                     <img src={listing.image} alt={listing.title} className="w-12 h-12 rounded-md object-cover" />
