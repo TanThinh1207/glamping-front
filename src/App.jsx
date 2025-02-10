@@ -13,7 +13,7 @@ import Campsite from './pages/Campsite';
 import Account from './pages/Account';
 import Listings from './pages/Listings';
 import ListingEditor from './pages/ListingEditor';
-import CreateCampsite from './pages/host-pages/CreateCampsite';
+import Overview  from './pages/host-pages/createCampsite/Overview';
 
 function App() {
   const router = createBrowserRouter([
@@ -37,7 +37,7 @@ function App() {
         { path: "calendar", element: <Calendar/> },
         { path: "listings", element: <Listings/> },
         { path: "editor/:id", element: <ListingEditor/> },
-        { path: "create-campsite/:id", element: <CreateCampsite/> }
+        { path: "create-campsite/:id/overview", element: <Overview/> }
       ]
     },
     {
