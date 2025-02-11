@@ -13,6 +13,7 @@ import Campsite from './pages/Campsite';
 import Account from './pages/Account';
 import Listings from './pages/Listings';
 import ListingEditor from './pages/ListingEditor';
+import ExtraService from './pages/ExtraService';
 
 function App() {
   const router = createBrowserRouter([
@@ -25,6 +26,7 @@ function App() {
         {path: "about", element: <About/>},
         {path: "glamping", element: <Glamping/>},
         {path: "glamping/:location", element: <Campsite/>},
+        {path: "glamping/:location/extra-service", element: <ExtraService/>},
         {path: "account", element: <Account/>}
       ]
     },

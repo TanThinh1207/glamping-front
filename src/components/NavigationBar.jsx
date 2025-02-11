@@ -6,6 +6,25 @@ import { Link } from "react-router-dom";
 import "../css/NavigationBar.css";
 import logo from "../assets/word-logo.png";
 
+const getMenuItems = (path) => {
+    switch (true) {
+        case path.startsWith("/hosting"):
+            return [
+                { name: "Today", link: "/hosting" },
+                { name: "Calendar", link: "/hosting/calendar" },
+                { name: "Listings", link: "/hosting/listings" },
+            ];
+        default:
+            return [
+                { name: "Glamping", link: "/glamping" },
+                { name: "Accommodations", link: "/accommodations" },
+                { name: "About", link: "/about" },
+                { name: "Become a Host", link: "/hosting" },
+            ];
+    }
+};
+
+
 const NavigationBar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
@@ -45,18 +64,7 @@ const NavigationBar = () => {
         { name: "Contact us", link: "/" },
     ]
 
-    const menuItems = isHostingPage
-        ? [
-            { name: "Today", link: "/hosting" },
-            { name: "Calendar", link: "/hosting/calendar" },
-            { name: "Listings", link: "/hosting/listings" },
-        ]
-        : [
-            { name: "Glamping", link: "/glamping" },
-            { name: "Accommodations", link: "/accommodations" },
-            { name: "About", link: "/about" },
-            { name: "Become a Host", link: "/hosting" },
-        ];
+    const menuItems = getMenuItems(location.pathname);
     return (
         <div
             className={`fixed w-full z-10 transition-colors duration-500 ${isScrolled || !isHomePage ? "bg-white" : "bg-transparent"
@@ -114,41 +122,30 @@ const NavigationBar = () => {
                         </ul>
                     </div>
                 </div>
-                {!isHostingPage ? (
-                    <div className="right-container flex justify-end space-x-5 w-1/2">
-                        <div className="flex items-center">
-                            <Link to="/account" className="font-canto uppercase text-xs hidden xl:inline-block">
-                                <FontAwesomeIcon
-                                    className="cursor-pointer hover:scale-110 transition-transform duration-200"
-                                    icon={faUser}
-                                />
-                                <span className=" pl-1">My Account</span>
-                            </Link>
-                        </div>
-                        <div className="flex items-center">
-                            <Link to="/" className="font-canto uppercase text-xs hidden xl:inline-block">
-                                <FontAwesomeIcon
-                                    className="cursor-pointer hover:scale-110 transition-transform duration-200 pr-1"
-                                    icon={faHeadphonesSimple}
-                                />
-                                <span className=""> Contact us</span>
-                            </Link>
-                        </div>
-                        <button className="bg-black text-white text-xs border-black border uppercase mb-2 p-4 transform 
-                        duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black 
-                        mr-2">
-                            Check availability
-                        </button>
-                    </div>
-                ) : (
-                    <div className="right-container flex justify-end w-1/2">
+                <div className="right-container flex justify-end space-x-5 w-1/2">
+                    {location.pathname.startsWith("/hosting") ? (
                         <button className="bg-black text-white text-xs border-black border uppercase mb-2 p-4 transform 
                         duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black 
                         mr-2">
                             Switch to customer
                         </button>
-                    </div>
-                )}
+                    ) : (
+                        <>
+                            <Link to="/account" className="font-canto uppercase text-xs hidden xl:inline-block">
+                                <FontAwesomeIcon className="cursor-pointer hover:scale-110 transition-transform duration-200" icon={faUser} />
+                                <span className="pl-1">My Account</span>
+                            </Link>
+                            <Link to="/" className="font-canto uppercase text-xs hidden xl:inline-block">
+                                <FontAwesomeIcon className="cursor-pointer hover:scale-110 transition-transform duration-200 pr-1" icon={faHeadphonesSimple} />
+                                <span>Contact us</span>
+                            </Link>
+                            <button className="bg-black text-white text-xs border-black border uppercase mb-2 p-4 transform duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black mr-2">
+                                Check availability
+                            </button>
+                        </>
+                    )}
+                </div>
+
             </div>
         </div>
     );

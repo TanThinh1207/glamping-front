@@ -4,6 +4,7 @@ import { campsites } from './Glamping'
 import SearchBar from '../components/SearchBar'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMugHot } from '@fortawesome/free-solid-svg-icons'
+import { Link } from 'react-router-dom'
 
 const Campsite = () => {
     const { location } = useParams();
@@ -57,7 +58,12 @@ const Campsite = () => {
                         </div>
                         <div className='bg-white flex items-center gap-6 p-4 rounded-xl border border-purple-100'>
                             <p className='tracking-wide text-purple-900'>Price per night: ${camptype.price}</p>
-                            <p className='bg-purple-900 text-white rounded-full px-8 py-4'>Reservation Inquiry</p>
+                            <Link
+                                to={`/glamping/${location}/extra-service`}
+                                className='bg-purple-900 text-white rounded-full px-8 py-4'
+                            >
+                                <p>Reservation Inquiry</p>
+                            </Link>
                         </div>
                     </div>
                     <hr className='mt-6'/>
