@@ -30,7 +30,6 @@ const NavigationBar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [isMinimized, setIsMinimized] = useState(window.innerWidth < 1280);
     const location = useLocation();
-    const isHostingPage = location.pathname.startsWith("/hosting");
     const isHomePage = location.pathname === "/";
 
     const toggleMenu = () => {

@@ -1,12 +1,15 @@
 import React from 'react'
 import { Outlet } from 'react-router-dom';
-import { faUsers, faChartLine } from '@fortawesome/free-solid-svg-icons';
+import { faUsers, faCar, faMountainSun, faMugHot } from '@fortawesome/free-solid-svg-icons';
 import Sidebar from '../../components/SideBar';
 import { Toaster } from 'sonner';
 
 const SidebarFrame = () => {
   const sidebarItems = [
-    { title: 'Dashboard', path: '/admin/dashboard', icon: faChartLine },
+    { title: 'Account', path: '/admin/manage-account', icon: faUsers },
+    { title: 'Place Type', path: '/admin/manage-place-type', icon: faMountainSun },
+    { title: 'Facility', path: '/admin/manage-facility', icon: faCar },
+    { title: 'Utility', path: '/admin/manage-utility', icon: faMugHot },
   ]
 
   return (

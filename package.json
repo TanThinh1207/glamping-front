@@ -19,6 +19,7 @@
     "@fullcalendar/daygrid": "^6.1.15",
     "@fullcalendar/interaction": "^6.1.15",
     "@fullcalendar/react": "^6.1.15",
+    "axios": "^1.7.9",
     "chart.js": "^4.4.7",
     "chartjs": "^0.3.24",
     "dayjs": "^1.11.13",

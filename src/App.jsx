@@ -15,6 +15,10 @@ import Listings from './pages/Listings';
 import ListingEditor from './pages/ListingEditor';
 import ExtraService from './pages/ExtraService';
 import Overview  from './pages/host-pages/createCampsite/Overview';
+import ManagePlaceType from './pages/admin-pages/ManagePlaceType';
+import ManageAccount from './pages/admin-pages/ManageAccount';
+import ManageUtility from './pages/admin-pages/ManageUtility';
+import ManageFacility from './pages/admin-pages/ManageFacility';
 
 function App() {
   const router = createBrowserRouter([
@@ -46,7 +50,10 @@ function App() {
       path: "/admin",
       element: <AdminFrame/>,
       children: [
-        { path: "dashboard", element: <Dashboard/> }
+        { path: "manage-place-type", element: <ManagePlaceType/> },
+        { path: "manage-account", element: <ManageAccount/> },
+        { path: "manage-utility", element: <ManageUtility/> },
+        { path: "manage-facility", element: <ManageFacility/> },
       ]
     }
   ])
