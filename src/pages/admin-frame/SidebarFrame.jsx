@@ -1,7 +1,7 @@
 import React from 'react'
 import { Outlet } from 'react-router-dom';
 import { faUsers, faCar, faMountainSun, faMugHot } from '@fortawesome/free-solid-svg-icons';
-import Sidebar from '../../components/SideBar';
+import Sidebar from '../../components/Sidebar';
 import { Toaster } from 'sonner';
 
 const SidebarFrame = () => {
