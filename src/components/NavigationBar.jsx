@@ -121,7 +121,7 @@ const NavigationBar = () => {
                         </ul>
                     </div>
                 </div>
-                <div className="right-container flex justify-end space-x-5 w-1/2">
+                <div className="right-container flex justify-end space-x-5 w-1/2 items-center">
                     {location.pathname.startsWith("/hosting") ? (
                         <button className="bg-black text-white text-xs border-black border uppercase mb-2 p-4 transform 
                         duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black 
