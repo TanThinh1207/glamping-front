@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import overviewImage1 from '../../../assets/overviewImage1.png';
 import overviewImage2 from '../../../assets/overviewImage2.png';
 import overviewImage3 from '../../../assets/overviewImage3.png';
+
 const Overview = () => {
     return (
-        <div className="w-full flex  items-center justify-center bg-white py-10 px-24 gap-10">
+        <div className="w-full flex  items-center justify-center bg-white py-24 px-24 gap-10">
             <div className='w-1/2  items-start '>
                 <h1 className='text-6xl font-semibold text-left leading-tight'>It’s easy to get <br />started on Glampé</h1>
             </div>

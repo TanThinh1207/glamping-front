@@ -8,6 +8,9 @@ import logo from "../assets/word-logo.png";
 
 const getMenuItems = (path) => {
     switch (true) {
+        case path.startsWith("/hosting/create-campsite"):
+            return [
+            ];
         case path.startsWith("/hosting"):
             return [
                 { name: "Today", link: "/hosting" },
@@ -62,6 +65,45 @@ const NavigationBar = () => {
         { name: "My Account", link: "/account" },
         { name: "Contact us", link: "/" },
     ]
+
+    const renderbutton = (path) => {
+        switch (true) {
+            case path.startsWith("/hosting/create-campsite"):
+                return (
+                    <button 
+                    className="bg-transparent text-black text-lg border-gray-1500 border-2 rounded-full  mb-2 py-2 px-8  mr-2 transform duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black"
+                    onClick={() => window.location.href = "/hosting"}
+                    >
+                        Exit
+                    </button>
+                );
+            case path.startsWith("/hosting"):
+                return (
+                    <button className="bg-black text-white text-xs border-black border uppercase mb-2 p-4 transform 
+                        duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black 
+                        mr-2">
+                        Switch to customer
+                    </button>
+                );
+            default:
+                return (
+                    <>
+                        <Link to="/account" className="font-canto uppercase text-xs hidden xl:inline-block">
+                            <FontAwesomeIcon className="cursor-pointer hover:scale-110 transition-transform duration-200" icon={faUser} />
+                            <span className="pl-1">My Account</span>
+                        </Link>
+                        <Link to="/" className="font-canto uppercase text-xs hidden xl:inline-block">
+                            <FontAwesomeIcon className="cursor-pointer hover:scale-110 transition-transform duration-200 pr-1" icon={faHeadphonesSimple} />
+                            <span>Contact us</span>
+                        </Link>
+                        <button className="bg-black text-white text-xs border-black border uppercase mb-2 p-4 transform duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black mr-2">
+                            Check availability
+                        </button>
+                    </>
+                );
+
+        }
+    }
 
     const menuItems = getMenuItems(location.pathname);
     return (
@@ -122,29 +164,8 @@ const NavigationBar = () => {
                     </div>
                 </div>
                 <div className="right-container flex justify-end space-x-5 w-1/2 items-center">
-                    {location.pathname.startsWith("/hosting") ? (
-                        <button className="bg-black text-white text-xs border-black border uppercase mb-2 p-4 transform 
-                        duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black 
-                        mr-2">
-                            Switch to customer
-                        </button>
-                    ) : (
-                        <>
-                            <Link to="/account" className="font-canto uppercase text-xs hidden xl:inline-block">
-                                <FontAwesomeIcon className="cursor-pointer hover:scale-110 transition-transform duration-200" icon={faUser} />
-                                <span className="pl-1">My Account</span>
-                            </Link>
-                            <Link to="/" className="font-canto uppercase text-xs hidden xl:inline-block">
-                                <FontAwesomeIcon className="cursor-pointer hover:scale-110 transition-transform duration-200 pr-1" icon={faHeadphonesSimple} />
-                                <span>Contact us</span>
-                            </Link>
-                            <button className="bg-black text-white text-xs border-black border uppercase mb-2 p-4 transform duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black mr-2">
-                                Check availability
-                            </button>
-                        </>
-                    )}
+                    {renderbutton(location.pathname)}
                 </div>
-
             </div>
         </div>
     );
