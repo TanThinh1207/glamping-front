@@ -23,18 +23,28 @@ const Overview = () => {
                     </div>
                 </div>
                 <div className="flex items-start space-x-4 border-b-2 border-gray-200 py-[32px]">
-                    <div>
-                        <h2 className="font-semibold text-lg">2. Make your listing stand out</h2>
-                        <p className="text-gray-600">Upload high-quality photos, add a catchy title, and describe the unique experience.</p>
+                    <div className='w-[3%]'>
+                        <h2 className="font-semibold text-2xl">2</h2>
                     </div>
-                    <img src={overviewImage2} alt="overviewImage2" className="w-1/4" />
+                    <div className='w-[77%]'>
+                        <h2 className="font-semibold text-2xl">Make your listing stand out</h2>
+                        <p className="text-gray-600 text-lg">Upload high-quality photos, add a catchy title, and describe the unique experience.</p>
+                    </div>
+                    <div className="w-[20%] flex justify-end">
+                        <img src={overviewImage2} alt="overviewImage2" className="w-[120px] h-[120px] object-cover" />
+                    </div>
                 </div>
                 <div className="flex items-start space-x-4 py-[32px]">
-                    <div>
-                        <h2 className="font-semibold text-lg">3. Set your price & publish</h2>
-                        <p className="text-gray-600">Choose your nightly rate, complete verification, and publish your listing to start hosting.</p>
+                    <div className='w-[3%]'>
+                        <h2 className="font-semibold text-2xl">3</h2>
                     </div>
-                    <img src={overviewImage3} alt="overviewImage3" className="w-1/5" />
+                    <div className='w-[77%]'>
+                        <h2 className="font-semibold text-2xl">Set your price & publish</h2>
+                        <p className="text-gray-600 text-lg">Choose your nightly rate, complete verification, and publish your listing to start hosting.</p>
+                    </div>
+                    <div className="w-[20%] flex justify-end">
+                        <img src={overviewImage3} alt="overviewImage3" className="w-[120px] h-[120px] object-cover" />
+                    </div>
                 </div>
             </div>
         </div>
