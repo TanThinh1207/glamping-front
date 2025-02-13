@@ -5,11 +5,11 @@ import overviewImage2 from '../../../assets/overviewImage2.png';
 import overviewImage3 from '../../../assets/overviewImage3.png';
 const Overview = () => {
     return (
-        <div className="w-full flex  items-center justify-center bg-white px-20">
-            <div className='w-1/2 ml-40 '>
-                <h1 className='text-6xl font-semibold text-start leading-tight'>It’s easy to get <br />started on Glampé</h1>
+        <div className="w-full flex  items-center justify-center bg-white py-10 px-24 gap-10">
+            <div className='w-1/2  items-start '>
+                <h1 className='text-6xl font-semibold text-left leading-tight'>It’s easy to get <br />started on Glampé</h1>
             </div>
-            <div className='w-1/2 mr-40'>
+            <div className='w-1/2  items-end'>
                 <div className="flex items-start space-x-4 border-b-2 border-gray-200 pb-[32px]">
                     <div className='w-[3%]'>
                         <h2 className="font-semibold text-2xl">1</h2>
