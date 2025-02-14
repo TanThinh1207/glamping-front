@@ -13,9 +13,9 @@ const CreateCampsiteStepPage = () => {
   const stepComponents = {
     overview: <Overview />,
     "about-your-place": <AboutYourPlace />,
+    services: <Services />,
     location: <Location />,
     "camp-type": <CampType />,
-    services: <Services />,
     receipt: <Receipt />,
   };
 

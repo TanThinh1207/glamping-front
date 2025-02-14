@@ -71,7 +71,7 @@ const NavigationBar = () => {
             case path.startsWith("/hosting/create-campsite"):
                 return (
                     <button 
-                    className="bg-transparent text-black text-lg border-gray-1500 border-2 rounded-full  mb-2 py-2 px-8  mr-2 transform duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black"
+                    className="bg-transparent text-black text-xl border-gray-1500 border-2 rounded-full  mb-2 py-2 px-8 font-semibold mr-2 transform duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black"
                     onClick={() => window.location.href = "/hosting"}
                     >
                         Exit

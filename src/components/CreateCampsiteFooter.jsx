@@ -4,9 +4,9 @@ import { useLocation, useParams, useNavigate } from 'react-router-dom';
 const pageSteps = [
   "overview",
   "about-your-place",
+  "services",
   "location",
   "camp-type",
-  "services",
   "receipt",
 ];
 
@@ -22,48 +22,47 @@ const CreateCampsiteFooter = () => {
       {/* Processing bar */}
       <div className="w-full h-1 bg-gray-200">
         <div
-          className="h-1 bg-green-500 transition-all duration-500"
+          className="h-1  bg-gradient-to-r from-green-400 to-yellow-300 transition-all duration-500"
           style={{ width: `${(currentStepIndex / (pageSteps.length - 1)) * 100}%` }}
         />
       </div>
       {/* Button */}
-      <div className="flex justify-between items-center p-4">
+      <div className=" p-4">
         {step === "overview" ? (
-          <button
-            className="bg-gradient-to-r from-green-400 to-yellow-300 text-white text-lg px-4 py-2 rounded-md text-end"
-            onClick={() => navigate(`/hosting/create-campsite/${id}/about-your-place`)}
-          >
-            Get started
-          </button>
+          <div className=' flex justify-end'>
+            <button
+              className="bg-gradient-to-r from-green-500 to-green-600 text-white text-xl font-semibold px-5 py-3 rounded-md mx-4 "
+              onClick={() => navigate(`/hosting/create-campsite/${id}/about-your-place`)}
+            >
+              Get started
+            </button>
+          </div>
         ) : (
-          <>
-            {/* Back Button */}
+          <div className='flex justify-between'>
             {prevStep && (
-              <button
-                className="text-blue-600 underline"
-                onClick={() => navigate(`/hosting/create-campsite/${id}/${prevStep}`)}
-              >
-                Back
-              </button>
+                <button
+                  className= "text-black px-5 underline mx-4 text-xl font-semibold"
+                  onClick={() => navigate(`/hosting/create-campsite/${id}/${prevStep}`)}
+                >
+                  Back
+                </button>
             )}
-
-            {/* Next Button or Finish Button */}
             {step === "receipt" ? (
-              <button
-                className="bg-green-500 text-white px-4 py-2 rounded-md"
+                <button
+                className="bg-gradient-to-r from-green-400 to-yellow-300 text-white px-5 py-3 rounded-md text-xl font-semibold mx-4"
                 onClick={() => navigate("/hosting")}
               >
                 Finish
               </button>
             ) : (
-              <button
-                className="bg-black text-white px-4 py-2 rounded-md"
+                <button
+                className="bg-black text-white px-5 py-3 rounded-md text-xl font-semibold mx-4"
                 onClick={() => navigate(`/hosting/create-campsite/${id}/${nextStep}`)}
               >
                 Next
               </button>
             )}
-          </>
+          </div>
         )}
       </div>
     </div>
