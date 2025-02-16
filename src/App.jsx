@@ -7,13 +7,12 @@ import HomePage from './pages/HomePage';
 import About from './pages/About';
 import Hosting from './pages/Hosting';
 import Calendar from './pages/Calendar';
-import Glamping from './pages/Glamping';
-import Dashboard from './pages/Dashboard';
-import Campsite from './pages/Campsite';
+import CampsitePage from './pages/booking-pages/CampsitePage';
+import CamptypePage from './pages/booking-pages/CamptypePage';
 import Account from './pages/Account';
 import Listings from './pages/Listings';
 import ListingEditor from './pages/ListingEditor';
-import ExtraService from './pages/ExtraService';
+import ExtraService from './pages/booking-pages/ExtraService';
 import ManagePlaceType from './pages/admin-pages/ManagePlaceType';
 import ManageAccount from './pages/admin-pages/ManageAccount';
 import ManageUtility from './pages/admin-pages/ManageUtility';
@@ -29,9 +28,9 @@ function App() {
       children: [
         { path: "", element: <HomePage /> },
         { path: "about", element: <About /> },
-        { path: "glamping", element: <Glamping /> },
-        { path: "glamping/:location", element: <Campsite /> },
-        { path: "glamping/:location/extra-service", element: <ExtraService /> },
+        { path: "campsite", element: <CampsitePage /> },
+        { path: "campsite/:campsiteId", element: <CamptypePage /> },
+        { path: "campsite/:campsiteId/extra-service", element: <ExtraService /> },
         { path: "account", element: <Account /> }
       ]
     },

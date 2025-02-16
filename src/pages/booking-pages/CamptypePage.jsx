@@ -1,38 +1,71 @@
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { campsites } from './Glamping'
-import SearchBar from '../components/SearchBar'
+import SearchBar from '../../components/SearchBar'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMugHot } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom'
 
-const Campsite = () => {
-    const { location } = useParams();
+const CamptypePage = () => {
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const { campsiteId } = useParams();
+    const [campsite, setCampsite] = useState(null);
     const [camptypes, setCamptypes] = useState([]);
 
-    const fetchCamptypes = async () => {
+    const fetchCampsite = async () => {
+        setLoading(true);
         try {
-            const response = await fetch(`https://1e9571cd-9582-429d-abfe-167d79882ad7.mock.pstmn.io/camptypes/${location}`);
+            const response = await fetch(`${import.meta.env.VITE_API_GET_CAMPSITE_BY_ID}${campsiteId}`);
+            if (!response.ok) throw new Error(`Failed to fetch campsite: ${response.statusText}`);
+
             const data = await response.json();
-            setCamptypes(data);
+            setCampsite(data.data);
         } catch (error) {
-            console.log(error);
+            setError(error.message);
+        } finally {
+            setLoading(false);
         }
-    }
+    };
+
+    const fetchCamptypes = async () => {
+        setLoading(true);
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_GET_CAMPTYPES_BY_ID}${campsiteId}`);
+            if (!response.ok) throw new Error(`Failed to fetch camptypes: ${response.statusText}`);
+
+            const data = await response.json();
+            setCamptypes(data.data);
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     useEffect(() => {
+        fetchCampsite();
         fetchCamptypes();
-    }, [location]);
+    }, [campsiteId]);
 
-    const selectedCampsite = campsites.find(campsite => campsite.location.toLowerCase() === location);
-
-    if (!selectedCampsite) {
+    if (!campsite) {
         return <h1 className='text-4xl font-bold inset-0 text-center items-center h-screen'>Campsite not found</h1>
     }
 
+    if (loading) {
+        return (
+            <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-80 z-50">
+                <div className="animate-spin rounded-full border-t-4 border-teal-400 border-solid h-16 w-16"></div>
+            </div>
+        );
+    }
+
+    if (error) return <p>Error: {error}</p>;
+
     return (
         <div className='container mx-auto pt-20'>
-            <p className='text-gray-500 text-xl pb-4'>{selectedCampsite.name}</p>
+            <p className='text-gray-500 text-xl pb-4'>{campsite.name}</p>
             <p className='text-5xl font-canto'>Select accomodation</p>
             <SearchBar />
             <hr className='mt-10' />
@@ -45,7 +78,7 @@ const Campsite = () => {
                         <div className='middle-container w-1/2'>
                             <p className='font-canto text-4xl pb-8'>{camptype.type}</p>
                             <p className='text-purple-900 uppercase font-serif tracking-tight pb-4'>Description</p>
-                            <p className='text-gray-500 font-light text-xl'>{camptype.type} available in all Astroglampé {location.charAt(0).toUpperCase() + location.slice(1)} lodges.</p>
+                            <p className='text-gray-500 font-light text-xl'>{camptype.type} available in all Astroglampé {campsite.name} lodges.</p>
                         </div>
                         <div className='right-container w-1/6'>
                             <p className='text-gray-500 font-light'>Max guests: {camptype.capacity}</p>
@@ -66,11 +99,11 @@ const Campsite = () => {
                             </Link>
                         </div>
                     </div>
-                    <hr className='mt-6'/>
+                    <hr className='mt-6' />
                 </div>
             ))}
         </div>
     )
 }
 
-export default Campsite
+export default CamptypePage
