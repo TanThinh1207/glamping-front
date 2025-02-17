@@ -4,10 +4,18 @@ import { useNavigate } from 'react-router-dom'
 const CampsiteCard = ({ campsite }) => {
     const navigate = useNavigate();
 
+    // const lat = campsite.latitude;
+    // const lon = campsite.longitude;
+
+    // fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+    //     .then(response => response.json())
+    //     .then(data => console.log(data.address.state || data.address.city))
+    //     .catch(err => console.error('Error:', err));
+
     const handleDiscover = () => {
-        const campsiteLocationPath = campsite.location.toLowerCase().replace(/\s+/g, '-');
-        navigate(`/glamping/${campsiteLocationPath}`);
-    }
+        // const campsiteLocationPath = encodeURIComponent(campsite.city.toLowerCase().replace(/\s+/g, '-'));
+        navigate(`/campsite/${campsite.id}`);
+    };
     return (
         <div className='flex flex-col md:flex-row gap-10 pb-16'>
             <div className='left-container md:w-1/2 w-full'>
@@ -19,7 +27,7 @@ const CampsiteCard = ({ campsite }) => {
                 <p className='font-serif tracking-wide text-gray-700'>{campsite.description}</p>
                 <button className='bg-gray-800 text-white tracking-tight font-semibold 
                 uppercase px-10 py-4 mt-6 mr-2 rounded-full transition-colors duration-300 hover:bg-gray-500'
-                onClick={handleDiscover}
+                    onClick={handleDiscover}
                 >
                     Discover
                 </button>

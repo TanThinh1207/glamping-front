@@ -19,7 +19,7 @@ const getMenuItems = (path) => {
             ];
         default:
             return [
-                { name: "Glamping", link: "/glamping" },
+                { name: "Campsite", link: "/campsite" },
                 { name: "Accommodations", link: "/accommodations" },
                 { name: "About", link: "/about" },
                 { name: "Become a Host", link: "/hosting" },
