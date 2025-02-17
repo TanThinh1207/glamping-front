@@ -4,6 +4,7 @@ import { useLocation, useParams, useNavigate } from 'react-router-dom';
 const pageSteps = [
   "overview",
   "about-your-place",
+  "stand-out",
   "services",
   "location",
   "camp-type",
