@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import SearchBar from '../../components/SearchBar'
 import CampsiteCard from '../../components/CampsiteCard'
+import { useBooking } from '../../context/BookingContext'
 
 const CampsitePage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [campsites, setCampsites] = useState([]);
+
+    const { updateCampsite } = useBooking();
 
     useEffect(() => {
         const fetchCampsites = async () => {

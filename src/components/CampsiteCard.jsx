@@ -1,12 +1,13 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useBooking } from '../context/BookingContext'
 
 const CampsiteCard = ({ campsite }) => {
     const navigate = useNavigate();
+    const { updateCampsite } = useBooking();
 
     // const lat = campsite.latitude;
     // const lon = campsite.longitude;
-
     // fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
     //     .then(response => response.json())
     //     .then(data => console.log(data.address.state || data.address.city))
@@ -14,6 +15,7 @@ const CampsiteCard = ({ campsite }) => {
 
     const handleDiscover = () => {
         // const campsiteLocationPath = encodeURIComponent(campsite.city.toLowerCase().replace(/\s+/g, '-'));
+        updateCampsite(campsite.id);
         navigate(`/campsite/${campsite.id}`);
     };
     return (

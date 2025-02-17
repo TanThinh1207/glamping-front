@@ -18,6 +18,8 @@ import ManageAccount from './pages/admin-pages/ManageAccount';
 import ManageUtility from './pages/admin-pages/ManageUtility';
 import ManageFacility from './pages/admin-pages/ManageFacility';
 import CreateCampsiteStepPage from './pages/host-pages/createCampsite/CreateCampsiteStepPage';
+import { BookingProvider } from './context/BookingContext';
+import GuestInfo from './pages/booking-pages/GuestInfo';
 
 function App() {
   const router = createBrowserRouter([
@@ -31,6 +33,7 @@ function App() {
         { path: "campsite", element: <CampsitePage /> },
         { path: "campsite/:campsiteId", element: <CamptypePage /> },
         { path: "campsite/:campsiteId/extra-service", element: <ExtraService /> },
+        { path: "campsite/:campsiteId/guest-info", element: <GuestInfo /> },
         { path: "account", element: <Account /> }
       ]
     },
@@ -59,7 +62,9 @@ function App() {
   ])
   return (
     <>
-      <RouterProvider router={router} />
+      <BookingProvider>
+        <RouterProvider router={router} />
+      </BookingProvider>
     </>
   )
 }
