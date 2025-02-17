@@ -4,14 +4,18 @@ import SearchBar from '../../components/SearchBar'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMugHot } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom'
+import { useBooking } from '../../context/BookingContext'
 
 const CamptypePage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const { updateCamptype } = useBooking();
+
     const { campsiteId } = useParams();
     const [campsite, setCampsite] = useState(null);
     const [camptypes, setCamptypes] = useState([]);
+    const [quantities, setQuantities] = useState({});
 
     const fetchCampsite = async () => {
         setLoading(true);
@@ -33,9 +37,14 @@ const CamptypePage = () => {
         try {
             const response = await fetch(`${import.meta.env.VITE_API_GET_CAMPTYPES_BY_ID}${campsiteId}`);
             if (!response.ok) throw new Error(`Failed to fetch camptypes: ${response.statusText}`);
-
             const data = await response.json();
             setCamptypes(data.data);
+
+            const initialQuantities = {};
+            data.data.forEach(camptype => {
+                initialQuantities[camptype.id] = 0;
+            });
+            setQuantities(initialQuantities);
         } catch (error) {
             setError(error.message);
         } finally {
@@ -48,6 +57,11 @@ const CamptypePage = () => {
         fetchCampsite();
         fetchCamptypes();
     }, [campsiteId]);
+
+    const handleQuantityChange = (id, value) => {
+        const newValue = Math.max(1, Math.min(10, Number(value)));
+        setQuantities(prev => ({ ...prev, [id]: newValue }));
+    };
 
     if (!campsite) {
         return <h1 className='text-4xl font-bold inset-0 text-center items-center h-screen'>Campsite not found</h1>
@@ -80,8 +94,19 @@ const CamptypePage = () => {
                             <p className='text-purple-900 uppercase font-serif tracking-tight pb-4'>Description</p>
                             <p className='text-gray-500 font-light text-xl'>{camptype.type} available in all Astroglampé {campsite.name} lodges.</p>
                         </div>
-                        <div className='right-container w-1/6'>
-                            <p className='text-gray-500 font-light'>Max guests: {camptype.capacity}</p>
+                        <div className="right-container w-1/6">
+                            <p className="text-gray-500 font-light">Max guests: {camptype.capacity}</p>
+                            <div className="flex items-center gap-3 mt-2">
+                                <label className="text-gray-700">Qty:</label>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max="10"
+                                    value={quantities[camptype.id] || 1}
+                                    onChange={e => handleQuantityChange(camptype.id, e.target.value)}
+                                    className="w-16 border border-gray-400 rounded px-2 text-center"
+                                />
+                            </div>
                         </div>
                     </div>
                     <div className='price-container rounded-md bg-blue-50 mx-8 flex justify-between p-8'>
@@ -92,7 +117,7 @@ const CamptypePage = () => {
                         <div className='bg-white flex items-center gap-6 p-4 rounded-xl border border-purple-100'>
                             <p className='tracking-wide text-purple-900'>Price per night: ${camptype.price}</p>
                             <Link
-                                to={`/glamping/${location}/extra-service`}
+                                to={`/campsite/${campsiteId}/extra-service`}
                                 className='bg-purple-900 text-white rounded-full px-8 py-4'
                             >
                                 <p>Reservation Inquiry</p>
