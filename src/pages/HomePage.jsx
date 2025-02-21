@@ -7,15 +7,18 @@ import feature5 from "../assets/feature5.jpg";
 import feature6 from "../assets/feature6.jpg";
 import feature7 from "../assets/feature7.jpg";
 import SearchBar from "../components/SearchBar";
+import LoginButton from "../components/LoginButton";
 
 const HomePage = () => {
   return (
     <div>
+      
       <div className="thumb flex relative justify-center w-full">
         <img src={thumb} className="w-full h-auto" alt="Thumbnail" />
       </div>
       <div className="flex justify-center ">
         <div className="mx-auto">
+        <LoginButton />
           <SearchBar />
         </div>
       </div>
