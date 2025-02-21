@@ -1,16 +1,17 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 
 const BookingContext = createContext();
 
 export const BookingProvider = ({ children }) => {
-    const [booking, setBooking] = useState({
-        bookingDetails: [
-            { campTypeId: null, quantity: 0, checkInAt: '', checkOutAt: '' }
-        ],
-        userId: null,
-        campSiteId: null,
-        totalAmount: 0,
-        bookingSelectionRequestList: [],
+    const [booking, setBooking] = useState(() => {
+        const savedBooking = localStorage.getItem('booking');
+        return savedBooking ? JSON.parse(savedBooking) : {
+            bookingDetails: [],
+            userId: null,
+            campSiteId: null,
+            totalAmount: 0,
+            bookingSelectionRequestList: [],
+        };
     });
 
     const updateTotalAmount = (total) => {
@@ -24,7 +25,7 @@ export const BookingProvider = ({ children }) => {
                 idSelection: parseInt(id),
                 quantity
             }));
-    
+
         setBooking((prev) => ({ ...prev, bookingSelectionRequestList: serviceList }));
     };
 
@@ -32,23 +33,23 @@ export const BookingProvider = ({ children }) => {
         setBooking(prev => ({ ...prev, campSiteId }));
     }
 
-    const updateCamptype = (index, campTypeId, quantity) => {
+    const updateCamptype = (campTypeId, quantity) => {
         setBooking(prev => {
             const updatedDetails = [...prev.bookingDetails];
 
-            if (index >= updatedDetails.length) {
-                updatedDetails[index] = {
-                    campTypeId,
-                    quantity,
-                    checkInAt: '',
-                    checkOutAt: ''
+            const existingIndex = updatedDetails.findIndex(item => item.campTypeId === campTypeId);
+            if (existingIndex !== -1) {
+                updatedDetails[existingIndex] = {
+                    ...updatedDetails[existingIndex],
+                    quantity: quantity
                 }
             } else {
-                updatedDetails[index] = {
-                    ...updatedDetails[index],
+                updatedDetails.push({
                     campTypeId,
-                    quantity
-                }
+                    quantity,
+                    checkInAt: localStorage.getItem('checkInDate') || '',
+                    checkOutAt: localStorage.getItem('checkOutDate') || ''
+                })
             }
 
             return { ...prev, bookingDetails: updatedDetails };
@@ -78,8 +79,19 @@ export const BookingProvider = ({ children }) => {
         });
     }
 
+    useEffect(() => {
+        localStorage.setItem("booking", JSON.stringify(booking));
+    }, [booking]);
+
     return (
-        <BookingContext.Provider value={{ booking, updateTotalAmount, updateServices, updateCampsite, updateCamptype, updateDates }}>
+        <BookingContext.Provider value={{
+            booking,
+            updateTotalAmount,
+            updateServices,
+            updateCampsite,
+            updateCamptype,
+            updateDates
+        }}>
             {children}
         </BookingContext.Provider>
     )

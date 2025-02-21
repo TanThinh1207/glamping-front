@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeadphonesSimple, faBars, faUser, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faUser, faTimes, faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import "../css/NavigationBar.css";
 import logo from "../assets/word-logo.png";
@@ -20,7 +20,6 @@ const getMenuItems = (path) => {
         default:
             return [
                 { name: "Campsite", link: "/campsite" },
-                { name: "Accommodations", link: "/accommodations" },
                 { name: "About", link: "/about" },
                 { name: "Become a Host", link: "/hosting" },
             ];
@@ -59,20 +58,19 @@ const NavigationBar = () => {
 
     const miniItems = [
         { name: "Glamping", link: "/glamping" },
-        { name: "Accommodations", link: "/accommodations" },
         { name: "About", link: "/about" },
         { name: "Become a Host", link: "/hosting" },
         { name: "My Account", link: "/account" },
-        { name: "Contact us", link: "/" },
+        { name: "My trip", link: "/trip" },
     ]
 
     const renderbutton = (path) => {
         switch (true) {
             case path.startsWith("/hosting/create-campsite"):
                 return (
-                    <button 
-                    className="bg-transparent text-black text-xl border-gray-1500 border-2 rounded-full  mb-2 py-2 px-8 font-semibold mr-2 transform duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black"
-                    onClick={() => window.location.href = "/hosting"}
+                    <button
+                        className="bg-transparent text-black text-xl border-gray-1500 border-2 rounded-full  mb-2 py-2 px-8 font-semibold mr-2 transform duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black"
+                        onClick={() => window.location.href = "/hosting"}
                     >
                         Exit
                     </button>
@@ -92,9 +90,9 @@ const NavigationBar = () => {
                             <FontAwesomeIcon className="cursor-pointer hover:scale-110 transition-transform duration-200" icon={faUser} />
                             <span className="pl-1">My Account</span>
                         </Link>
-                        <Link to="/" className="font-canto uppercase text-xs hidden xl:inline-block">
-                            <FontAwesomeIcon className="cursor-pointer hover:scale-110 transition-transform duration-200 pr-1" icon={faHeadphonesSimple} />
-                            <span>Contact us</span>
+                        <Link to="/trip" className="font-canto uppercase text-xs hidden xl:inline-block">
+                            <FontAwesomeIcon className="cursor-pointer hover:scale-110 transition-transform duration-200 pr-1" icon={faCartShopping} />
+                            <span>My Trip</span>
                         </Link>
                         <button className="bg-black text-white text-xs border-black border uppercase mb-2 p-4 transform duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black mr-2">
                             Check availability

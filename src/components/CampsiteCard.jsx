@@ -1,10 +1,8 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useBooking } from '../context/BookingContext'
 
 const CampsiteCard = ({ campsite }) => {
     const navigate = useNavigate();
-    const { updateCampsite } = useBooking();
 
     // const lat = campsite.latitude;
     // const lon = campsite.longitude;
@@ -15,7 +13,6 @@ const CampsiteCard = ({ campsite }) => {
 
     const handleDiscover = () => {
         // const campsiteLocationPath = encodeURIComponent(campsite.city.toLowerCase().replace(/\s+/g, '-'));
-        updateCampsite(campsite.id);
         navigate(`/campsite/${campsite.id}`);
     };
     return (

@@ -26,9 +26,15 @@ const SearchBar = () => {
   const [isCheckOutOpen, setIsCheckOutOpen] = useState(false);
 
   const [destination, setDestination] = useState(null);
-  const [checkInDate, setCheckInDate] = useState(null);
-  const [checkOutDate, setCheckOutDate] = useState(null);
-  const [guests, setGuests] = useState(1);
+  const [checkInDate, setCheckInDate] = useState(
+    localStorage.getItem("checkInDate") ? dayjs(localStorage.getItem("checkInDate")) : null
+  );
+
+  const [checkOutDate, setCheckOutDate] = useState(
+    localStorage.getItem("checkOutDate") ? dayjs(localStorage.getItem("checkOutDate")) : null
+  );  
+
+  const [guests, setGuests] = useState(localStorage.getItem("guests") ? JSON.parse(localStorage.getItem("guests")) : 1);
 
   const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
 
@@ -44,29 +50,38 @@ const SearchBar = () => {
     const selectedDate = currentDate.date(day);
     setCheckInDate(selectedDate);
     setIsCheckInOpen(false);
-    if (checkOutDate && selectedDate.isAfter(checkOutDate)) {
+    if (checkOutDate && selectedDate.isAfter(checkOutDate) + 1) {
       setCheckOutDate(null);
+      localStorage.removeItem("checkOutDate");
     }
+    localStorage.setItem("checkInDate", selectedDate.toISOString());
   };
 
   const handleCheckOutDate = (day) => {
     const selectedDate = currentDate.date(day);
     setCheckOutDate(selectedDate);
     setIsCheckOutOpen(false);
+    localStorage.setItem("checkOutDate", selectedDate.toISOString());
   };
 
-  const increaseGuest = () => setGuests((prev) => prev + 1);
-  const decreaseGuest = () => setGuests((prev) => Math.max(1, prev - 1));
+  const increaseGuest = () => {
+    setGuests((prev) => prev + 1);
+    localStorage.setItem("guests", JSON.stringify(guests));
+  }
+  const decreaseGuest = () => {
+    setGuests((prev) => Math.max(1, prev - 1));
+    localStorage.setItem("guests", JSON.stringify(guests));
+  }
 
   return (
     <div className="pb-6 pt-10 w-full flex justify-center">
-      <div className={`border border-black flex flex-col md:flex-row ${isCampsiteRoute ? "w-3/4" : "w-full" } gap-4 md:shadow-md md:rounded-xl py-4 px-2 md:mx-auto 
+      <div className={`border border-black flex flex-col md:flex-row ${isCampsiteRoute ? "w-3/4" : "w-full"} gap-4 md:shadow-md md:rounded-xl py-4 px-2 md:mx-auto 
                       justify-center items-center`}>
         {!isCampsiteRoute && (
-          <Dropdown 
-            items={vietnamCities} 
-            selected={destination} 
-            onSelect={setDestination} 
+          <Dropdown
+            items={vietnamCities}
+            selected={destination}
+            onSelect={setDestination}
           />
         )}
 

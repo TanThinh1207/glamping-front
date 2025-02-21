@@ -5,57 +5,42 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMugHot } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom'
 import { useBooking } from '../../context/BookingContext'
+import { fetchCampsiteById, fetchCamptypeById } from '../../utils/FetchBookingData'
 
 const CamptypePage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const { updateCamptype } = useBooking();
-
+    const { updateCampsite } = useBooking();
     const { campsiteId } = useParams();
     const [campsite, setCampsite] = useState(null);
     const [camptypes, setCamptypes] = useState([]);
     const [quantities, setQuantities] = useState({});
 
-    const fetchCampsite = async () => {
-        setLoading(true);
-        try {
-            const response = await fetch(`${import.meta.env.VITE_API_GET_CAMPSITE_BY_ID}${campsiteId}`);
-            if (!response.ok) throw new Error(`Failed to fetch campsite: ${response.statusText}`);
-
-            const data = await response.json();
-            setCampsite(data.data);
-        } catch (error) {
-            setError(error.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchCamptypes = async () => {
-        setLoading(true);
-        try {
-            const response = await fetch(`${import.meta.env.VITE_API_GET_CAMPTYPES_BY_ID}${campsiteId}`);
-            if (!response.ok) throw new Error(`Failed to fetch camptypes: ${response.statusText}`);
-            const data = await response.json();
-            setCamptypes(data.data);
-
-            const initialQuantities = {};
-            data.data.forEach(camptype => {
-                initialQuantities[camptype.id] = 0;
-            });
-            setQuantities(initialQuantities);
-        } catch (error) {
-            setError(error.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-
     useEffect(() => {
-        fetchCampsite();
-        fetchCamptypes();
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                const campsiteData = await fetchCampsiteById(campsiteId);
+                const camptypesData = await fetchCamptypeById(campsiteId);
+
+                setCampsite(campsiteData);
+                setCamptypes(camptypesData);
+                const initialQuantities = {};
+                camptypesData.forEach(camptype => {
+                    initialQuantities[camptype.id] = 1;
+                });
+                setQuantities(initialQuantities);
+
+            } catch (error) {
+                setError(error.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
     }, [campsiteId]);
 
     const handleQuantityChange = (id, value) => {
@@ -63,8 +48,9 @@ const CamptypePage = () => {
         setQuantities(prev => ({ ...prev, [id]: newValue }));
     };
 
-    if (!campsite) {
-        return <h1 className='text-4xl font-bold inset-0 text-center items-center h-screen'>Campsite not found</h1>
+    const handleCamptypeSelection = (camptype) => {
+        updateCampsite(campsiteId);
+        updateCamptype(camptype.id, quantities[camptype.id]);
     }
 
     if (loading) {
@@ -119,6 +105,7 @@ const CamptypePage = () => {
                             <Link
                                 to={`/campsite/${campsiteId}/extra-service`}
                                 className='bg-purple-900 text-white rounded-full px-8 py-4'
+                                onClick={() => handleCamptypeSelection(camptype)}
                             >
                                 <p>Reservation Inquiry</p>
                             </Link>
