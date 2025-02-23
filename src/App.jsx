@@ -21,6 +21,7 @@ import CreateCampsiteStepPage from './pages/host-pages/createCampsite/CreateCamp
 import { BookingProvider } from './context/BookingContext';
 import GuestInfo from './pages/booking-pages/GuestInfo';
 import TripList from './pages/TripList';
+import LoginPage from './pages/LoginPage';
 
 function App() {
   const router = createBrowserRouter([
@@ -30,6 +31,7 @@ function App() {
       errorElement: <h1>Oops! This page doesn't exist.</h1>,
       children: [
         { path: "", element: <HomePage /> },
+        { path: "login", element: <LoginPage /> },
         { path: "about", element: <About /> },
         { path: "campsite", element: <CampsitePage /> },
         { path: "campsite/:campsiteId", element: <CamptypePage /> },
