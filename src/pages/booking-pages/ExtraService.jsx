@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import ServiceDropdown from '../../components/ServiceDropdown';
+import React, { useEffect, useState, useMemo } from 'react';
 import { ChevronDownIcon } from 'lucide-react';
 import BookingSummary from '../../components/BookingSummary';
+import { useBooking } from '../../context/BookingContext';
 
 const ExtraService = () => {
     const [loading, setLoading] = useState(true);
@@ -9,6 +9,8 @@ const ExtraService = () => {
     const [services, setServices] = useState([]);
     const [openStates, setOpenStates] = useState({});
     const [serviceQuantities, setServiceQuantities] = useState({});
+
+    const { updateServices } = useBooking();
 
     const toggleDropdown = (serviceId) => {
         setOpenStates((prev) => ({
@@ -24,6 +26,12 @@ const ExtraService = () => {
             [serviceId]: validQuantity
         }));
     };
+
+    useEffect(() => {
+        if (Object.keys(serviceQuantities).length > 0) {
+            updateServices(serviceQuantities);
+        }
+    }, [serviceQuantities, updateServices]);
 
     const fetchServices = async () => {
         setLoading(true);
@@ -50,6 +58,17 @@ const ExtraService = () => {
     useEffect(() => {
         fetchServices();
     }, []);
+
+    const selectedServices = useMemo(() => 
+        services.filter(service => serviceQuantities[service.id] > 0)
+        .map(service => ({
+            id: service.id,
+            name: service.name,
+            quantity: serviceQuantities[service.id],
+            price: service.price
+        })),
+        [services, serviceQuantities]
+    );
 
     if (loading) {
         return (
@@ -99,8 +118,8 @@ const ExtraService = () => {
                     </div>
                 ))}
             </div>
-            <div className='lg:w-1/3 w-full'>
-                <BookingSummary />
+            <div className="lg:w-1/3 w-full">
+                <BookingSummary selectedServices={selectedServices} />
             </div>
         </div>
     );

@@ -26,7 +26,7 @@ export const fetchAllCampsites = async () => {
     try {
         const response = await fetch(`${import.meta.env.VITE_API_GET_CAMPSITES}`);
         if (!response.ok) throw new Error(`Failed to fetch campsite: ${response.statusText}`);
-
+        
         const data = await response.json();
         return data.data;
     } catch (error) {

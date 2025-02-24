@@ -3,7 +3,7 @@ import { useBooking } from "../context/BookingContext";
 import { fetchCampsiteById, fetchCamptypeById } from "../utils/FetchBookingData";
 import dayjs from "dayjs";
 
-const BookingSummary = () => {
+const BookingSummary = ({ selectedServices = [] }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { booking } = useBooking();
@@ -22,15 +22,8 @@ const BookingSummary = () => {
 
   useEffect(() => {
     if (checkInDate && checkOutDate) {
-      const checkIn = new Date(checkInDate);
-      const checkOut = new Date(checkOutDate);
-      if (!isNaN(checkIn) && !isNaN(checkOut)) {
-        const nights = Math.max(0, (checkOut - checkIn) / (1000 * 60 * 60 * 24));
-        setNights(nights);
-      } else {
-        setNights(0);
-        console.error("Invalid date format:", { checkInDate, checkOutDate });
-      }
+      const nights = Math.max(0, checkOutDate.diff(checkInDate, "day"));
+      setNights(nights);
     }
   }, [checkInDate, checkOutDate]);
 
@@ -52,17 +45,22 @@ const BookingSummary = () => {
   }, [campsiteId]);
 
   useEffect(() => {
+    let total = 0;
     if (booking?.bookingDetails?.length > 0 && camptypes.length > 0) {
-      let total = 0;
       booking.bookingDetails.forEach((item) => {
         const campType = camptypes.find((type) => type.id === item.campTypeId);
         if (campType) {
           total += campType.price * item.quantity * nights;
         }
       });
-      setTotalPrice(total);
     }
-  }, [booking, camptypes, nights]);
+
+    selectedServices.forEach(service => {
+      total += service.price * service.quantity;
+    });
+
+    setTotalPrice(total);
+  }, [booking, camptypes, nights, selectedServices]);
 
   if (loading) {
     return (
@@ -86,7 +84,6 @@ const BookingSummary = () => {
         <p>
           <span className="font-semibold">Number of nights:</span> {nights}
         </p>
-        <p className="text-purple-800 cursor-pointer mt-1">Edit</p>
       </div>
 
       {booking?.bookingDetails?.length > 0 ? (
@@ -110,15 +107,18 @@ const BookingSummary = () => {
       ) : (
         <p className="text-gray-600">No accommodations selected.</p>
       )}
+      <p className="text-lg font-semibold">Extra Services</p>
+      {selectedServices.length > 0 ? selectedServices.map(service => (
+        <p key={service.id}>{service.name} x{service.quantity}</p>
+      )) : <p>No extra services selected.</p>}
 
       <div className="border-t border-gray-300 pt-3">
         <p className="text-sm text-gray-600">Total {nights} nights (taxes incl.):</p>
         <p className="text-xl font-bold mt-1">VND {totalPrice.toLocaleString()}</p>
-        <p className="text-purple-800 cursor-pointer mt-2">Price Breakdown</p>
       </div>
 
-      <button className="w-full mt-6 py-3 border border-purple-800 text-purple-800 font-semibold rounded-full hover:bg-purple-100 transition">
-        SKIP - YOU CAN ADD THEM LATER
+      <button className="bg-black w-full text-white text-xs border-black border uppercase my-5 p-4 transform duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black mr-2">
+        CONFIRM BOOKING
       </button>
     </div>
   );

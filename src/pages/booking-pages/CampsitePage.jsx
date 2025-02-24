@@ -13,7 +13,7 @@ const CampsitePage = () => {
             setLoading(true);
             try {
                 const response = await fetchAllCampsites();
-                setCampsites(response);
+                setCampsites(response.content);
             } catch (error) {
                 setError(error.message);
             }
