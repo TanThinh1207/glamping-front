@@ -18,7 +18,7 @@ const Location = () => {
   const [city, setCity] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [isConfirmed, setIsConfirmed] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState("VN");
+  const [selectedCountry, setSelectedCountry] = useState("");
   return (
     <div className=" bg-white w-full py-24 px-96">
       <div className="mb-8">
@@ -27,10 +27,11 @@ const Location = () => {
       </div>
       <div>
         <div className="relative">
+          <label >Country/Region</label>
           <select
-            label="Country/Region"
             value={selectedCountry}
             onChange={(e) => setSelectedCountry(e.target.value)}
+            defaultValue={selectedCountry}
             className="w-full border rounded-lg px-4 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-black appearance-none"
           >
             {countries.map((country) => (
@@ -39,6 +40,7 @@ const Location = () => {
               </option>
             ))}
           </select>
+          
         </div>
       </div>
       <div className="mt-4">
@@ -48,7 +50,6 @@ const Location = () => {
           className="w-full p-2 border rounded-md"
           value={address}
           onChange={(e) => setAddress(e.target.value)}
-          disabled={!isConfirmed}
         />
       </div>
 
@@ -60,7 +61,7 @@ const Location = () => {
             className="w-full p-2 border rounded-md"
             value={city}
             onChange={(e) => setCity(e.target.value)}
-            disabled={!isConfirmed}
+
           />
         </div>
         <div className="w-1/2">
