@@ -17,7 +17,6 @@ const CreateCampsiteStepPage = () => {
     services: <Services />,
     location: <Location />,
     "camp-type": <CampType />,
-    receipt: <Receipt />,
   };
 
   return (

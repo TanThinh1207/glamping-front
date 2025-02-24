@@ -8,12 +8,11 @@ const pageSteps = [
   "services",
   "location",
   "camp-type",
-  "receipt",
 ];
 
 const CreateCampsiteFooter = () => {
   const navigate = useNavigate();
-  const { id, step } = useParams();
+  const { step } = useParams();
   const currentStepIndex = pageSteps.indexOf(step);
   const prevStep = currentStepIndex > 0 ? pageSteps[currentStepIndex - 1] : null;
   const nextStep = currentStepIndex < pageSteps.length - 1 ? pageSteps[currentStepIndex + 1] : null;
@@ -33,7 +32,7 @@ const CreateCampsiteFooter = () => {
           <div className=' flex justify-end'>
             <button
               className="bg-gradient-to-r from-green-500 to-green-600 text-white text-xl font-semibold px-5 py-3 rounded-md mx-4 "
-              onClick={() => navigate(`/hosting/create-campsite/${id}/about-your-place`)}
+              onClick={() => navigate(`/hosting/create-campsite/about-your-place`)}
             >
               Get started
             </button>
@@ -43,12 +42,12 @@ const CreateCampsiteFooter = () => {
             {prevStep && (
                 <button
                   className= "text-black px-5 underline mx-4 text-xl font-semibold"
-                  onClick={() => navigate(`/hosting/create-campsite/${id}/${prevStep}`)}
+                  onClick={() => navigate(`/hosting/create-campsite/${prevStep}`)}
                 >
                   Back
                 </button>
             )}
-            {step === "receipt" ? (
+            {step === "camp-type" ? (
                 <button
                 className="bg-gradient-to-r from-green-400 to-yellow-300 text-white px-5 py-3 rounded-md text-xl font-semibold mx-4"
                 onClick={() => navigate("/hosting")}
@@ -58,7 +57,7 @@ const CreateCampsiteFooter = () => {
             ) : (
                 <button
                 className="bg-black text-white px-5 py-3 rounded-md text-xl font-semibold mx-4"
-                onClick={() => navigate(`/hosting/create-campsite/${id}/${nextStep}`)}
+                onClick={() => navigate(`/hosting/create-campsite/${nextStep}`)}
               >
                 Next
               </button>

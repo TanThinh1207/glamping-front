@@ -51,7 +51,7 @@ function App() {
         { path: "calendar", element: <Calendar /> },
         { path: "listings", element: <Listings /> },
         { path: "editor/:id", element: <ListingEditor /> },
-        { path: "create-campsite/:id/:step", element: <CreateCampsiteStepPage /> },
+        { path: "create-campsite/:step", element: <CreateCampsiteStepPage /> },
       ]
     },
     {
