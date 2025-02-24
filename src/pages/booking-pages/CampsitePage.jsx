@@ -1,29 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import SearchBar from '../../components/SearchBar'
 import CampsiteCard from '../../components/CampsiteCard'
-import { useBooking } from '../../context/BookingContext'
+import { fetchAllCampsites } from '../../utils/FetchBookingData'
 
 const CampsitePage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [campsites, setCampsites] = useState([]);
 
-    const { updateCampsite } = useBooking();
-
     useEffect(() => {
         const fetchCampsites = async () => {
             setLoading(true);
             try {
-                const controller = new AbortController();
-                const signal = controller.signal;
-                const response = await fetch(`${import.meta.env.VITE_API_GET_CAMPSITES}`, { signal });
-                response.json().then(data => {
-                    if (response.ok) {
-                        setCampsites(data.data);
-                    } else {
-                        setError(data.message);
-                    }
-                });
+                const response = await fetchAllCampsites();
+                setCampsites(response.content);
             } catch (error) {
                 setError(error.message);
             }
@@ -45,7 +35,7 @@ const CampsitePage = () => {
 
     return (
         <div className='container mx-auto pt-20'>
-            <p className='text-5xl font-canto'>Campsites & </p>
+            <p className='text-5xl font-canto'>Campsites</p>
             <SearchBar />
             <hr className='my-10' />
             {campsites.map(campsite => (
