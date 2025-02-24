@@ -48,7 +48,7 @@ const TripList = () => {
                     <p className='text-gray-500 font-light text-lg'>{camptype.description}</p>
                   </div>
                   <div className="right-container w-1/6 space-y-3">
-                    <p className="text-gray-500 font-light">Quantity </p>
+                    <p className="text-gray-500 font-light">Quantity {camptype.quantity} </p>
                     <p className="text-gray-500 font-light">Price {camptype.price}VND</p>
                   </div>
                 </div>

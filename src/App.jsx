@@ -1,8 +1,8 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import "./index.css";
-import CustomerFrame from './pages/user-frame/CustomerFrame';
-import HostFrame from './pages/host-frame/HostFrame';
-import AdminFrame from './pages/admin-frame/SidebarFrame';
+import CustomerFrame from './pages/frame/CustomerFrame';
+import HostFrame from './pages/frame/HostFrame';
+import AdminFrame from './pages/frame/SidebarFrame';
 import HomePage from './pages/HomePage';
 import About from './pages/About';
 import Hosting from './pages/Hosting';
@@ -22,6 +22,8 @@ import { BookingProvider } from './context/BookingContext';
 import GuestInfo from './pages/booking-pages/GuestInfo';
 import TripList from './pages/TripList';
 import LoginPage from './pages/LoginPage';
+import Dashboard from './pages/manager-pages/Dashboard';
+import HandleRequest from './pages/manager-pages/HandleRequest';
 
 function App() {
   const router = createBrowserRouter([
@@ -49,7 +51,6 @@ function App() {
         { path: "calendar", element: <Calendar /> },
         { path: "listings", element: <Listings /> },
         { path: "editor/:id", element: <ListingEditor /> },
-        // Create Campsite
         { path: "create-campsite/:id/:step", element: <CreateCampsiteStepPage /> },
       ]
     },
@@ -57,10 +58,18 @@ function App() {
       path: "/admin",
       element: <AdminFrame />,
       children: [
-        { path: "manage-place-type", element: <ManagePlaceType /> },
-        { path: "manage-account", element: <ManageAccount /> },
-        { path: "manage-utility", element: <ManageUtility /> },
-        { path: "manage-facility", element: <ManageFacility /> },
+        { path: "place-type", element: <ManagePlaceType /> },
+        { path: "account", element: <ManageAccount /> },
+        { path: "utility", element: <ManageUtility /> },
+        { path: "facility", element: <ManageFacility /> },
+      ]
+    },
+    {
+      path: "/manager",
+      element: <AdminFrame />,
+      children: [
+        { path: "dashboard", element: <Dashboard /> },
+        { path: "request", element: <HandleRequest /> },
       ]
     }
   ])

@@ -51,14 +51,15 @@ const BookingSummary = ({ selectedServices = [] }) => {
         const campType = camptypes.find((type) => type.id === item.campTypeId);
         if (campType) {
           total += campType.price * item.quantity * nights;
-        }
-      });
+          }
+        });
     }
 
     selectedServices.forEach(service => {
       total += service.price * service.quantity;
     });
 
+    console.log(selectedServices)
     setTotalPrice(total);
   }, [booking, camptypes, nights, selectedServices]);
 

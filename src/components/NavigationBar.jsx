@@ -5,6 +5,7 @@ import { faBars, faUser, faTimes, faCartShopping } from "@fortawesome/free-solid
 import { Link } from "react-router-dom";
 import "../css/NavigationBar.css";
 import logo from "../assets/word-logo.png";
+import { useBooking } from "../context/BookingContext";
 
 const getMenuItems = (path) => {
     switch (true) {
@@ -33,6 +34,8 @@ const NavigationBar = () => {
     const [isMinimized, setIsMinimized] = useState(window.innerWidth < 1280);
     const location = useLocation();
     const isHomePage = location.pathname === "/";
+    const [bookingCount, setBookingCount] = useState(0);
+    const { booking } = useBooking();
 
     const toggleMenu = () => {
         setMenuOpen(!menuOpen);
@@ -55,6 +58,19 @@ const NavigationBar = () => {
             window.removeEventListener("resize", handleResize);
         };
     }, []);
+
+    useEffect(() => {
+        const fetchBookingCount = () => {
+            const storedBooking = JSON.parse(localStorage.getItem("booking"));
+            if (storedBooking && storedBooking.bookingDetails) {
+                setBookingCount(storedBooking.bookingDetails.length);
+            } else {
+                setBookingCount(0);
+            }
+        };
+
+        fetchBookingCount();
+    }, [booking]);
 
     const miniItems = [
         { name: "Glamping", link: "/glamping" },
@@ -90,9 +106,14 @@ const NavigationBar = () => {
                             <FontAwesomeIcon className="cursor-pointer hover:scale-110 transition-transform duration-200" icon={faUser} />
                             <span className="pl-1">My Account</span>
                         </Link>
-                        <Link to="/trip" className="font-canto uppercase text-xs hidden xl:inline-block">
+                        <Link to="/trip" className="relative font-canto uppercase text-xs hidden xl:inline-block">
                             <FontAwesomeIcon className="cursor-pointer hover:scale-110 transition-transform duration-200 pr-1" icon={faCartShopping} />
                             <span>My Trip</span>
+                            {bookingCount > 0 && (
+                                <span className="absolute -top-2 -left-3 bg-red-500 text-white text-xs rounded-lg px-1">
+                                    {bookingCount}
+                                </span>
+                            )}
                         </Link>
                         <button className="bg-black text-white text-xs border-black border uppercase mb-2 p-4 transform duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black mr-2">
                             Check availability
