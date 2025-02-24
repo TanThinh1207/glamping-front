@@ -110,7 +110,7 @@ const NavigationBar = () => {
                             <FontAwesomeIcon className="cursor-pointer hover:scale-110 transition-transform duration-200 pr-1" icon={faCartShopping} />
                             <span>My Trip</span>
                             {bookingCount > 0 && (
-                                <span className="absolute -top-2 -left-3 bg-red-500 text-white text-xs rounded-lg px-1">
+                                <span className="absolute -top-2 -left-2 bg-red-500 text-white text-xs rounded-lg px-1">
                                     {bookingCount}
                                 </span>
                             )}

@@ -31,6 +31,16 @@ const TripList = () => {
     fetchSelectedCamptypeList();
   }, []);
 
+  if (loading) {
+    return (
+        <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-80 z-50">
+            <div className="animate-spin rounded-full border-t-4 border-teal-400 border-solid h-16 w-16"></div>
+        </div>
+    );
+}
+
+if (error) return <p>Error: {error}</p>;
+
   return (
     <div>
       {camptypes.length > 0 ? (

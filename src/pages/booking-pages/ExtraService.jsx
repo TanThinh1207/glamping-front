@@ -12,6 +12,24 @@ const ExtraService = () => {
 
     const { updateServices } = useBooking();
 
+    useEffect(() => {
+        const storedBooking = localStorage.getItem('booking');
+        if (storedBooking) {
+            try {
+                const parsedBooking = JSON.parse(storedBooking);
+                if (parsedBooking.bookingSelectionRequestList) {
+                    const preSelectedServices = parsedBooking.bookingSelectionRequestList.reduce((acc, item) => {
+                        acc[item.idSelection] = item.quantity;
+                        return acc;
+                    }, {});
+                    setServiceQuantities(preSelectedServices);
+                }
+            } catch (error) {
+                throw new Error(error);
+            }
+        }
+    }, []);
+
     const toggleDropdown = (serviceId) => {
         setOpenStates((prev) => ({
             ...prev,
@@ -46,6 +64,7 @@ const ExtraService = () => {
                 acc[service.id] = false;
                 return acc;
             }, {});
+
             setOpenStates(initialStates);
 
         } catch (error) {
@@ -59,14 +78,14 @@ const ExtraService = () => {
         fetchServices();
     }, []);
 
-    const selectedServices = useMemo(() => 
+    const selectedServices = useMemo(() =>
         services.filter(service => serviceQuantities[service.id] > 0)
-        .map(service => ({
-            id: service.id,
-            name: service.name,
-            quantity: serviceQuantities[service.id],
-            price: service.price
-        })),
+            .map(service => ({
+                id: service.id,
+                name: service.name,
+                quantity: serviceQuantities[service.id],
+                price: service.price
+            })),
         [services, serviceQuantities]
     );
 
