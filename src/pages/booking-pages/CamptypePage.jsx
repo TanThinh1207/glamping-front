@@ -24,7 +24,6 @@ const CamptypePage = () => {
             try {
                 const campsiteData = await fetchCampsiteById(campsiteId);
                 const camptypesData = await fetchCamptypeById(campsiteId);
-
                 setCampsite(campsiteData);
                 setCamptypes(camptypesData);
                 const initialQuantities = {};
@@ -64,7 +63,7 @@ const CamptypePage = () => {
     if (error) return <p>Error: {error}</p>;
 
     return (
-        <div className='container mx-auto pt-20'>
+        <div className='container mx-auto pt-20 min-h-screen'>
             <p className='text-gray-500 text-xl pb-4'>{campsite.name}</p>
             <p className='text-5xl font-canto'>Select accomodation</p>
             <SearchBar />

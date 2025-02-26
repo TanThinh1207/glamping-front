@@ -14,7 +14,7 @@ const Account = () => {
 
     
     return (
-        <div className='flex flex-col items-center'>
+        <div className='container-fluid mx-auto flex flex-col items-center min-h-screen'>
             <div className='flex relative h-80 w-full mb-12'>
                 <img src={thumb} alt="" className='w-full h-full object-cover' />
                 <div className="absolute inset-0 text-white flex items-center justify-center text-2xl md:text-3xl lg:text-4xl font-canto w-full uppercase text-center">

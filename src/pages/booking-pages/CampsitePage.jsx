@@ -13,7 +13,7 @@ const CampsitePage = () => {
             setLoading(true);
             try {
                 const response = await fetchAllCampsites();
-                setCampsites(response.content);
+                setCampsites(response);
             } catch (error) {
                 setError(error.message);
             }
@@ -34,7 +34,7 @@ const CampsitePage = () => {
     if (error) return <p>Error: {error}</p>;
 
     return (
-        <div className='container mx-auto pt-20'>
+        <div className='container mx-auto pt-20 min-h-screen'>
             <p className='text-5xl font-canto'>Campsites</p>
             <SearchBar />
             <hr className='my-10' />

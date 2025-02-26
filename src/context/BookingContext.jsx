@@ -7,7 +7,7 @@ export const BookingProvider = ({ children }) => {
         const savedBooking = localStorage.getItem('booking');
         return savedBooking ? JSON.parse(savedBooking) : {
             bookingDetails: [],
-            userId: null,
+            // userId: null,
             campSiteId: null,
             totalAmount: 0,
             bookingSelectionRequestList: [],

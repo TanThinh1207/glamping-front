@@ -7,6 +7,7 @@ const BookingSummary = ({ selectedServices = [] }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { booking } = useBooking();
+  const { updateTotalAmount } = useBooking();
 
   const checkInDateStr = localStorage.getItem("checkInDate");
   const checkOutDateStr = localStorage.getItem("checkOutDate");
@@ -59,8 +60,11 @@ const BookingSummary = ({ selectedServices = [] }) => {
       total += service.price * service.quantity;
     });
 
-    console.log(selectedServices)
-    setTotalPrice(total);
+    if (total !== totalPrice) {
+      setTotalPrice(total);
+      updateTotalAmount(total);
+    }
+    
   }, [booking, camptypes, nights, selectedServices]);
 
   if (loading) {

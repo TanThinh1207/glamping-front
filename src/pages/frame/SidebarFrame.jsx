@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import { faUsers, faCar, faMountainSun, faMugHot, faClipboardList, faBuilding, faTools } from '@fortawesome/free-solid-svg-icons';
+import { faUsers, faCar, faMountainSun, faMugHot, faBuilding, faChartPie } from '@fortawesome/free-solid-svg-icons';
 import Sidebar from '../../components/Sidebar';
 import { Toaster } from 'sonner';
 
@@ -15,9 +15,8 @@ const SidebarFrame = () => {
   ];
 
   const managerSidebarItems = [
-    { title: 'Dashboard', path: '/manager/dashboard', icon: faClipboardList },
+    { title: 'Dashboard', path: '/manager/dashboard', icon: faChartPie },
     { title: 'Request', path: '/manager/request', icon: faBuilding },
-    { title: 'Services', path: '/manager/services', icon: faTools },
   ];
 
   const sidebarItems = location.pathname.startsWith('/manager') ? managerSidebarItems : adminSidebarItems;

@@ -54,13 +54,14 @@ const ExtraService = () => {
     const fetchServices = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_GET_SERVICES}`);
+            const url = new URL(`${import.meta.env.VITE_API_GET_SERVICES}`);
+            const response = await fetch(url.toString());
             if (!response.ok) throw new Error(`Failed to fetch services: ${response.statusText}`);
 
             const data = await response.json();
-            setServices(data.data);
+            setServices(data.data.content);
 
-            const initialStates = data.data.reduce((acc, service) => {
+            const initialStates = data.data.content.reduce((acc, service) => {
                 acc[service.id] = false;
                 return acc;
             }, {});
