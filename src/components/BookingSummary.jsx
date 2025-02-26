@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useBooking } from "../context/BookingContext";
-import { fetchCampsiteById, fetchCamptypeById } from "../utils/FetchBookingData";
+import { fetchCampsiteById, fetchCamptypeById, createBooking } from "../utils/BookingAPI";
 import dayjs from "dayjs";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const BookingSummary = ({ selectedServices = [] }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { booking } = useBooking();
   const { updateTotalAmount } = useBooking();
+
+  const navigate = useNavigate();
 
   const checkInDateStr = localStorage.getItem("checkInDate");
   const checkOutDateStr = localStorage.getItem("checkOutDate");
@@ -16,10 +20,39 @@ const BookingSummary = ({ selectedServices = [] }) => {
   const checkOutDate = checkOutDateStr ? dayjs(checkOutDateStr) : null;
 
   const campsiteId = booking.campSiteId;
-  const [campsite, setCampsite] = useState("");
+  const [campsite, setCampsite] = useState({});
   const [camptypes, setCamptypes] = useState([]);
   const [nights, setNights] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
+
+  const handleConfirmBooking = async () => {
+    if (!booking.userId) {
+      toast.error("Please log in before booking.");
+      return;
+    }
+    if (!booking.campSiteId || booking.bookingDetails.length === 0) {
+      toast.error("Please select a campsite and at least one accommodation.");
+      return;
+    }
+    try {
+      setLoading(true);
+  
+      const responseData = await createBooking(booking);
+      
+      toast.success("Booking confirmed! 🎉");
+      
+      localStorage.removeItem("booking");
+      localStorage.removeItem("checkInDate");
+      localStorage.removeItem("checkOutDate");
+      localStorage.removeItem("guests");
+      navigate('/complete-booking');
+  
+    } catch (error) {
+      console.log(`Booking failed: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (checkInDate && checkOutDate) {
@@ -34,7 +67,7 @@ const BookingSummary = ({ selectedServices = [] }) => {
         setLoading(true);
         const campsiteData = await fetchCampsiteById(campsiteId);
         const camptypesData = await fetchCamptypeById(campsiteId);
-        setCampsite(campsiteData);
+        setCampsite(campsiteData.length > 0 ? campsiteData[0] : {});
         setCamptypes(camptypesData);
       } catch (error) {
         setError(error.message);
@@ -52,8 +85,8 @@ const BookingSummary = ({ selectedServices = [] }) => {
         const campType = camptypes.find((type) => type.id === item.campTypeId);
         if (campType) {
           total += campType.price * item.quantity * nights;
-          }
-        });
+        }
+      });
     }
 
     selectedServices.forEach(service => {
@@ -64,7 +97,7 @@ const BookingSummary = ({ selectedServices = [] }) => {
       setTotalPrice(total);
       updateTotalAmount(total);
     }
-    
+
   }, [booking, camptypes, nights, selectedServices]);
 
   if (loading) {
@@ -74,6 +107,8 @@ const BookingSummary = ({ selectedServices = [] }) => {
       </div>
     );
   }
+
+  if (error) return <p>Error: {error}</p>;
 
   return (
     <div className="w-full bg-[#F5F3EB] p-6 shadow-md text-[#3C2F2F] font-sans">
@@ -122,7 +157,9 @@ const BookingSummary = ({ selectedServices = [] }) => {
         <p className="text-xl font-bold mt-1">VND {totalPrice.toLocaleString()}</p>
       </div>
 
-      <button className="bg-black w-full text-white text-xs border-black border uppercase my-5 p-4 transform duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black mr-2">
+      <button className="bg-black w-full text-white text-xs border-black border uppercase my-5 p-4 transform duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black mr-2"
+        onClick={handleConfirmBooking}
+      >
         CONFIRM BOOKING
       </button>
     </div>

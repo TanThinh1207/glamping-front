@@ -31,7 +31,6 @@ const LoginPage = () => {
       });
 
       const data = await response.json();
-      console.log("Backend Response:", data);
 
       if (response.ok) {
         localStorage.setItem("accessToken", data.data.accessToken);

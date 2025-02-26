@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import SearchBar from '../../components/SearchBar'
 import CampsiteCard from '../../components/CampsiteCard'
-import { fetchAllCampsites } from '../../utils/FetchBookingData'
+import { fetchAllCampsites } from '../../utils/BookingAPI'
 
 const CampsitePage = () => {
     const [loading, setLoading] = useState(true);

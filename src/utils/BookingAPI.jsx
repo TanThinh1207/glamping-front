@@ -1,3 +1,6 @@
+import { toast } from "sonner";
+import { useBooking } from "../context/BookingContext";
+
 export const fetchCampsiteById = async (campSiteId) => {
     try {
         const url = new URL(`${import.meta.env.VITE_API_GET_CAMPSITES}`);
@@ -30,9 +33,30 @@ export const fetchAllCampsites = async () => {
     try {
         const response = await fetch(`${import.meta.env.VITE_API_GET_CAMPSITES}`);
         if (!response.ok) throw new Error(`Failed to fetch campsite: ${response.statusText}`);
-        
+
         const data = await response.json();
         return data.data.content;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
+export const createBooking = async (bookingData) => {
+    try {
+        const response = await fetch(`${import.meta.env.VITE_API_BOOKING}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(bookingData),
+        });
+        if (!response.ok) {
+            throw new Error(`Booking failed: ${response.statusText}`);
+        }
+        const responseData = await response.json();
+        console.log("Booking successful:", responseData);
+
+        return responseData;
     } catch (error) {
         throw new Error(error.message);
     }

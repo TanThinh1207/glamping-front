@@ -5,18 +5,24 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMugHot } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom'
 import { useBooking } from '../../context/BookingContext'
-import { fetchCampsiteById, fetchCamptypeById } from '../../utils/FetchBookingData'
+import { fetchCampsiteById, fetchCamptypeById } from '../../utils/BookingAPI'
+import { toast } from 'sonner'
+import { useNavigate } from 'react-router-dom'
 
 const CamptypePage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     const { updateCamptype } = useBooking();
     const { updateCampsite } = useBooking();
     const { campsiteId } = useParams();
+    const { booking } = useBooking();
     const [campsite, setCampsite] = useState(null);
     const [camptypes, setCamptypes] = useState([]);
     const [quantities, setQuantities] = useState({});
+    const checkInAt = localStorage.getItem('checkInDate');
+    const checkOutAt = localStorage.getItem('checkOutDate');
 
     useEffect(() => {
         const fetchData = async () => {
@@ -48,8 +54,15 @@ const CamptypePage = () => {
     };
 
     const handleCamptypeSelection = (camptype) => {
-        updateCampsite(campsiteId);
-        updateCamptype(camptype.id, quantities[camptype.id]);
+        if (!checkInAt || !checkOutAt) {
+            toast.info('Please select check-in and check-out dates first');
+            return;
+        } else {
+            updateCampsite(campsiteId);
+            updateCamptype(camptype.id, quantities[camptype.id]);
+            navigate(`/campsite/${campsiteId}/extra-service`);
+        }
+
     }
 
     if (loading) {
@@ -101,13 +114,12 @@ const CamptypePage = () => {
                         </div>
                         <div className='bg-white flex items-center gap-6 p-4 rounded-xl border border-purple-100'>
                             <p className='tracking-wide text-purple-900'>Price per night: ${camptype.price}</p>
-                            <Link
-                                to={`/campsite/${campsiteId}/extra-service`}
+                            <button
                                 className='bg-purple-900 text-white rounded-full px-8 py-4'
                                 onClick={() => handleCamptypeSelection(camptype)}
                             >
                                 <p>Reservation Inquiry</p>
-                            </Link>
+                            </button>
                         </div>
                     </div>
                     <hr className='mt-6' />

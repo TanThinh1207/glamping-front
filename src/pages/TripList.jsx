@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { fetchCamptypeById } from '../utils/FetchBookingData';
+import { fetchCamptypeById } from '../utils/BookingAPI';
 import { useBooking } from '../context/BookingContext';
 
 const TripList = () => {

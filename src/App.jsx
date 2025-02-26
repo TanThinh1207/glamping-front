@@ -24,6 +24,7 @@ import TripList from './pages/TripList';
 import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/manager-pages/Dashboard';
 import HandleRequest from './pages/manager-pages/HandleRequest';
+import CompleteBookingPage from './pages/CompleteBookingPage';
 
 function App() {
   const router = createBrowserRouter([
@@ -41,6 +42,7 @@ function App() {
         { path: "campsite/:campsiteId/guest-info", element: <GuestInfo /> },
         { path: "account", element: <Account /> },
         { path: "trip", element: <TripList /> },
+        { path: "complete-booking", element: <CompleteBookingPage /> },
       ]
     },
     {
