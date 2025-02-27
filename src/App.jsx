@@ -25,6 +25,7 @@ import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/manager-pages/Dashboard';
 import HandleRequest from './pages/manager-pages/HandleRequest';
 import CompleteBookingPage from './pages/CompleteBookingPage';
+import { CampsiteProvider } from './context/CampsiteContext';
 
 function App() {
   const router = createBrowserRouter([
@@ -77,9 +78,11 @@ function App() {
   ])
   return (
     <>
-      <BookingProvider>
-        <RouterProvider router={router} />
-      </BookingProvider>
+      <CampsiteProvider>
+        <BookingProvider>
+          <RouterProvider router={router} />
+        </BookingProvider>
+      </CampsiteProvider>
     </>
   )
 }

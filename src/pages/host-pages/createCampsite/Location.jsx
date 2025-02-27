@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import * as maptilerClient from "@maptiler/client";
+import { useCampsite } from '../../../context/CampsiteContext';
 
-const MAPTILER_KEY = "6PzV7JPUgWxephJUe1TH"; // Replace with your actual key
-const INITIAL_COORDS = { lat: 10.7769, lng: 106.7009 }; // Default to Ho Chi Minh City
+const MAPTILER_KEY = "6PzV7JPUgWxephJUe1TH"; 
+const INITIAL_COORDS = { lat: 10.7769, lng: 106.7009 }; 
 
 const countries = [
   { label: "Vietnam - VN", code: "VN" },
@@ -18,6 +18,7 @@ const countries = [
 ];
 
 const Location = () => {
+  const { campsiteData, updateCampsiteData } = useCampsite();
   const mapContainer = useRef(null);
   const [map, setMap] = useState(null);
   const [marker, setMarker] = useState(null);
@@ -25,60 +26,117 @@ const Location = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
-  const [selectedCountry, setSelectedCountry] = useState("VN");
+  const [selectedCountry, setSelectedCountry] = useState("");
   const [lat, setLat] = useState(INITIAL_COORDS.lat);
   const [lng, setLng] = useState(INITIAL_COORDS.lng);
 
   useEffect(() => {
     const mapInstance = new maplibregl.Map({
       container: mapContainer.current,
-      style: `https://api.maptiler.com/maps/streets/style.json?key=${MAPTILER_KEY}`,
+      style: `https://api.maptiler.com/maps/basic/style.json?key=${MAPTILER_KEY}`, 
       center: [lng, lat],
-      zoom: 12,
+      zoom: 10,
     });
-    console.log(lat, lng);
+    
+  
     const newMarker = new maplibregl.Marker({ draggable: true })
       .setLngLat([lng, lat])
       .addTo(mapInstance);
-
+  
     newMarker.on("dragend", () => {
       const lngLat = newMarker.getLngLat();
       setLat(lngLat.lat);
       setLng(lngLat.lng);
       reverseGeocode(lngLat.lat, lngLat.lng);
     });
-
+  
     setMap(mapInstance);
     setMarker(newMarker);
-
+  
     return () => mapInstance.remove();
-  }, []);
-
+  }, [lat, lng]); 
+  
+  const handleSelectLocation = (place) => {
+    if (!place || !place.geometry || !place.geometry.coordinates) {
+      console.error("Invalid place object:", place);
+      return;
+    }
+    const [lng, lat] = place.geometry.coordinates;
+    const streetName = place.text || "";
+    const ward =
+      place.context?.find((c) => c.id.includes("municipal_district"))?.text || "";
+    const district =
+      place.context?.find((c) => c.id.includes("municipality"))?.text || "";
+    const city =
+      place.context?.find((c) => c.id.includes("subregion"))?.text || "";
+    const formattedAddress = [streetName, ward, district]
+      .filter((part) => part) 
+      .join(", ");
+    setLat(lat);
+    setLng(lng);
+    setAddress(formattedAddress);
+    setCity(city);
+    if (marker) {
+      marker.setLngLat([lng, lat]);
+    }
+    if (map) {
+      map.flyTo({ center: [lng, lat], zoom: 16 });
+    }
+    updateCampsiteData("campsiteLocation", {
+      lat,
+      lng,
+      address: formattedAddress,
+      city,
+      country: selectedCountry,
+    });
+    setSearchResults([]);
+    setSearchQuery("");
+  };
+  
+  
   const reverseGeocode = async (latitude, longitude) => {
-    const response = await maptilerClient.geocoding.reverse({ lat: latitude, lon: longitude, key: MAPTILER_KEY });
-    if (response.features.length > 0) {
-      const place = response.features[0];
-      setAddress(place.properties.address || "");
-      setCity(place.properties.city || "");
+  
+    try {
+      const response = await fetch(
+        `https://api.maptiler.com/geocoding/${longitude},${latitude}.json?key=${MAPTILER_KEY}`
+      );
+  
+      if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+  
+      const data = await response.json();
+      console.log("Reverse Geocode Response:", data);
+  
+      if (data.features.length > 0) {
+        const place = data.features[0];
+        const newAddress = place.properties.address || address;
+        const newCity = place.properties.locality || city;
+        setAddress(newAddress);
+        setCity(newCity);
+        updateCampsiteData("campsiteLocation", {
+          lat: latitude,
+          lng: longitude,
+          address: newAddress,
+          city: newCity,
+          country: selectedCountry,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching reverse geocode:", error);
     }
   };
+  
 
   const handleSearch = async (e) => {
     const query = e.target.value;
     setSearchQuery(query);
-  
     if (query.length > 2) {
       try {
         const response = await fetch(
           `https://api.maptiler.com/geocoding/${encodeURIComponent(query)}.json?key=${MAPTILER_KEY}&country=${selectedCountry}`,
           { headers: { Accept: "application/json" } }
         );
-  
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-  
-        const data = await response.json();
-        console.log("Filtered Search API Response:", JSON.stringify(data, null, 2));
-  
+        const data = await response.json(); 
         setSearchResults(data.features || []);
       } catch (error) {
         console.error("Error fetching search results:", error);
@@ -88,30 +146,6 @@ const Location = () => {
       setSearchResults([]);
     }
   };
-  
-  
-
-
-  const handleSelectLocation = (place) => {
-    if (!place || !place.geometry) return;
-  
-    const [lng, lat] = place.geometry.coordinates; // Extract coordinates
-  
-    setAddress(place.place_name || place.text || ""); // Set address
-    setCity(place.context?.find((c) => c.id.includes("place"))?.text || ""); // Set city
-  
-    setLat(lat);
-    setLng(lng);
-  
-    if (marker) marker.setLngLat([lng, lat]); // Move the marker
-    if (map) map.flyTo({ center: [lng, lat], zoom: 14 }); // Fly to new location
-  
-    setSearchResults([]);
-    setSearchQuery("");
-  };
-  
-  
-
   return (
     <div className="w-full  bg-white py-24 px-96">
       <div className='mb-8'>
@@ -142,31 +176,37 @@ const Location = () => {
   />
   <ul>
   {searchResults.map((place, index) => {
-    const address = place.place_name || place.text || "Unknown location";
-    const [lng, lat] = place.geometry?.coordinates || [0, 0];
+    const streetName = place.text || "";
+    const ward =
+      place.context?.find((c) => c.id.includes("municipal_district"))?.text ||
+      "";
+    const district =
+      place.context?.find((c) => c.id.includes("municipality"))?.text || "";
+    const city = 
+      place.context?.find((c) => c.id.includes("subregion"))?.text || "";
+    const displayName = [streetName, ward, district, city]
+      .filter((part) => part)
+      .join(", ");
 
     return (
       <li
-        key={place.id || `location-${index}`} // Ensure a unique key
+        key={place.id || `location-${index}`}
         className="p-2 border hover:bg-gray-200 cursor-pointer"
         onClick={() => {
-          console.log("Clicked:", address, lat, lng);
-          handleSelectLocation(place); // Pass the whole place object
-        }}        
+          console.log("Clicked:", displayName);
+          handleSelectLocation(place);
+        }}
       >
-        {address} (Lat: {lat}, Lng: {lng})
+        {displayName}
       </li>
     );
   })}
 </ul>
 
-
-
 </div>
-
       <div ref={mapContainer} className="w-full h-64 mt-4 border rounded-md" />
       <div className="mt-4">
-        <label className="block text-sm font-medium">Street Address</label>
+        <label className="block text-sm font-medium">Address</label>
         <input type="text" className="w-full p-2 border rounded-md" value={address} onChange={(e) => setAddress(e.target.value)} />
       </div>
       <div className="mt-2">

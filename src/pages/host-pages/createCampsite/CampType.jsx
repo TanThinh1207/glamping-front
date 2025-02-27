@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { useCampsite } from '../../../context/CampsiteContext';
 
 const CampType = () => {
-  const [addedCampTypes, setAddedCampTypes] = useState([]);
+  const { campsiteData, updateCampsiteData } = useCampsite();
+  const [addedCampTypes, setAddedCampTypes] = useState(
+    Array.isArray(campsiteData.campType) ? campsiteData.campType : []
+  );
   const [isOpen, setIsOpen] = useState(false);
   const [campName, setCampName] = useState('');
   const [campDesc, setCampDesc] = useState('');
@@ -20,7 +24,7 @@ const CampType = () => {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (modalRef.current && !modalRef.current.contains(event.target)) {
-        handleCloseModal();
+        handleClosePopUp();
       }
     };
     if (isOpen) {
@@ -46,8 +50,12 @@ const CampType = () => {
         image: campImage,
         facilities: selectedFacilities,
       };
-      setAddedCampTypes([...addedCampTypes, newCampType]);
-      handleCloseModal();
+      setAddedCampTypes((prevCampTypes) => {
+        const updatedCampTypes = [...prevCampTypes, newCampType];
+        updateCampsiteData('campType', updatedCampTypes);
+        return updatedCampTypes;
+      });
+      handleClosePopUp();
     }
   };
 
@@ -58,7 +66,7 @@ const CampType = () => {
     }
   };
 
-  const handleCloseModal = () => {
+  const handleClosePopUp = () => {
     setIsOpen(false);
     setCampName('');
     setCampDesc('');
@@ -74,14 +82,14 @@ const CampType = () => {
         <h2 className='text-gray-500'>Provide different glamping styles (e.g., safari tents, yurts, cabins, treehouses)</h2>
       </div>
       <div className='flex gap-4 flex-wrap'>
-        {addedCampTypes.map((camp, index) => (
+        {addedCampTypes.filter(camp => camp.name).map((camp, index) => (
           <div key={index} className='w-64 border rounded-xl p-4 shadow-lg'>
             {camp.image && <img src={camp.image} alt='Camp' className='w-full h-auto object-cover rounded-xl' />}
             <h3 className='text-lg font-semibold mt-2'>{camp.name}</h3>
             <p className='text-gray-500'>{camp.description}</p>
             <p className='font-bold mt-2'>${camp.price}</p>
             <div className='mt-2 text-sm text-gray-600'>
-              {camp.facilities.join(', ')}
+              {Array.isArray(camp.facilities) ? camp.facilities.join(', ') : 'No facilities'}
             </div>
           </div>
         ))}
@@ -115,7 +123,7 @@ const CampType = () => {
             </div>
             <div className='text-right'>
               <button className='bg-black text-white px-4 py-2 rounded-xl' onClick={handleAddCampType}>Add Camp Type</button>
-              <button className='bg-red-500 text-white px-4 py-2 rounded-xl ml-4' onClick={handleCloseModal}>Cancel</button>
+              <button className='bg-red-500 text-white px-4 py-2 rounded-xl ml-4' onClick={handleClosePopUp}>Cancel</button>
             </div>
           </div>
         </div>

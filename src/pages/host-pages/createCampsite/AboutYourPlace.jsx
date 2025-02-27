@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useCampsite } from '../../../context/CampsiteContext'
 
 const AboutYourPlace = () => {
+  const {campsiteData, updateCampsiteData} = useCampsite();
   return (
     <div className="w-full flex  items-center justify-center bg-white py-24 px-24 gap-10">
       <div className='w-1/2 flex items-start'>
@@ -16,6 +18,8 @@ const AboutYourPlace = () => {
           <textarea
             className='w-[80%] h-32 border-2 rounded-xl border-gray-200 p-2 mt-5'
             placeholder='Create a beautiful name for your campsite'
+            value={campsiteData.campsiteName}
+            onChange={(e) => updateCampsiteData('campsiteName', e.target.value)}
           />
         </div>
         <div className='mb-8'>
@@ -25,6 +29,8 @@ const AboutYourPlace = () => {
           <textarea
             className='w-[80%] h-32 border-2 rounded-xl border-gray-200 p-2 mt-5'
             placeholder='Describe your campsite'
+            value={campsiteData.campsiteDescription}
+            onChange={(e) => updateCampsiteData('campsiteDescription', e.target.value)}
           />
         </div>
       </div>

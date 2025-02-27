@@ -2,8 +2,16 @@ import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
+import { useCampsite } from '../../../context/CampsiteContext';
 
 const StandOut = () => {
+    const {campsiteData, updateCampsiteData} = useCampsite();
+    const [selectedUtilities, setSelectedUtilities] = useState(campsiteData.campsiteUtilities || []);
+    const [selectedTypes, setSelectedTypes] = useState(campsiteData.campsiteType || []);
+    const [selectedImages, setSelectedImages] = useState(
+        Array.isArray(campsiteData.campsitePhoto) ? campsiteData.campsitePhoto.filter(Boolean) : []
+      );
+
     const listUtilities = [
         "Wifi",
         "Parking",
@@ -32,31 +40,39 @@ const StandOut = () => {
         "countryside",
         "city",
     ];
-    const [selectedUtilities, setSelectedUtilities] = useState([]);
+   
 
     const toggleUtility = (utility) => {
-        setSelectedUtilities((prevSelected) =>
-            prevSelected.includes(utility)
-                ? prevSelected.filter((item) => item !== utility) 
-                : [...prevSelected, utility] 
-        );
+        setSelectedUtilities((prevSelected) => {
+            const updatedUtilities = prevSelected.includes(utility)
+                ? prevSelected.filter((item) => item !== utility)
+                : [...prevSelected, utility];
+
+            updateCampsiteData("campsiteUtilities", updatedUtilities); 
+            return updatedUtilities;
+        });
     };
     const toggleType = (type) => {
-        setSelectedTypes((prevSelected) =>
-            prevSelected.includes(type)
+        setSelectedTypes((prevSelected) => {
+            const updatedTypes = prevSelected.includes(type)
                 ? prevSelected.filter((item) => item !== type)
-                : [...prevSelected, type]
-        );
+                : [...prevSelected, type];
+
+            updateCampsiteData("campsiteType", updatedTypes); 
+            return updatedTypes;
+        });
     };
-    const [selectedTypes, setSelectedTypes] = useState([]);
-    const [selectedImages, setSelectedImages] = useState([]);
     const handleImageUpload = (event) => {
         const files = event.target.files;
         if (files) {
             const newImages = Array.from(files).map((file) =>
                 URL.createObjectURL(file)
-            );
-            setSelectedImages((prevImages) => [...prevImages, ...newImages]);
+            ).filter(Boolean);
+            setSelectedImages((prevImages) => {
+                const updatedImages = [...prevImages, ...newImages];
+                updateCampsiteData("campsitePhoto", updatedImages);
+                return updatedImages;
+            });
         }
     };
     return (
@@ -66,7 +82,7 @@ const StandOut = () => {
                     Add some photos of your campsite
                 </h1>
                 <div className='flex gap-4 flex-wrap mt-5'>
-                    {selectedImages.map((image, index) => (
+                    {selectedImages.filter(Boolean).map((image, index) => (
                         <div key={index} className='relative w-32 h-32'>
                             <img
                                 src={image}
@@ -90,7 +106,7 @@ const StandOut = () => {
                 </div>
             </div>
             <div className='mb-8'>
-                <h1 className='text-4xl font-semiblod'>
+                <h1 className='text-4xl font-semibold'>
                     Tell us about your campsite's type
                 </h1>
                 <div className='flex gap-4 flex-wrap mt-5'>

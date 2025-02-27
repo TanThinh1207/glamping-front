@@ -1,9 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { useCampsite } from '../../../context/CampsiteContext';
+import { Hand } from 'lucide-react';
 
 const Services = () => {
-  const [addedServices, setAddedServices] = useState([]);
+  const { campsiteData, updateCampsiteData } = useCampsite();
+  const [addedServices, setAddedServices] = useState(
+    Array.isArray(campsiteData.campsiteServices) ? campsiteData.campsiteServices : []
+  );
   const [isOpen, setIsOpen] = useState(false);
   const [serviceName, setServiceName] = useState('');
   const [serviceDesc, setServiceDesc] = useState('');
@@ -14,7 +19,7 @@ const Services = () => {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (modalRef.current && !modalRef.current.contains(event.target)) {
-        setIsOpen(false);
+        handleClosePopUp();
       }
     };
 
@@ -35,12 +40,12 @@ const Services = () => {
         price: servicePrice,
         image: serviceImage,
       };
-      setAddedServices([...addedServices, newService]);
-      setIsOpen(false);
-      setServiceName('');
-      setServiceDesc('');
-      setServicePrice('');
-      setServiceImage(null);
+      setAddedServices((prevServices) => {
+        const updatedServices = [...prevServices, newService];
+        updateCampsiteData('campsiteServices', updatedServices);
+        return updatedServices;
+      })
+      handleClosePopUp();
     }
   };
 
@@ -50,7 +55,13 @@ const Services = () => {
       setServiceImage(URL.createObjectURL(file));
     }
   };
-
+  const handleClosePopUp = () => {
+    setIsOpen(false);
+    setServiceName('');
+    setServiceDesc('');
+    setServicePrice('');
+    setServiceImage(null);
+  }
   return (
     <div className='w-full bg-white py-24 px-96'>
       <div className='mb-8'>
@@ -58,7 +69,7 @@ const Services = () => {
         <h2 className='text-gray-500'>Add services that you offer to your guests</h2>
       </div>
       <div className='flex gap-4 flex-wrap'>
-        {addedServices.map((service, index) => (
+        {addedServices.filter(service => service.name).map((service, index) => (
           <div key={index} className='w-64 border rounded-xl p-4 shadow-lg'>
             {service.image && <img src={service.image} alt='Service' className='w-full h-auto object-cover rounded-xl' />}
             <h3 className='text-lg font-semibold mt-2'>{service.name}</h3>
@@ -88,7 +99,7 @@ const Services = () => {
             </div>
             <div className='text-right'>
               <button className='bg-black text-white px-4 py-2 rounded-xl' onClick={handleAddService}>Add service</button>
-              <button className='bg-red-500 text-white px-4 py-2 rounded-xl ml-4' onClick={() => setIsOpen(false)}>Cancel</button>
+              <button className='bg-red-500 text-white px-4 py-2 rounded-xl ml-4' onClick={handleClosePopUp}>Cancel</button>
             </div>
           </div>
         </div>

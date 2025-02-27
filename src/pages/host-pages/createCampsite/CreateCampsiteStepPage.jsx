@@ -4,7 +4,6 @@ import AboutYourPlace from "../createCampsite/AboutYourPlace";
 import Location from "../createCampsite/Location";
 import CampType from "../createCampsite/CampType";
 import Services from "../createCampsite/Services";
-import Receipt from "../createCampsite/Receipt";
 import StandOut  from "../createCampsite/StandOut";
 
 const CreateCampsiteStepPage = () => {
