@@ -49,7 +49,7 @@ const CreateCampsiteFooter = () => {
             )}
             {step === "camp-type" ? (
                 <button
-                className="bg-gradient-to-r from-green-400 to-yellow-300 text-white px-5 py-3 rounded-md text-xl font-semibold mx-4"
+                className="bg-gradient-to-r from-green-500 to-green-600 text-white px-5 py-3 rounded-md text-xl font-semibold mx-4"
                 onClick={() => navigate("/hosting")}
               >
                 Finish

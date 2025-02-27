@@ -79,7 +79,7 @@ const StandOut = () => {
                         key={utility}
                         className={`border-2 rounded-2xl p-2 cursor-pointer transition ${
                             selectedUtilities.includes(utility)
-                                ? 'border-gray-400 bg-gray-300 text-white'
+                                ? 'border-gray-400 bg-gradient-to-r from-green-500 to-green-600 text-white'
                                 : 'border-gray-300'
                         }`}
                         onClick={() => toggleUtility(utility)}
