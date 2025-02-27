@@ -20,15 +20,35 @@ const StandOut = () => {
         "Kid Friendly",
 
     ];
+    const listTypes = [
+        "mountain",
+        "beach",
+        "forest",
+        "lake",
+        "desert",
+        "river",
+        "island",
+        "cave",
+        "countryside",
+        "city",
+    ];
     const [selectedUtilities, setSelectedUtilities] = useState([]);
 
     const toggleUtility = (utility) => {
         setSelectedUtilities((prevSelected) =>
             prevSelected.includes(utility)
-                ? prevSelected.filter((item) => item !== utility) // Remove if already selected
-                : [...prevSelected, utility] // Add if not selected
+                ? prevSelected.filter((item) => item !== utility) 
+                : [...prevSelected, utility] 
         );
     };
+    const toggleType = (type) => {
+        setSelectedTypes((prevSelected) =>
+            prevSelected.includes(type)
+                ? prevSelected.filter((item) => item !== type)
+                : [...prevSelected, type]
+        );
+    };
+    const [selectedTypes, setSelectedTypes] = useState([]);
     const [selectedImages, setSelectedImages] = useState([]);
     const handleImageUpload = (event) => {
         const files = event.target.files;
@@ -68,6 +88,26 @@ const StandOut = () => {
                         />
                     </label>
                 </div>
+            </div>
+            <div className='mb-8'>
+                <h1 className='text-4xl font-semiblod'>
+                    Tell us about your campsite's type
+                </h1>
+                <div className='flex gap-4 flex-wrap mt-5'>
+                    {listTypes.map((type) => (
+                        <div
+                            key={type}
+                            className={`border-2 rounded-2xl p-2 cursor-pointer transition ${
+                                selectedTypes.includes(type)
+                                    ? 'border-gray-400 bg-gradient-to-r from-green-500 to-green-600 text-white'
+                                    : 'border-gray-300'
+                            }`}
+                            onClick={() => toggleType(type)}
+                        >
+                            {type}
+                        </div>
+                    ))}
+            </div>
             </div>
             <div className='mb-8'>
                 <h1 className='text-4xl font-semibold'>
