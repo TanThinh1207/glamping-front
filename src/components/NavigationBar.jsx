@@ -17,6 +17,7 @@ const getMenuItems = (path) => {
                 { name: "Today", link: "/hosting" },
                 { name: "Calendar", link: "/hosting/calendar" },
                 { name: "Listings", link: "/hosting/listings" },
+                { name: "Reservations", link: "/hosting/reservations" },
             ];
         default:
             return [

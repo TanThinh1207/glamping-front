@@ -5,13 +5,9 @@ import HostFrame from './pages/frame/HostFrame';
 import AdminFrame from './pages/frame/SidebarFrame';
 import HomePage from './pages/HomePage';
 import About from './pages/About';
-import Hosting from './pages/Hosting';
-import Calendar from './pages/Calendar';
 import CampsitePage from './pages/booking-pages/CampsitePage';
 import CamptypePage from './pages/booking-pages/CamptypePage';
 import Account from './pages/Account';
-import Listings from './pages/Listings';
-import ListingEditor from './pages/ListingEditor';
 import ExtraService from './pages/booking-pages/ExtraService';
 import ManagePlaceType from './pages/admin-pages/ManagePlaceType';
 import ManageAccount from './pages/admin-pages/ManageAccount';
@@ -25,7 +21,21 @@ import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/manager-pages/Dashboard';
 import HandleRequest from './pages/manager-pages/HandleRequest';
 import CompleteBookingPage from './pages/CompleteBookingPage';
+
+// Host
 import { CampsiteProvider } from './context/CampsiteContext';
+import Hosting from './pages/host-pages/Hosting';
+import Calendar from './pages/host-pages/Calendar';
+import Listings from './pages/host-pages/Listings';
+import Reservations from './pages/host-pages/Reservations';
+
+// Reservation Subpages
+import ReservationUpcoming from './pages/host-pages/reservationList/ReservationUpcoming';
+import ReservationCompleted from './pages/host-pages/reservationList/ReservationCompleted';
+import ReservationCanceled from './pages/host-pages/reservationList/ReservationCanceled';
+import ReservationAll from './pages/host-pages/reservationList/ReservationAll';
+import ReservationCheckin from './pages/host-pages/reservationList/ReservationCheckin';
+import ReservationCheckout from './pages/host-pages/reservationList/ReservationCheckout';
 
 function App() {
   const router = createBrowserRouter([
@@ -53,8 +63,21 @@ function App() {
         { path: "", element: <Hosting /> },
         { path: "calendar", element: <Calendar /> },
         { path: "listings", element: <Listings /> },
-        { path: "editor/:id", element: <ListingEditor /> },
+        {
+          path: "reservations",
+          element: <Reservations />,
+          children: [
+            { index: true, element: <ReservationUpcoming /> }, 
+            { path: "upcoming", element: <ReservationUpcoming /> },
+            { path: "completed", element: <ReservationCompleted /> },
+            { path: "canceled", element: <ReservationCanceled /> },
+            { path: "all", element: <ReservationAll /> },
+            { path: "checking-in", element: <ReservationCheckin /> },
+            { path: "checking-out", element: <ReservationCheckout /> },
+          ]
+        },
         { path: "create-campsite/:step", element: <CreateCampsiteStepPage /> },
+
       ]
     },
     {

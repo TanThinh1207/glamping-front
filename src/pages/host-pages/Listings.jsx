@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import image1 from '../assets/B6D7F1F4-1DB2-4380-94D9-185EF023BE36.jpg';
+import image1 from '../../assets/B6D7F1F4-1DB2-4380-94D9-185EF023BE36.jpg';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
