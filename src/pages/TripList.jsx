@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { fetchCamptypeById } from '../utils/BookingAPI';
 import { useBooking } from '../context/BookingContext';
+import { Link } from 'react-router-dom';
 
 const TripList = () => {
     const [loading, setLoading] = useState(true);
@@ -66,10 +67,12 @@ const TripList = () => {
                         ))
                     }
                     < div className='flex justify-end'>
-                        <button className="bg-black text-white border-black border uppercase mb-2 p-4 transform duration-300 
+                        <Link to={`/campsite/${campsiteId}/extra-service`}>
+                            <button className="bg-black text-white border-black border uppercase mb-2 p-4 transform duration-300 
         ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black mr-2 mt-2">
-                            Proceed to payment
-                        </button>
+                                Proceed to payment
+                            </button>
+                        </Link>
                     </div>
                 </div>
             ) : (

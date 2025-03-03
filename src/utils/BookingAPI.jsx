@@ -54,7 +54,6 @@ export const createBooking = async (bookingData) => {
             throw new Error(`Booking failed: ${response.statusText}`);
         }
         const responseData = await response.json();
-        console.log("Booking successful:", responseData);
 
         return responseData;
     } catch (error) {

@@ -14,6 +14,16 @@ export const BookingProvider = ({ children }) => {
         };
     });
 
+    const resetBooking = useCallback(() => {
+        setBooking({
+            bookingDetails: [],
+            userId: 1,
+            campSiteId: null,
+            totalAmount: 0,
+            bookingSelectionRequestList: [],
+        });
+    }, []);
+
     const updateTotalAmount = useCallback((total) => {
         setBooking((prev) => ({ ...prev, totalAmount: total }));
     }, []);
@@ -34,7 +44,18 @@ export const BookingProvider = ({ children }) => {
     }, []);
 
     const updateCampsite = useCallback((campSiteId) => {
-        setBooking((prev) => ({ ...prev, campSiteId }));
+        setBooking((prev) => {
+            if (prev.campSiteId && prev.campSiteId !== campSiteId) {
+                return {
+                    bookingDetails: [],
+                    userId: 1,
+                    campSiteId,
+                    totalAmount: 0,
+                    bookingSelectionRequestList: [],
+                };
+            }
+            return { ...prev, campSiteId };
+        });
     }, []);
 
     const updateCamptype = useCallback((campTypeId, quantity) => {
@@ -90,6 +111,7 @@ export const BookingProvider = ({ children }) => {
     return (
         <BookingContext.Provider value={{
             booking,
+            resetBooking,
             updateTotalAmount,
             updateServices,
             updateCampsite,

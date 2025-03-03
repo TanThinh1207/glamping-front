@@ -36,17 +36,29 @@ const BookingSummary = ({ selectedServices = [] }) => {
     }
     try {
       setLoading(true);
-  
+
       const responseData = await createBooking(booking);
-      
-      toast.success("Booking confirmed! 🎉");
-      
+      const bookingId = responseData.data.id;
+      console.log(responseData)
+
+      // const paymentResponse = await fetch(`http://localhost:8080/api/vn-pay?bookingId=${bookingId}`);
+      // const paymentData = await paymentResponse.json();
+      // console.log(paymentData)
+
+      // if (paymentResponse.ok) {
+      //   const paymentUrl = paymentData.data;
+  
+      //   window.location.href = paymentUrl;
+      // } else {
+      //   throw new Error(paymentData.message || "VNPay payment failed.");
+      // }
       localStorage.removeItem("booking");
       localStorage.removeItem("checkInDate");
       localStorage.removeItem("checkOutDate");
       localStorage.removeItem("guests");
+      console.log(booking)
       navigate('/complete-booking');
-  
+
     } catch (error) {
       console.log(`Booking failed: ${error.message}`);
     } finally {
@@ -111,10 +123,10 @@ const BookingSummary = ({ selectedServices = [] }) => {
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <div className="w-full bg-[#F5F3EB] p-6 shadow-md text-[#3C2F2F] font-sans">
-      <h2 className="text-xl font-semibold mb-4">{campsite.name}</h2>
+    <div className="w-full bg-[#F5F3EB] p-6 shadow-md text-[#3C2F2F] font-canto">
+      <h2 className="text-2xl font-semibold mb-4">{campsite.name}</h2>
 
-      <div className="mb-3">
+      <div className="mb-3 text-xl">
         <p>
           <span className="font-semibold">Arrival:</span> {checkInDate?.format("MMMM DD YYYY")}
         </p>
@@ -128,7 +140,7 @@ const BookingSummary = ({ selectedServices = [] }) => {
 
       {booking?.bookingDetails?.length > 0 ? (
         <div className="mb-3">
-          <h3 className="text-lg font-semibold">Selected Accommodations</h3>
+          <h3 className="text-xl font-semibold">Selected Accommodations</h3>
           {booking.bookingDetails.map((item, index) => {
             const campType = camptypes.find((type) => type.id === item.campTypeId);
             return (
@@ -147,7 +159,7 @@ const BookingSummary = ({ selectedServices = [] }) => {
       ) : (
         <p className="text-gray-600">No accommodations selected.</p>
       )}
-      <p className="text-lg font-semibold">Extra Services</p>
+      <p className="text-xl font-semibold">Extra Services</p>
       {selectedServices.length > 0 ? selectedServices.map(service => (
         <p key={service.id}>{service.name} x{service.quantity}</p>
       )) : <p>No extra services selected.</p>}

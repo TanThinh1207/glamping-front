@@ -78,11 +78,11 @@ function App() {
   ])
   return (
     <>
-      <CampsiteProvider>
-        <BookingProvider>
+      <BookingProvider>
+        <CampsiteProvider>
           <RouterProvider router={router} />
-        </BookingProvider>
-      </CampsiteProvider>
+        </CampsiteProvider>
+      </BookingProvider>
     </>
   )
 }

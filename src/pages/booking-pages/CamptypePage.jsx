@@ -3,26 +3,26 @@ import { useParams } from 'react-router-dom'
 import SearchBar from '../../components/SearchBar'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMugHot } from '@fortawesome/free-solid-svg-icons'
-import { Link } from 'react-router-dom'
 import { useBooking } from '../../context/BookingContext'
 import { fetchCampsiteById, fetchCamptypeById } from '../../utils/BookingAPI'
 import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
+import Modal from '../../components/Modal'
 
 const CamptypePage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    const { updateCamptype } = useBooking();
-    const { updateCampsite } = useBooking();
+    const { updateCamptype, updateCampsite, resetBooking, booking } = useBooking();
     const { campsiteId } = useParams();
-    const { booking } = useBooking();
+
     const [campsite, setCampsite] = useState(null);
     const [camptypes, setCamptypes] = useState([]);
     const [quantities, setQuantities] = useState({});
-    const checkInAt = localStorage.getItem('checkInDate');
-    const checkOutAt = localStorage.getItem('checkOutDate');
+
+    const [modalOpen, setModalOpen] = useState(false);
+    const [pendingSelection, setPendingSelection] = useState('');
 
     useEffect(() => {
         const fetchData = async () => {
@@ -54,16 +54,33 @@ const CamptypePage = () => {
     };
 
     const handleCamptypeSelection = (camptype) => {
+        const checkInAt = localStorage.getItem('checkInDate')
+        const checkOutAt = localStorage.getItem('checkOutDate')
+
         if (!checkInAt || !checkOutAt) {
             toast.info('Please select check-in and check-out dates first');
             return;
-        } else {
-            updateCampsite(campsiteId);
-            updateCamptype(camptype.id, quantities[camptype.id]);
-            navigate(`/campsite/${campsiteId}/extra-service`);
         }
-
+        if (booking.campSiteId && booking.campSiteId !== campsiteId) {
+            setPendingSelection(camptype);
+            setModalOpen(true);
+            return;
+        } else {
+            proceedWithSelection(camptype);
+        }
     }
+
+    const proceedWithSelection = (camptype) => {
+        updateCampsite(campsiteId);
+        updateCamptype(camptype.id, quantities[camptype.id]);
+        navigate(`/campsite/${campsiteId}/extra-service`);
+    };
+
+    const handleConfirmNewSelection = () => {
+        setModalOpen(false);
+        resetBooking();
+        proceedWithSelection(pendingSelection);
+    };
 
     if (loading) {
         return (
@@ -125,6 +142,25 @@ const CamptypePage = () => {
                     <hr className='mt-6' />
                 </div>
             ))}
+            <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
+                <div className="bg-white p-6 rounded shadow-md">
+                    <p>You have already selected a camp type from another campsite. If you proceed, your previous selection will be lost.</p>
+                    <div className="mt-4 flex justify-end gap-4">
+                        <button
+                            className="px-4 py-2 bg-gray-300 rounded"
+                            onClick={() => setModalOpen(false)}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            className="px-4 py-2 bg-red-600 text-white rounded"
+                            onClick={handleConfirmNewSelection}
+                        >
+                            Yes, Proceed
+                        </button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     )
 }
