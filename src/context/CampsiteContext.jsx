@@ -8,14 +8,7 @@ export const CampsiteProvider = ({ children }) => {
         campsitePhoto: [],
         campsiteType: [],
         campsiteUtilities: [],
-        campsiteServices: [
-            {
-                serviceName: '',
-                serviceImage: '',
-                serviceDescription: '',
-                servicePrice: 0,
-            }
-        ],
+        campsiteServices: [],
         campsiteLocation: {
             lat: 0,
             lng: 0,
@@ -23,15 +16,7 @@ export const CampsiteProvider = ({ children }) => {
             city: '',
             country: '',
         },
-        campType: [
-            {
-                campTypeName: '',
-                campTypeImage: '',
-                campTypeDescription: '',
-                campTypeFacilities: [],
-                campTypePrice: 0,
-            }
-        ],
+        campType: [],
     });
     const updateCampsiteData = (key, value) => {
         setCampsiteData((prevData) => ({

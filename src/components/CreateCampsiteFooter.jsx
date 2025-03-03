@@ -1,5 +1,6 @@
 import React from 'react'
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
+import { useCampsite } from '../context/CampsiteContext';
 
 const pageSteps = [
   "overview",
@@ -11,12 +12,17 @@ const pageSteps = [
 ];
 
 const CreateCampsiteFooter = () => {
+  const {campsiteData} = useCampsite();
   const navigate = useNavigate();
   const { step } = useParams();
   const currentStepIndex = pageSteps.indexOf(step);
   const prevStep = currentStepIndex > 0 ? pageSteps[currentStepIndex - 1] : null;
   const nextStep = currentStepIndex < pageSteps.length - 1 ? pageSteps[currentStepIndex + 1] : null;
-
+  
+  const handleFinish = () => {
+    console.log(campsiteData);
+    navigate("/hosting");
+  }
   return (
     <div className='fixed bottom-0 w-full bg-white'>
       {/* Processing bar */}
@@ -50,7 +56,7 @@ const CreateCampsiteFooter = () => {
             {step === "camp-type" ? (
                 <button
                 className="bg-gradient-to-r from-green-500 to-green-600 text-white px-5 py-3 rounded-md text-xl font-semibold mx-4"
-                onClick={() => navigate("/hosting")}
+                onClick={handleFinish}
               >
                 Finish
               </button>

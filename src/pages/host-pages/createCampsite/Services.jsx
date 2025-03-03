@@ -33,6 +33,9 @@ const Services = () => {
   }, [isOpen]);
 
   const handleAddService = () => {
+    if(!serviceName.trim() || !serviceDesc.trim() || !servicePrice) {
+      return;
+    }
     if (serviceName && serviceDesc && servicePrice) {
       const newService = {
         name: serviceName,
@@ -40,15 +43,14 @@ const Services = () => {
         price: servicePrice,
         image: serviceImage,
       };
-      setAddedServices((prevServices) => {
-        const updatedServices = [...prevServices, newService];
-        updateCampsiteData('campsiteServices', updatedServices);
-        return updatedServices;
-      })
+      setAddedServices((prevServices) => [...prevServices, newService]);
       handleClosePopUp();
     }
   };
-
+  
+  useEffect(() => {
+    updateCampsiteData("campsiteServices", addedServices);
+  }, [addedServices]);
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {

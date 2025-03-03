@@ -1,17 +1,27 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 import { useCampsite } from '../../../context/CampsiteContext';
 
 const StandOut = () => {
-    const {campsiteData, updateCampsiteData} = useCampsite();
+    const { campsiteData, updateCampsiteData } = useCampsite();
     const [selectedUtilities, setSelectedUtilities] = useState(campsiteData.campsiteUtilities || []);
     const [selectedTypes, setSelectedTypes] = useState(campsiteData.campsiteType || []);
     const [selectedImages, setSelectedImages] = useState(
         Array.isArray(campsiteData.campsitePhoto) ? campsiteData.campsitePhoto.filter(Boolean) : []
-      );
+    );
+    useEffect(() => {
+        updateCampsiteData("campsiteUtilities", selectedUtilities);
+    }, [selectedUtilities]);
 
+    useEffect(() => {
+        updateCampsiteData("campsiteType", selectedTypes);
+    }, [selectedTypes]);
+
+    useEffect(() => {
+        updateCampsiteData("campsitePhoto", selectedImages);
+    }, [selectedImages]);
     const listUtilities = [
         "Wifi",
         "Parking",
@@ -40,15 +50,13 @@ const StandOut = () => {
         "countryside",
         "city",
     ];
-   
+
 
     const toggleUtility = (utility) => {
         setSelectedUtilities((prevSelected) => {
             const updatedUtilities = prevSelected.includes(utility)
                 ? prevSelected.filter((item) => item !== utility)
                 : [...prevSelected, utility];
-
-            updateCampsiteData("campsiteUtilities", updatedUtilities); 
             return updatedUtilities;
         });
     };
@@ -57,8 +65,6 @@ const StandOut = () => {
             const updatedTypes = prevSelected.includes(type)
                 ? prevSelected.filter((item) => item !== type)
                 : [...prevSelected, type];
-
-            updateCampsiteData("campsiteType", updatedTypes); 
             return updatedTypes;
         });
     };
@@ -68,11 +74,7 @@ const StandOut = () => {
             const newImages = Array.from(files).map((file) =>
                 URL.createObjectURL(file)
             ).filter(Boolean);
-            setSelectedImages((prevImages) => {
-                const updatedImages = [...prevImages, ...newImages];
-                updateCampsiteData("campsitePhoto", updatedImages);
-                return updatedImages;
-            });
+            setSelectedImages((prevImages) => [...prevImages, ...newImages]);
         }
     };
     return (
@@ -113,35 +115,33 @@ const StandOut = () => {
                     {listTypes.map((type) => (
                         <div
                             key={type}
-                            className={`border-2 rounded-2xl p-2 cursor-pointer transition ${
-                                selectedTypes.includes(type)
+                            className={`border-2 rounded-2xl p-2 cursor-pointer transition ${selectedTypes.includes(type)
                                     ? 'border-gray-400 bg-gradient-to-r from-green-500 to-green-600 text-white'
                                     : 'border-gray-300'
-                            }`}
+                                }`}
                             onClick={() => toggleType(type)}
                         >
                             {type}
                         </div>
                     ))}
-            </div>
+                </div>
             </div>
             <div className='mb-8'>
                 <h1 className='text-4xl font-semibold'>
-                    Tell us about your campsite's utilities 
+                    Tell us about your campsite's utilities
                 </h1>
                 <div className='flex gap-4 flex-wrap mt-5'>
                     {listUtilities.map((utility) => (
                         <div
-                        key={utility}
-                        className={`border-2 rounded-2xl p-2 cursor-pointer transition ${
-                            selectedUtilities.includes(utility)
-                                ? 'border-gray-400 bg-gradient-to-r from-green-500 to-green-600 text-white'
-                                : 'border-gray-300'
-                        }`}
-                        onClick={() => toggleUtility(utility)}
-                    >
-                        {utility}
-                    </div>
+                            key={utility}
+                            className={`border-2 rounded-2xl p-2 cursor-pointer transition ${selectedUtilities.includes(utility)
+                                    ? 'border-gray-400 bg-gradient-to-r from-green-500 to-green-600 text-white'
+                                    : 'border-gray-300'
+                                }`}
+                            onClick={() => toggleUtility(utility)}
+                        >
+                            {utility}
+                        </div>
                     ))}
                 </div>
             </div>

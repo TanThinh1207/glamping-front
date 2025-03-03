@@ -124,15 +124,15 @@ const Location = () => {
       console.error("Error fetching reverse geocode:", error);
     }
   };
-  
 
   const handleSearch = async (e) => {
     const query = e.target.value;
     setSearchQuery(query);
     if (query.length > 2) {
       try {
+        const countryCode = selectedCountry || "VN";
         const response = await fetch(
-          `https://api.maptiler.com/geocoding/${encodeURIComponent(query)}.json?key=${MAPTILER_KEY}&country=${selectedCountry}`,
+          `https://api.maptiler.com/geocoding/${encodeURIComponent(query)}.json?key=${MAPTILER_KEY}&country=${countryCode}`,
           { headers: { Accept: "application/json" } }
         );
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);

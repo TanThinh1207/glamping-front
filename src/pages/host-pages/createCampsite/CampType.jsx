@@ -40,8 +40,11 @@ const CampType = () => {
       prev.includes(facility) ? prev.filter((item) => item !== facility) : [...prev, facility]
     );
   };
-
+  
   const handleAddCampType = () => {
+    if (!campName.trim() || !campDesc.trim() || !campPrice) {
+      return; 
+    }
     if (campName && campDesc && campPrice) {
       const newCampType = {
         name: campName,
@@ -50,15 +53,13 @@ const CampType = () => {
         image: campImage,
         facilities: selectedFacilities,
       };
-      setAddedCampTypes((prevCampTypes) => {
-        const updatedCampTypes = [...prevCampTypes, newCampType];
-        updateCampsiteData('campType', updatedCampTypes);
-        return updatedCampTypes;
-      });
+      setAddedCampTypes((prevCampTypes) => [...prevCampTypes, newCampType]);
       handleClosePopUp();
     }
   };
-
+  useEffect(() => {
+    updateCampsiteData('campType', addedCampTypes);
+  }, [addedCampTypes]);
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
