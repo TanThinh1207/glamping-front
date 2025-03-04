@@ -12,7 +12,32 @@ const ReservationCompleted = () => {
           <p className="text-black mt-2">Please try a different filter</p>
         </div>
       ) : (
-        <table></table>
+        <table>
+          <thead>
+            <tr>
+              <th>Guest</th>
+              <th>Campsite's name</th>
+              <th>Camp types</th>
+              <th>Services</th>
+              <th>Check in date</th>
+              <th>Check out date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {CompletedReservations.map((reservation, index) => (
+              <tr key={index}>
+                <td>{reservation.guest}</td>
+                <td>{reservation.campsiteName}</td>
+                <td>{reservation.campTypes}</td>
+                <td>{reservation.services}</td>
+                <td>{reservation.checkInDate}</td>
+                <td>{reservation.checkOutDate}</td>
+                <td>{reservation.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
   )

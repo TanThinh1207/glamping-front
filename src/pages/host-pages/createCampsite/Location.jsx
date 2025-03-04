@@ -3,8 +3,8 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useCampsite } from '../../../context/CampsiteContext';
 
-const MAPTILER_KEY = "6PzV7JPUgWxephJUe1TH"; 
-const INITIAL_COORDS = { lat: 10.7769, lng: 106.7009 }; 
+const MAPTILER_KEY = "6PzV7JPUgWxephJUe1TH";
+const INITIAL_COORDS = { lat: 10.7769, lng: 106.7009 };
 
 const countries = [
   { label: "Vietnam - VN", code: "VN" },
@@ -33,29 +33,23 @@ const Location = () => {
   useEffect(() => {
     const mapInstance = new maplibregl.Map({
       container: mapContainer.current,
-      style: `https://api.maptiler.com/maps/basic/style.json?key=${MAPTILER_KEY}`, 
+      style: `https://api.maptiler.com/maps/basic/style.json?key=${MAPTILER_KEY}`,
       center: [lng, lat],
       zoom: 10,
     });
-    
-  
     const newMarker = new maplibregl.Marker({ draggable: true })
       .setLngLat([lng, lat])
       .addTo(mapInstance);
-  
     newMarker.on("dragend", () => {
       const lngLat = newMarker.getLngLat();
       setLat(lngLat.lat);
       setLng(lngLat.lng);
       reverseGeocode(lngLat.lat, lngLat.lng);
     });
-  
     setMap(mapInstance);
     setMarker(newMarker);
-  
     return () => mapInstance.remove();
-  }, [lat, lng]); 
-  
+  }, [lat, lng]);
   const handleSelectLocation = (place) => {
     if (!place || !place.geometry || !place.geometry.coordinates) {
       console.error("Invalid place object:", place);
@@ -70,7 +64,7 @@ const Location = () => {
     const city =
       place.context?.find((c) => c.id.includes("subregion"))?.text || "";
     const formattedAddress = [streetName, ward, district]
-      .filter((part) => part) 
+      .filter((part) => part)
       .join(", ");
     setLat(lat);
     setLng(lng);
@@ -92,20 +86,12 @@ const Location = () => {
     setSearchResults([]);
     setSearchQuery("");
   };
-  
-  
   const reverseGeocode = async (latitude, longitude) => {
-  
     try {
       const response = await fetch(
         `https://api.maptiler.com/geocoding/${longitude},${latitude}.json?key=${MAPTILER_KEY}`
       );
-  
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-  
-      const data = await response.json();
-      console.log("Reverse Geocode Response:", data);
-  
       if (data.features.length > 0) {
         const place = data.features[0];
         const newAddress = place.properties.address || address;
@@ -124,7 +110,6 @@ const Location = () => {
       console.error("Error fetching reverse geocode:", error);
     }
   };
-
   const handleSearch = async (e) => {
     const query = e.target.value;
     setSearchQuery(query);
@@ -136,7 +121,7 @@ const Location = () => {
           { headers: { Accept: "application/json" } }
         );
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        const data = await response.json(); 
+        const data = await response.json();
         setSearchResults(data.features || []);
       } catch (error) {
         console.error("Error fetching search results:", error);
@@ -167,43 +152,40 @@ const Location = () => {
         </select>
       </div>
       <div className="relative">
-  <input
-    type="text"
-    placeholder="Search for a location..."
-    value={searchQuery}
-    onChange={handleSearch}
-    className="w-full p-2 border rounded-md"
-  />
-  <ul>
-  {searchResults.map((place, index) => {
-    const streetName = place.text || "";
-    const ward =
-      place.context?.find((c) => c.id.includes("municipal_district"))?.text ||
-      "";
-    const district =
-      place.context?.find((c) => c.id.includes("municipality"))?.text || "";
-    const city = 
-      place.context?.find((c) => c.id.includes("subregion"))?.text || "";
-    const displayName = [streetName, ward, district, city]
-      .filter((part) => part)
-      .join(", ");
-
-    return (
-      <li
-        key={place.id || `location-${index}`}
-        className="p-2 border hover:bg-gray-200 cursor-pointer"
-        onClick={() => {
-          console.log("Clicked:", displayName);
-          handleSelectLocation(place);
-        }}
-      >
-        {displayName}
-      </li>
-    );
-  })}
-</ul>
-
-</div>
+        <input
+          type="text"
+          placeholder="Search for a location..."
+          value={searchQuery}
+          onChange={handleSearch}
+          className="w-full p-2 border rounded-md"
+        />
+        <ul>
+          {searchResults.map((place, index) => {
+            const streetName = place.text || "";
+            const ward =
+              place.context?.find((c) => c.id.includes("municipal_district"))?.text ||
+              "";
+            const district =
+              place.context?.find((c) => c.id.includes("municipality"))?.text || "";
+            const city =
+              place.context?.find((c) => c.id.includes("subregion"))?.text || "";
+            const displayName = [streetName, ward, district, city]
+              .filter((part) => part)
+              .join(", ");
+            return (
+              <li
+                key={place.id || `location-${index}`}
+                className="p-2 border hover:bg-gray-200 cursor-pointer"
+                onClick={() => {
+                  handleSelectLocation(place);
+                }}
+              >
+                {displayName}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
       <div ref={mapContainer} className="w-full h-64 mt-4 border rounded-md" />
       <div className="mt-4">
         <label className="block text-sm font-medium">Address</label>

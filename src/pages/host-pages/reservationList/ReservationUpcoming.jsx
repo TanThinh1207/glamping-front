@@ -38,16 +38,17 @@ const ReservationUpcoming = () => {
         </div>
       ) : (
         <table className='w-full text-left'>
-          <tr>
-            <th>Guest</th>
-            <th>Phone Number</th>
-            <th>Email</th>
-            <th>Campsite's name</th>
-            <th>Camp types</th>
-            <th className='text-center'>Status</th>
-            <th className='text-center'>Action</th>
-          </tr>
-
+          <thead>
+            <tr>
+              <th>Guest</th>
+              <th>Phone Number</th>
+              <th>Email</th>
+              <th>Campsite's name</th>
+              <th>Camp types</th>
+              <th className='text-center'>Status</th>
+              <th className='text-center'>Action</th>
+            </tr>
+          </thead>
           <tbody>
             {UpcomingReservations.map((reservation, index) => (
               <tr key={index}>

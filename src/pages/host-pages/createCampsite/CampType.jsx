@@ -9,10 +9,12 @@ const CampType = () => {
     Array.isArray(campsiteData.campType) ? campsiteData.campType : []
   );
   const [isOpen, setIsOpen] = useState(false);
-  const [campName, setCampName] = useState('');
-  const [campDesc, setCampDesc] = useState('');
-  const [campPrice, setCampPrice] = useState('');
-  const [campImage, setCampImage] = useState(null);
+  const [campTypeQuantity, setCampTypeQuantity] = useState(0);
+  const [numberOfGuests, setNumberOfGuests] = useState(0);
+  const [campTypeName, setCampTypeName] = useState('');
+  const [campTypeDesc, setCampTypeDesc] = useState('');
+  const [campTypePrice, setCampTypePrice] = useState('');
+  const [campTypeImage, setCampTypeImage] = useState(null);
   const modalRef = useRef(null);
   const [selectedFacilities, setSelectedFacilities] = useState([]);
 
@@ -40,17 +42,19 @@ const CampType = () => {
       prev.includes(facility) ? prev.filter((item) => item !== facility) : [...prev, facility]
     );
   };
-  
+
   const handleAddCampType = () => {
-    if (!campName.trim() || !campDesc.trim() || !campPrice) {
-      return; 
+    if (!campTypeName.trim() || !campTypeDesc.trim() || !campTypePrice) {
+      return;
     }
-    if (campName && campDesc && campPrice) {
+    if (campTypeName && campTypeDesc && campTypePrice) {
       const newCampType = {
-        name: campName,
-        description: campDesc,
-        price: campPrice,
-        image: campImage,
+        name: campTypeName,
+        description: campTypeDesc,
+        numberOfGuests: numberOfGuests,
+        quantity: campTypeQuantity,
+        price: campTypePrice,
+        image: campTypeImage,
         facilities: selectedFacilities,
       };
       setAddedCampTypes((prevCampTypes) => [...prevCampTypes, newCampType]);
@@ -69,10 +73,12 @@ const CampType = () => {
 
   const handleClosePopUp = () => {
     setIsOpen(false);
-    setCampName('');
-    setCampDesc('');
-    setCampPrice('');
-    setCampImage(null);
+    setCampTypeName('');
+    setCampTypeDesc('');
+    setCampTypePrice('');
+    setNumberOfGuests(0);
+    setCampTypeQuantity(0);
+    setCampTypeImage(null);
     setSelectedFacilities([]);
   };
 
@@ -102,24 +108,49 @@ const CampType = () => {
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
           <div ref={modalRef} className='bg-white shadow-lg p-6 lg:w-2/4 relative rounded-xl'>
             <div className='mb-8 flex flex-col gap-4'>
-              <h1 className='text-xl font-semibold'>Camp Type Name</h1>
-              <input className='w-full h-10 border-2 rounded-xl border-gray-200 p-2' placeholder='Enter camp type name' value={campName} onChange={(e) => setCampName(e.target.value)} />
-              <h1 className='text-xl font-semibold'>Camp Type Image</h1>
-              <label className='w-32 h-32 border-2 border-gray-300 rounded-xl flex items-center justify-center cursor-pointer hover:bg-gray-100 ' htmlFor='imageUpload'>
-                {campImage ? <img src={campImage} alt='Preview' className='w-full h-full object-cover rounded-xl' /> : <FontAwesomeIcon icon={faPlus} className='text-gray-400 text-3xl' />}
-              </label>
-              <input type='file' id='imageUpload' className='hidden' onChange={handleImageUpload} />
-              <h1 className='text-xl font-semibold'>Camp Type Description</h1>
-              <textarea className='w-full h-32 border-2 rounded-xl border-gray-200 p-2' placeholder='Enter camp type description' value={campDesc} onChange={(e) => setCampDesc(e.target.value)} />
-              <h1 className='text-xl font-semibold'>Camp Type Price</h1>
-              <input className='w-full h-10 border-2 rounded-xl border-gray-200 p-2' placeholder='Enter camp type price' type='number' value={campPrice} onChange={(e) => setCampPrice(e.target.value)} />
-              <h1 className='text-xl font-semibold'>Facilities</h1>
-              <div className='flex gap-4 flex-wrap'>
-                {listFacilities.map((facility) => (
-                  <div key={facility} className={`border-2 rounded-2xl p-2 cursor-pointer transition ${selectedFacilities.includes(facility) ? 'border-gray-400 bg-gradient-to-r from-green-500 to-green-600 text-white' : 'border-gray-300'}`} onClick={() => toggleFacility(facility)}>
-                    {facility}
+              <div className='flex space-x-4'>
+                <div className='w-3/4'>
+                  <h1 className='text-xl font-semibold mb-2'>Camp Type Name</h1>
+                  <input className='w-full h-10 border-2 rounded-xl border-gray-200 p-2' placeholder='Enter camp type name' value={campTypeName} onChange={(e) => setCampTypeName(e.target.value)} />
+                </div>
+                <div className='w-1/4'>
+                  <h1 className='text-xl font-semibold mb-2'>Camp Type Image</h1>
+                  <div className='flex items-center justify-center'>
+                    <label className='w-20 h-20 border-2 border-gray-300 rounded-xl flex items-center justify-center cursor-pointer hover:bg-gray-100' htmlFor='imageUpload'>
+                      {campTypeImage ? <img src={campTypeImage} alt='Preview' className='w-full h-full object-cover rounded-xl' /> : <FontAwesomeIcon icon={faPlus} className='text-gray-400 text-3xl' />}
+                    </label>
                   </div>
-                ))}
+                  <input type='file' id='imageUpload' className='hidden' onChange={handleImageUpload} />
+                </div>
+              </div>
+              <div>
+                <h1 className='text-xl font-semibold mb-2'>Camp Type Description</h1>
+                <textarea className='w-full h-32 border-2 rounded-xl border-gray-200 p-2' placeholder='Enter camp type description' value={campTypeDesc} onChange={(e) => setTypeCampDesc(e.target.value)} />
+              </div>
+
+              <div className='flex space-x-4'>
+                <div className='w-1/4'>
+                  <h1 className='text-xl font-semibold mb-2'>Number of Guests</h1>
+                  <input className='w-full h-10 border-2 rounded-xl border-gray-200 p-2' placeholder='Enter number of guests' type='number' value={numberOfGuests} onChange={(e) => setNumberOfGuests(e.target.value)} />
+                </div>
+                <div className='w-1/4'>
+                  <h1 className='text-xl font-semibold mb-2'>Quantity</h1>
+                  <input className='w-full h-10 border-2 rounded-xl border-gray-200 p-2' placeholder='Enter camp type quantity' type='number' value={campTypeQuantity} onChange={(e) => setCampTypeQuantity(e.target.value)} />
+                </div>
+                <div className='w-1/2'>
+                  <h1 className='text-xl font-semibold mb-2'>Camp Type Price</h1>
+                  <input className='w-full h-10 border-2 rounded-xl border-gray-200 p-2' placeholder='Enter camp type price' type='number' value={campTypePrice} onChange={(e) => setCampTypePrice(e.target.value)} />
+                </div>
+              </div>
+              <div>
+                <h1 className='text-xl font-semibold mb-2'>Facilities</h1>
+                <div className='flex gap-4 flex-wrap'>
+                  {listFacilities.map((facility) => (
+                    <div key={facility} className={`border-2 rounded-2xl p-2 cursor-pointer transition ${selectedFacilities.includes(facility) ? 'border-gray-400 bg-gradient-to-r from-green-500 to-green-600 text-white' : 'border-gray-300'}`} onClick={() => toggleFacility(facility)}>
+                      {facility}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
             <div className='text-right'>
