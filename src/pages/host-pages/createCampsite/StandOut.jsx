@@ -3,8 +3,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 import { useCampsite } from '../../../context/CampsiteContext';
+import axios from 'axios';
 
 const StandOut = () => {
+    const [placeTypes, setPlaceTypes] = useState([]);
+    const [utilities, setUtilities] = useState([]);
     const { campsiteData, updateCampsiteData } = useCampsite();
     const [selectedUtilities, setSelectedUtilities] = useState(campsiteData.campsiteUtilities || []);
     const [selectedTypes, setSelectedTypes] = useState(campsiteData.campsiteType || []);
@@ -22,52 +25,56 @@ const StandOut = () => {
     useEffect(() => {
         updateCampsiteData("campsitePhoto", selectedImages);
     }, [selectedImages]);
-    const listUtilities = [
-        "Wifi",
-        "Parking",
-        "Toilet",
-        "Swimming Pool",
-        "Kitchen",
-        "Shower",
-        "Laundry",
-        "Water",
-        "Electricity",
-        "Fireplace",
-        "BBQ",
-        "Pet Friendly",
-        "Kid Friendly",
 
-    ];
-    const listTypes = [
-        "mountain",
-        "beach",
-        "forest",
-        "lake",
-        "desert",
-        "river",
-        "island",
-        "cave",
-        "countryside",
-        "city",
-    ];
+    useEffect(() => {
+        const fetchUtilities = async () => {
+          try {
+            const response = await axios.get(`${import.meta.env.VITE_API_GET_UTILITIES}`, {
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+            setUtilities(response.data.data.content);
+          } catch (error) {
+            console.error("Error fetching utilities data:", error);
+          }
+        };
+        fetchUtilities();
+      }, []);
+
+    useEffect(() => {
+        const fetchPlaceTypes = async () => {
+            try {
+                const response = await axios.get(`${import.meta.env.VITE_API_GET_PLACETYPES}`, {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+                setPlaceTypes(response.data.data.content);
+            } catch (error) {
+                console.error("Error fetching place type data:", error);
+            }
+        };
+        fetchPlaceTypes();
+    }, []);
 
 
-    const toggleUtility = (utility) => {
-        setSelectedUtilities((prevSelected) => {
-            const updatedUtilities = prevSelected.includes(utility)
-                ? prevSelected.filter((item) => item !== utility)
-                : [...prevSelected, utility];
-            return updatedUtilities;
+    const toggleUtility = (utilityId) => {
+        setSelectedUtilities((prev) => {
+            return prev.includes(utilityId)
+                ? prev.filter((id) => id !== utilityId)
+                : [...prev, utilityId];
         });
     };
-    const toggleType = (type) => {
-        setSelectedTypes((prevSelected) => {
-            const updatedTypes = prevSelected.includes(type)
-                ? prevSelected.filter((item) => item !== type)
-                : [...prevSelected, type];
-            return updatedTypes;
+    
+    const toggleType = (typeId) => {
+        setSelectedTypes((prev) => {
+            return prev.includes(typeId)
+                ? prev.filter((id) => id !== typeId)
+                : [...prev, typeId];
         });
     };
+    
     const handleImageUpload = (event) => {
         const files = event.target.files;
         if (files) {
@@ -112,16 +119,16 @@ const StandOut = () => {
                     Tell us about your campsite's type
                 </h1>
                 <div className='flex gap-4 flex-wrap mt-5'>
-                    {listTypes.map((type) => (
+                    {placeTypes?.map((type) => (
                         <div
-                            key={type}
-                            className={`border-2 rounded-2xl p-2 cursor-pointer transition ${selectedTypes.includes(type)
-                                    ? 'border-gray-400 bg-gradient-to-r from-green-500 to-green-600 text-white'
-                                    : 'border-gray-300'
+                            key={type.id}
+                            className={`border-2 rounded-2xl p-2 cursor-pointer transition ${selectedTypes.includes(type.id)
+                                ? 'border-gray-400 bg-gradient-to-r from-green-500 to-green-600 text-white'
+                                : 'border-gray-300'
                                 }`}
-                            onClick={() => toggleType(type)}
+                            onClick={() => toggleType(type.id)}
                         >
-                            {type}
+                            {type.name}
                         </div>
                     ))}
                 </div>
@@ -131,16 +138,16 @@ const StandOut = () => {
                     Tell us about your campsite's utilities
                 </h1>
                 <div className='flex gap-4 flex-wrap mt-5'>
-                    {listUtilities.map((utility) => (
+                    {utilities?.map((utility) => (
                         <div
-                            key={utility}
-                            className={`border-2 rounded-2xl p-2 cursor-pointer transition ${selectedUtilities.includes(utility)
-                                    ? 'border-gray-400 bg-gradient-to-r from-green-500 to-green-600 text-white'
-                                    : 'border-gray-300'
+                            key={utility.id}
+                            className={`border-2 rounded-2xl p-2 cursor-pointer transition ${selectedUtilities.includes(utility.id)
+                                ? 'border-gray-400 bg-gradient-to-r from-green-500 to-green-600 text-white'
+                                : 'border-gray-300'
                                 }`}
-                            onClick={() => toggleUtility(utility)}
+                            onClick={() => toggleUtility(utility.id)}
                         >
-                            {utility}
+                            {utility.name}
                         </div>
                     ))}
                 </div>

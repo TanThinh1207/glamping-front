@@ -29,7 +29,15 @@ const Location = () => {
   const [selectedCountry, setSelectedCountry] = useState("");
   const [lat, setLat] = useState(INITIAL_COORDS.lat);
   const [lng, setLng] = useState(INITIAL_COORDS.lng);
-
+  useEffect(() => {
+    updateCampsiteData("campsiteLocation", {
+      lat,
+      lng,
+      address,
+      city,
+      country: selectedCountry,
+    });
+  }, [address, city, selectedCountry]);
   useEffect(() => {
     const mapInstance = new maplibregl.Map({
       container: mapContainer.current,
@@ -63,13 +71,17 @@ const Location = () => {
       place.context?.find((c) => c.id.includes("municipality"))?.text || "";
     const city =
       place.context?.find((c) => c.id.includes("subregion"))?.text || "";
+      const country =
+    place.context?.find((c) => c.id.includes("country"))?.text || selectedCountry;
     const formattedAddress = [streetName, ward, district]
       .filter((part) => part)
       .join(", ");
+
     setLat(lat);
     setLng(lng);
     setAddress(formattedAddress);
     setCity(city);
+    setSelectedCountry(country);
     if (marker) {
       marker.setLngLat([lng, lat]);
     }
@@ -81,7 +93,7 @@ const Location = () => {
       lng,
       address: formattedAddress,
       city,
-      country: selectedCountry,
+      country: country,
     });
     setSearchResults([]);
     setSearchQuery("");
@@ -96,6 +108,9 @@ const Location = () => {
         const place = data.features[0];
         const newAddress = place.properties.address || address;
         const newCity = place.properties.locality || city;
+        const newCountry =
+        place.context?.find((c) => c.id.includes("country"))?.text || selectedCountry;
+        setSelectedCountry(newCountry);
         setAddress(newAddress);
         setCity(newCity);
         updateCampsiteData("campsiteLocation", {
@@ -103,7 +118,7 @@ const Location = () => {
           lng: longitude,
           address: newAddress,
           city: newCity,
-          country: selectedCountry,
+          country: newCountry,
         });
       }
     } catch (error) {

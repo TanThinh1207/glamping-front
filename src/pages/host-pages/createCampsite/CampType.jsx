@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { useCampsite } from '../../../context/CampsiteContext';
+import axios from 'axios';
 
 const CampType = () => {
   const { campsiteData, updateCampsiteData } = useCampsite();
@@ -17,11 +18,23 @@ const CampType = () => {
   const [campTypeImage, setCampTypeImage] = useState(null);
   const modalRef = useRef(null);
   const [selectedFacilities, setSelectedFacilities] = useState([]);
+  const [facilities, setFacilities] = useState([]);
 
-  const listFacilities = [
-    "Wifi", "Parking", "Toilet", "Swimming Pool", "Kitchen", "Shower", "Laundry",
-    "Water", "Electricity", "Fireplace", "BBQ", "Pet Friendly", "Kid Friendly"
-  ];
+  useEffect(() => {
+    const fetchFacilities = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_GET_FACILITIES}`, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        setFacilities(response.data.data.content);
+      } catch (error) {
+        console.error("Error fetching facilities data:", error);
+      }
+    };
+    fetchFacilities();
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -37,11 +50,12 @@ const CampType = () => {
     };
   }, [isOpen]);
 
-  const toggleFacility = (facility) => {
+  const toggleFacility = (facilityId) => {
     setSelectedFacilities((prev) =>
-      prev.includes(facility) ? prev.filter((item) => item !== facility) : [...prev, facility]
+      prev.includes(facilityId) ? prev.filter((id) => id !== facilityId) : [...prev, facilityId]
     );
   };
+
 
   const handleAddCampType = () => {
     if (!campTypeName.trim() || !campTypeDesc.trim() || !campTypePrice) {
@@ -67,7 +81,7 @@ const CampType = () => {
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
-      setCampImage(URL.createObjectURL(file));
+      setCampTypeImage(URL.createObjectURL(file));
     }
   };
 
@@ -111,7 +125,12 @@ const CampType = () => {
               <div className='flex space-x-4'>
                 <div className='w-3/4'>
                   <h1 className='text-xl font-semibold mb-2'>Camp Type Name</h1>
-                  <input className='w-full h-10 border-2 rounded-xl border-gray-200 p-2' placeholder='Enter camp type name' value={campTypeName} onChange={(e) => setCampTypeName(e.target.value)} />
+                  <input
+                    className='w-full h-10 border-2 rounded-xl border-gray-200 p-2'
+                    placeholder='Enter camp type name'
+                    value={campTypeName}
+                    onChange={(e) => setCampTypeName(e.target.value)}
+                  />
                 </div>
                 <div className='w-1/4'>
                   <h1 className='text-xl font-semibold mb-2'>Camp Type Image</h1>
@@ -125,37 +144,76 @@ const CampType = () => {
               </div>
               <div>
                 <h1 className='text-xl font-semibold mb-2'>Camp Type Description</h1>
-                <textarea className='w-full h-32 border-2 rounded-xl border-gray-200 p-2' placeholder='Enter camp type description' value={campTypeDesc} onChange={(e) => setTypeCampDesc(e.target.value)} />
+                <textarea
+                  className='w-full h-32 border-2 rounded-xl border-gray-200 p-2'
+                  placeholder='Enter camp type description'
+                  value={campTypeDesc}
+                  onChange={(e) => setCampTypeDesc(e.target.value)}
+                />
               </div>
 
               <div className='flex space-x-4'>
                 <div className='w-1/4'>
                   <h1 className='text-xl font-semibold mb-2'>Number of Guests</h1>
-                  <input className='w-full h-10 border-2 rounded-xl border-gray-200 p-2' placeholder='Enter number of guests' type='number' value={numberOfGuests} onChange={(e) => setNumberOfGuests(e.target.value)} />
+                  <input
+                    className='w-full h-10 border-2 rounded-xl border-gray-200 p-2'
+                    placeholder='Enter number of guests'
+                    type='number'
+                    value={numberOfGuests}
+                    onChange={(e) => setNumberOfGuests(e.target.value)}
+                  />
                 </div>
                 <div className='w-1/4'>
                   <h1 className='text-xl font-semibold mb-2'>Quantity</h1>
-                  <input className='w-full h-10 border-2 rounded-xl border-gray-200 p-2' placeholder='Enter camp type quantity' type='number' value={campTypeQuantity} onChange={(e) => setCampTypeQuantity(e.target.value)} />
+                  <input
+                    className='w-full h-10 border-2 rounded-xl border-gray-200 p-2'
+                    placeholder='Enter camp type quantity'
+                    type='number'
+                    value={campTypeQuantity}
+                    onChange={(e) => setCampTypeQuantity(e.target.value)}
+                  />
                 </div>
                 <div className='w-1/2'>
                   <h1 className='text-xl font-semibold mb-2'>Camp Type Price</h1>
-                  <input className='w-full h-10 border-2 rounded-xl border-gray-200 p-2' placeholder='Enter camp type price' type='number' value={campTypePrice} onChange={(e) => setCampTypePrice(e.target.value)} />
+                  <input
+                    className='w-full h-10 border-2 rounded-xl border-gray-200 p-2'
+                    placeholder='Enter camp type price'
+                    type='number'
+                    value={campTypePrice}
+                    onChange={(e) => setCampTypePrice(e.target.value)}
+                  />
                 </div>
               </div>
               <div>
                 <h1 className='text-xl font-semibold mb-2'>Facilities</h1>
                 <div className='flex gap-4 flex-wrap'>
-                  {listFacilities.map((facility) => (
-                    <div key={facility} className={`border-2 rounded-2xl p-2 cursor-pointer transition ${selectedFacilities.includes(facility) ? 'border-gray-400 bg-gradient-to-r from-green-500 to-green-600 text-white' : 'border-gray-300'}`} onClick={() => toggleFacility(facility)}>
-                      {facility}
+                  {facilities?.map((facility) => (
+                    <div
+                      key={facility.id}
+                      className={`border-2 rounded-2xl p-2 cursor-pointer transition ${selectedFacilities.includes(facility.id) ? 'border-gray-400 bg-gradient-to-r from-green-500 to-green-600 text-white' : 'border-gray-300'
+                        }`}
+                      onClick={() => toggleFacility(facility.id)}
+                    >
+                      {facility.name}
                     </div>
                   ))}
                 </div>
+
               </div>
             </div>
             <div className='text-right'>
-              <button className='bg-black text-white px-4 py-2 rounded-xl' onClick={handleAddCampType}>Add Camp Type</button>
-              <button className='bg-red-500 text-white px-4 py-2 rounded-xl ml-4' onClick={handleClosePopUp}>Cancel</button>
+              <button
+                className='bg-black text-white px-4 py-2 rounded-xl'
+                onClick={handleAddCampType}
+              >
+                Add Camp Type
+              </button>
+              <button
+                className='bg-red-500 text-white px-4 py-2 rounded-xl ml-4'
+                onClick={handleClosePopUp}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
