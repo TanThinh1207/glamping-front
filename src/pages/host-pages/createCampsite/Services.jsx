@@ -48,8 +48,10 @@ const Services = () => {
   };
 
   useEffect(() => {
-    updateCampsiteData("campsiteServices", addedServices);
+    const updateServices = addedServices.map(({image, ...rest}) => rest);
+    updateCampsiteData('campSiteSelections', updateServices);
   }, [addedServices]);
+
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {

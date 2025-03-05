@@ -4,18 +4,20 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { useCampsite } from '../../../context/CampsiteContext';
 import axios from 'axios';
 
+
 const CampType = () => {
   const { campsiteData, updateCampsiteData } = useCampsite();
   const [addedCampTypes, setAddedCampTypes] = useState(
     Array.isArray(campsiteData.campType) ? campsiteData.campType : []
   );
   const [isOpen, setIsOpen] = useState(false);
-  const [campTypeQuantity, setCampTypeQuantity] = useState(0);
-  const [numberOfGuests, setNumberOfGuests] = useState(0);
+  const [campTypeQuantity, setCampTypeQuantity] = useState('');
+  const [numberOfGuests, setNumberOfGuests] = useState('');
   const [campTypeName, setCampTypeName] = useState('');
-  const [campTypeDesc, setCampTypeDesc] = useState('');
+  // const [campTypeDesc, setCampTypeDesc] = useState('');
   const [campTypePrice, setCampTypePrice] = useState('');
   const [campTypeImage, setCampTypeImage] = useState(null);
+  const [campTypeWeekendRate, setCampTypeWeekendRate] = useState('');
   const modalRef = useRef(null);
   const [selectedFacilities, setSelectedFacilities] = useState([]);
   const [facilities, setFacilities] = useState([]);
@@ -58,26 +60,31 @@ const CampType = () => {
 
 
   const handleAddCampType = () => {
-    if (!campTypeName.trim() || !campTypeDesc.trim() || !campTypePrice) {
+    if (!campTypeName.trim() || !campTypePrice) {
       return;
     }
-    if (campTypeName && campTypeDesc && campTypePrice) {
+    if (campTypeName && campTypePrice) {
       const newCampType = {
-        name: campTypeName,
-        description: campTypeDesc,
-        numberOfGuests: numberOfGuests,
-        quantity: campTypeQuantity,
+        type: campTypeName,
+        capacity: numberOfGuests,
         price: campTypePrice,
-        image: campTypeImage,
+        weekendRate: campTypeWeekendRate,
+        updatedAt: new Date().toISOString(),
+        quantity: campTypeQuantity,
+        status: true,
         facilities: selectedFacilities,
+        image: campTypeImage,
       };
       setAddedCampTypes((prevCampTypes) => [...prevCampTypes, newCampType]);
       handleClosePopUp();
     }
   };
   useEffect(() => {
-    updateCampsiteData('campType', addedCampTypes);
+    const updatedCampTypes = addedCampTypes.map(({ image, ...rest }) => rest);
+    updateCampsiteData('campTypeList', updatedCampTypes);
   }, [addedCampTypes]);
+  
+
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -88,11 +95,11 @@ const CampType = () => {
   const handleClosePopUp = () => {
     setIsOpen(false);
     setCampTypeName('');
-    setCampTypeDesc('');
     setCampTypePrice('');
     setNumberOfGuests(0);
     setCampTypeQuantity(0);
     setCampTypeImage(null);
+    setCampTypeWeekendRate('');
     setSelectedFacilities([]);
   };
 
@@ -103,11 +110,13 @@ const CampType = () => {
         <h2 className='text-gray-500'>Provide different glamping styles (e.g., safari tents, yurts, cabins, treehouses)</h2>
       </div>
       <div className='flex gap-4 flex-wrap'>
-        {addedCampTypes.filter(camp => camp.name).map((camp, index) => (
+        {addedCampTypes.filter(camp => camp.type).map((camp, index) => (
           <div key={index} className='w-64 border rounded-xl p-4 shadow-lg'>
             {camp.image && <img src={camp.image} alt='Camp' className='w-full h-auto object-cover rounded-xl' />}
-            <h3 className='text-lg font-semibold mt-2'>{camp.name}</h3>
-            <p className='text-gray-500'>{camp.description}</p>
+            <h3 className='text-lg font-semibold mt-2'>{camp.type}</h3>
+            <p className='text-gray-500'>{camp.quantity}</p>
+            <p className='text-gray-500'>{camp.capacity}</p>
+            <p className='text-gray-500'>{camp.weekendRate}</p>
             <p className='font-bold mt-2'>${camp.price}</p>
             <div className='mt-2 text-sm text-gray-600'>
               {Array.isArray(camp.facilities) ? camp.facilities.join(', ') : 'No facilities'}
@@ -123,13 +132,23 @@ const CampType = () => {
           <div ref={modalRef} className='bg-white shadow-lg p-6 lg:w-2/4 relative rounded-xl'>
             <div className='mb-8 flex flex-col gap-4'>
               <div className='flex space-x-4'>
-                <div className='w-3/4'>
+                <div className='w-2/4'>
                   <h1 className='text-xl font-semibold mb-2'>Camp Type Name</h1>
                   <input
                     className='w-full h-10 border-2 rounded-xl border-gray-200 p-2'
                     placeholder='Enter camp type name'
                     value={campTypeName}
                     onChange={(e) => setCampTypeName(e.target.value)}
+                  />
+                </div>
+                <div className='w-1/4'>
+                  <h1 className='text-xl font-semibold mb-2'>Number of Guests</h1>
+                  <input
+                    className='w-full h-10 border-2 rounded-xl border-gray-200 p-2'
+                    placeholder='Enter number of guests'
+                    type='number'
+                    value={numberOfGuests}
+                    onChange={(e) => setNumberOfGuests(e.target.value)}
                   />
                 </div>
                 <div className='w-1/4'>
@@ -142,7 +161,7 @@ const CampType = () => {
                   <input type='file' id='imageUpload' className='hidden' onChange={handleImageUpload} />
                 </div>
               </div>
-              <div>
+              {/* <div>
                 <h1 className='text-xl font-semibold mb-2'>Camp Type Description</h1>
                 <textarea
                   className='w-full h-32 border-2 rounded-xl border-gray-200 p-2'
@@ -150,19 +169,10 @@ const CampType = () => {
                   value={campTypeDesc}
                   onChange={(e) => setCampTypeDesc(e.target.value)}
                 />
-              </div>
+              </div> */}
 
               <div className='flex space-x-4'>
-                <div className='w-1/4'>
-                  <h1 className='text-xl font-semibold mb-2'>Number of Guests</h1>
-                  <input
-                    className='w-full h-10 border-2 rounded-xl border-gray-200 p-2'
-                    placeholder='Enter number of guests'
-                    type='number'
-                    value={numberOfGuests}
-                    onChange={(e) => setNumberOfGuests(e.target.value)}
-                  />
-                </div>
+
                 <div className='w-1/4'>
                   <h1 className='text-xl font-semibold mb-2'>Quantity</h1>
                   <input
@@ -181,6 +191,16 @@ const CampType = () => {
                     type='number'
                     value={campTypePrice}
                     onChange={(e) => setCampTypePrice(e.target.value)}
+                  />
+                </div>
+                <div className='w-1/4'>
+                  <h1 className='text-xl font-semibold mb-2'>Weekend Rate</h1>
+                  <input
+                    className='w-full h-10 border-2 rounded-xl border-gray-200 p-2'
+                    placeholder='Enter weekend rate'
+                    type='number'
+                    value={campTypeWeekendRate}
+                    onChange={(e) => setCampTypeWeekendRate(e.target.value)}
                   />
                 </div>
               </div>

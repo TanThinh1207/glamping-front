@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useCampsite } from '../../../context/CampsiteContext';
+import { use } from "react";
 
 const MAPTILER_KEY = "6PzV7JPUgWxephJUe1TH";
 const INITIAL_COORDS = { lat: 10.7769, lng: 106.7009 };
@@ -29,15 +30,14 @@ const Location = () => {
   const [selectedCountry, setSelectedCountry] = useState("");
   const [lat, setLat] = useState(INITIAL_COORDS.lat);
   const [lng, setLng] = useState(INITIAL_COORDS.lng);
+
   useEffect(() => {
-    updateCampsiteData("campsiteLocation", {
-      lat,
-      lng,
-      address,
-      city,
-      country: selectedCountry,
-    });
-  }, [address, city, selectedCountry]);
+    updateCampsiteData("latitude", lat);
+    updateCampsiteData("longitude", lng);
+    updateCampsiteData("address", address);
+    updateCampsiteData("city", city);
+  }, [lat, lng, address, city]);
+
   useEffect(() => {
     const mapInstance = new maplibregl.Map({
       container: mapContainer.current,
@@ -58,6 +58,7 @@ const Location = () => {
     setMarker(newMarker);
     return () => mapInstance.remove();
   }, [lat, lng]);
+
   const handleSelectLocation = (place) => {
     if (!place || !place.geometry || !place.geometry.coordinates) {
       console.error("Invalid place object:", place);
@@ -71,8 +72,7 @@ const Location = () => {
       place.context?.find((c) => c.id.includes("municipality"))?.text || "";
     const city =
       place.context?.find((c) => c.id.includes("subregion"))?.text || "";
-      const country =
-    place.context?.find((c) => c.id.includes("country"))?.text || selectedCountry;
+
     const formattedAddress = [streetName, ward, district]
       .filter((part) => part)
       .join(", ");
@@ -81,20 +81,12 @@ const Location = () => {
     setLng(lng);
     setAddress(formattedAddress);
     setCity(city);
-    setSelectedCountry(country);
     if (marker) {
       marker.setLngLat([lng, lat]);
     }
     if (map) {
       map.flyTo({ center: [lng, lat], zoom: 16 });
     }
-    updateCampsiteData("campsiteLocation", {
-      lat,
-      lng,
-      address: formattedAddress,
-      city,
-      country: country,
-    });
     setSearchResults([]);
     setSearchQuery("");
   };
@@ -104,22 +96,13 @@ const Location = () => {
         `https://api.maptiler.com/geocoding/${longitude},${latitude}.json?key=${MAPTILER_KEY}`
       );
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      const data = await response.json();
       if (data.features.length > 0) {
         const place = data.features[0];
         const newAddress = place.properties.address || address;
         const newCity = place.properties.locality || city;
-        const newCountry =
-        place.context?.find((c) => c.id.includes("country"))?.text || selectedCountry;
-        setSelectedCountry(newCountry);
         setAddress(newAddress);
-        setCity(newCity);
-        updateCampsiteData("campsiteLocation", {
-          lat: latitude,
-          lng: longitude,
-          address: newAddress,
-          city: newCity,
-          country: newCountry,
-        });
+        setCity(newCity);       
       }
     } catch (error) {
       console.error("Error fetching reverse geocode:", error);

@@ -19,7 +19,7 @@ const AboutYourPlace = () => {
             className='w-[80%] h-32 border-2 rounded-xl border-gray-200 p-2 mt-5'
             placeholder='Create a beautiful name for your campsite'
             value={campsiteData.campsiteName}
-            onChange={(e) => updateCampsiteData('campsiteName', e.target.value)}
+            onChange={(e) => updateCampsiteData('name', e.target.value)}
           />
         </div>
         <div className='mb-8'>
@@ -30,7 +30,7 @@ const AboutYourPlace = () => {
             className='w-[80%] h-32 border-2 rounded-xl border-gray-200 p-2 mt-5'
             placeholder='Describe your campsite'
             value={campsiteData.campsiteDescription}
-            onChange={(e) => updateCampsiteData('campsiteDescription', e.target.value)}
+            onChange={(e) => updateCampsiteData('description', e.target.value)}
           />
         </div>
       </div>

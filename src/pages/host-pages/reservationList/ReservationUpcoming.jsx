@@ -40,26 +40,27 @@ const ReservationUpcoming = () => {
         <table className='w-full text-left'>
           <thead>
             <tr>
-              <th>Guest</th>
-              <th>Phone Number</th>
-              <th>Email</th>
-              <th>Campsite's name</th>
-              <th>Camp types</th>
-              <th className='text-center'>Status</th>
-              <th className='text-center'>Action</th>
+              <th className='text-left py-4'>Guest</th>
+              <th className='text-left py-4'>Phone Number</th>
+              <th className='text-left py-4'>Email</th>
+              <th className='text-left py-4'>Campsite's name</th>
+              <th className='text-left py-4'>Camp types</th>
+              <th className='text-center py-4'>Status</th>
+              <th className='text-center py-4'>Action</th>
             </tr>
           </thead>
           <tbody>
             {UpcomingReservations.map((reservation, index) => (
               <tr key={index}>
-                <td>{reservation.guest}</td>
-                <td>{reservation.phoneNumber}</td>
-                <td>{reservation.email}</td>
-                <td>{reservation.campsiteName}</td>
-                <td>{reservation.campTypes}</td>
-                <td className='text-center'>{reservation.status}</td>
-                <td className='text-center'>
-                  <button className='bg-blue-500 text-white px-4 py-1 rounded-lg'>Accept</button>
+                <td className='text-left py-4'>{reservation.guest}</td>
+                <td className='text-left py-4'>{reservation.phoneNumber}</td>
+                <td className='text-left py-4'>{reservation.email}</td>
+                <td className='text-left py-4'>{reservation.campsiteName}</td>
+                <td className='text-left py-4'>{reservation.campTypes}</td>
+                <td className='text-center py-4'>{reservation.status}</td>
+                <td className='text-center py-4 space-x-4'>
+                  <button className='bg-green-500 text-white px-4 py-2 rounded-lg'>Accept</button>
+                  <button className='bg-red-500 text-white px-4 py-2 rounded-lg '>Decline</button>
                 </td>
               </tr>
             ))}

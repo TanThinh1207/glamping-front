@@ -3,21 +3,19 @@ import React, { createContext, useContext, useState } from 'react'
 const CampsiteContext = createContext();
 export const CampsiteProvider = ({ children }) => {
     const [campsiteData, setCampsiteData] = useState({
-        campsiteName: '',
-        campsiteDescription: '',
-        campsitePhoto: [],
-        campsiteType: [],
-        campsiteUtilities: [],
-        campsiteServices: [],
-        campsiteLocation: {
-            lat: 0,
-            lng: 0,
-            address: '',
-            city: '',
-            country: '',
-        },
-        campType: [],
-    });
+            hostId: 1,
+            name: "", 
+            address: "",
+            latitude: 0,
+            longitude: 0,
+            city: "",
+            description: "",
+            placeTypeIds: [], 
+            campSiteSelections: [],
+            utilityIds: [], 
+            campTypeList: [],
+          }
+    );
     const updateCampsiteData = (key, value) => {
         setCampsiteData((prevData) => ({
             ...prevData,

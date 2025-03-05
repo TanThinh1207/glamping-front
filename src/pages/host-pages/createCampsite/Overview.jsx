@@ -1,5 +1,4 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom';
 import overviewImage1 from '../../../assets/overviewImage1.png';
 import overviewImage2 from '../../../assets/overviewImage2.png';
 import overviewImage3 from '../../../assets/overviewImage3.png';

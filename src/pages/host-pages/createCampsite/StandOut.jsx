@@ -15,16 +15,16 @@ const StandOut = () => {
         Array.isArray(campsiteData.campsitePhoto) ? campsiteData.campsitePhoto.filter(Boolean) : []
     );
     useEffect(() => {
-        updateCampsiteData("campsiteUtilities", selectedUtilities);
+        updateCampsiteData("utilityIds", selectedUtilities);
     }, [selectedUtilities]);
 
     useEffect(() => {
-        updateCampsiteData("campsiteType", selectedTypes);
+        updateCampsiteData("placeTypeIds", selectedTypes);
     }, [selectedTypes]);
 
-    useEffect(() => {
-        updateCampsiteData("campsitePhoto", selectedImages);
-    }, [selectedImages]);
+    // useEffect(() => {
+    //     updateCampsiteData("campsitePhoto", selectedImages);
+    // }, [selectedImages]);
 
     useEffect(() => {
         const fetchUtilities = async () => {

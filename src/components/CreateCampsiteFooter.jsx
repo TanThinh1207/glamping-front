@@ -1,7 +1,7 @@
 import React from 'react'
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { useCampsite } from '../context/CampsiteContext';
-
+import axios from 'axios';
 const pageSteps = [
   "overview",
   "about-your-place",
@@ -19,9 +19,21 @@ const CreateCampsiteFooter = () => {
   const prevStep = currentStepIndex > 0 ? pageSteps[currentStepIndex - 1] : null;
   const nextStep = currentStepIndex < pageSteps.length - 1 ? pageSteps[currentStepIndex + 1] : null;
   
-  const handleFinish = () => {
+  const handleFinish = async () => {
+    try {
+      const url = `${import.meta.env.VITE_API_GET_CAMPSITES}`;
+      const response = await axios.post(url, campsiteData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      console.log("Campsite created successfully:", response.data);
+      navigate("/hosting");
+    } catch (error) {
+      console.error("Error creating campsite:", error);
+    }
     console.log(campsiteData);
-    navigate("/hosting");
   }
   return (
     <div className='fixed bottom-0 w-full bg-white'>
