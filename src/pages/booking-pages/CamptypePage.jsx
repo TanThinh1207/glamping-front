@@ -143,7 +143,7 @@ const CamptypePage = () => {
                 </div>
             ))}
             <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}>
-                <div className="bg-white p-6 rounded shadow-md">
+                <div className="">
                     <p>You have already selected a camp type from another campsite. If you proceed, your previous selection will be lost.</p>
                     <div className="mt-4 flex justify-end gap-4">
                         <button

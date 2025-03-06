@@ -209,8 +209,8 @@ const SearchBar = () => {
           onClick={() => setIsGuestModalOpen(true)}
         >
           <FontAwesomeIcon icon={faUserFriends} className="text-md" />
-          <p className="text-gray-800 gap-1">
-            <span>{guests}</span><span>Guests</span>
+          <p className="text-gray-800">
+            <span>{guests} </span><span>Guests</span>
           </p>
         </div>
         <Modal isOpen={isGuestModalOpen} onClose={() => setIsGuestModalOpen(false)}>

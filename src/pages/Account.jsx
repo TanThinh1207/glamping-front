@@ -2,6 +2,11 @@ import React from 'react'
 import { useState } from 'react';
 import thumb from '../assets/terrace.jpg';
 import Modal from '../components/Modal';
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
+
 
 const Account = () => {
     const [firstName, setFirstName] = useState("");
@@ -9,10 +14,11 @@ const Account = () => {
     const [phone, setPhone] = useState("");
     const [email, setEmail] = useState("");
     const [address, setAddress] = useState("");
+    const [birthday, setBirthday] = useState("");
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    
+
     return (
         <div className='container-fluid mx-auto flex flex-col items-center min-h-screen'>
             <div className='flex relative h-80 w-full mb-12'>
@@ -109,6 +115,17 @@ const Account = () => {
                             Address
                         </label>
                     </div>
+                    <div className="relative my-6 pb-5">
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker
+                                label="Select Birthday"
+                                value={birthday ? dayjs(birthday) : null}
+                                onChange={(newValue) => setBirthday(newValue ? newValue.format("YYYY-MM-DD") : "")}
+                                slotProps={{ textField: { variant: "standard", fullWidth: true } }}
+                            />
+                        </LocalizationProvider>
+                    </div>
+
                 </div>
             </Modal>
 
@@ -152,6 +169,14 @@ const Account = () => {
                     </label>
                     <div className="w-full text-sm lg:text-lg font-light">
                         <p>Address</p>
+                    </div>
+                </div>
+                <div>
+                    <label className="block text-xs mb-1 uppercase tracking-wider font-medium">
+                        BIRTHDAY
+                    </label>
+                    <div className="w-full text-sm lg:text-lg font-light">
+                        <p>birthday</p>
                     </div>
                 </div>
             </div>

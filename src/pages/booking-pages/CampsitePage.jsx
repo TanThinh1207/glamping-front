@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import SearchBar from '../../components/SearchBar'
 import CampsiteCard from '../../components/CampsiteCard'
 import { fetchAllCampsites } from '../../utils/BookingAPI'
+// import antony from '../../assets/antony.gif'
 
 const CampsitePage = () => {
     const [loading, setLoading] = useState(true);
@@ -17,6 +18,11 @@ const CampsitePage = () => {
             } catch (error) {
                 setError(error.message);
             }
+
+            // setTimeout(() => {
+            //     setLoading(false);
+            // }, 10000);
+            
             finally {
                 setLoading(false);
             }
@@ -29,6 +35,9 @@ const CampsitePage = () => {
             <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-80 z-50">
                 <div className="animate-spin rounded-full border-t-4 border-teal-400 border-solid h-16 w-16"></div>
             </div>
+            // <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-80 z-50">
+            //     <img src={antony} alt="Loading..." className="h-30 w-30" />
+            // </div>
         );
     }
     if (error) return <p>Error: {error}</p>;
