@@ -13,6 +13,7 @@ const pageSteps = [
 
 const CreateCampsiteFooter = () => {
   const {campsiteData} = useCampsite();
+  const {campsiteImages} = useCampsite();
   const navigate = useNavigate();
   const { step } = useParams();
   const currentStepIndex = pageSteps.indexOf(step);
@@ -27,8 +28,19 @@ const CreateCampsiteFooter = () => {
           "Content-Type": "application/json",
         },
       });
-  
-      console.log("Campsite created successfully:", response.data);
+      const campsiteId = response.data.data.id;
+      if (campsiteImages.length > 0) {
+        const formData = new FormData();
+        campsiteImages.forEach((image) => formData.append("file", image)); 
+
+        await axios.post(
+            `${import.meta.env.VITE_API_CAMPSITE_IMAGE}?id=${campsiteId}`, 
+            formData,
+            {
+                headers: { "Content-Type": "multipart/form-data" },
+            }
+        );
+    }
       navigate("/hosting");
     } catch (error) {
       console.error("Error creating campsite:", error);

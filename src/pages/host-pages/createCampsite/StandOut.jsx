@@ -9,11 +9,10 @@ const StandOut = () => {
     const [placeTypes, setPlaceTypes] = useState([]);
     const [utilities, setUtilities] = useState([]);
     const { campsiteData, updateCampsiteData } = useCampsite();
+    const { campsiteImages, updateCampsiteImages } = useCampsite();
     const [selectedUtilities, setSelectedUtilities] = useState(campsiteData.campsiteUtilities || []);
     const [selectedTypes, setSelectedTypes] = useState(campsiteData.campsiteType || []);
-    const [selectedImages, setSelectedImages] = useState(
-        Array.isArray(campsiteData.campsitePhoto) ? campsiteData.campsitePhoto.filter(Boolean) : []
-    );
+
     useEffect(() => {
         updateCampsiteData("utilityIds", selectedUtilities);
     }, [selectedUtilities]);
@@ -22,25 +21,21 @@ const StandOut = () => {
         updateCampsiteData("placeTypeIds", selectedTypes);
     }, [selectedTypes]);
 
-    // useEffect(() => {
-    //     updateCampsiteData("campsitePhoto", selectedImages);
-    // }, [selectedImages]);
-
     useEffect(() => {
         const fetchUtilities = async () => {
-          try {
-            const response = await axios.get(`${import.meta.env.VITE_API_GET_UTILITIES}`, {
-              headers: {
-                'Content-Type': 'application/json'
-              }
-            });
-            setUtilities(response.data.data.content);
-          } catch (error) {
-            console.error("Error fetching utilities data:", error);
-          }
+            try {
+                const response = await axios.get(`${import.meta.env.VITE_API_GET_UTILITIES}`, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                setUtilities(response.data.data.content);
+            } catch (error) {
+                console.error("Error fetching utilities data:", error);
+            }
         };
         fetchUtilities();
-      }, []);
+    }, []);
 
     useEffect(() => {
         const fetchPlaceTypes = async () => {
@@ -66,7 +61,7 @@ const StandOut = () => {
                 : [...prev, utilityId];
         });
     };
-    
+
     const toggleType = (typeId) => {
         setSelectedTypes((prev) => {
             return prev.includes(typeId)
@@ -74,16 +69,18 @@ const StandOut = () => {
                 : [...prev, typeId];
         });
     };
-    
+
     const handleImageUpload = (event) => {
         const files = event.target.files;
         if (files) {
-            const newImages = Array.from(files).map((file) =>
-                URL.createObjectURL(file)
-            ).filter(Boolean);
-            setSelectedImages((prevImages) => [...prevImages, ...newImages]);
+            const newImages = Array.from(files);
+            updateCampsiteImages([...campsiteImages, ...newImages]);
         }
     };
+    const removeImage = (index) => {
+        updateCampsiteImages(campsiteImages.filter((_, i) => i !== index));
+    };
+    
     return (
         <div className='w-full  bg-white py-24 px-96'>
             <div className='mb-8'>
@@ -91,13 +88,19 @@ const StandOut = () => {
                     Add some photos of your campsite
                 </h1>
                 <div className='flex gap-4 flex-wrap mt-5'>
-                    {selectedImages.filter(Boolean).map((image, index) => (
+                    {campsiteImages.map((image, index) => (
                         <div key={index} className='relative w-32 h-32'>
                             <img
-                                src={image}
+                                src={URL.createObjectURL(image)}
                                 alt={`Uploaded ${index}`}
                                 className='w-full h-full object-cover rounded-xl'
                             />
+                            <button
+                                className='absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-1 rounded-full'
+                                onClick={() => removeImage(index)}
+                            >
+                                X
+                            </button>
                         </div>
                     ))}
                     <label

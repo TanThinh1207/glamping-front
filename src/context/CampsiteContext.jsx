@@ -22,8 +22,13 @@ export const CampsiteProvider = ({ children }) => {
             [key]: value,
         }));
     };
+
+    const [campsiteImages, setCampsiteImages] = useState([]);
+    const updateCampsiteImages = (images) => {
+        setCampsiteImages(images);
+    };
     return (
-        <CampsiteContext.Provider value={{ campsiteData, updateCampsiteData }}>
+        <CampsiteContext.Provider value={{ campsiteData, updateCampsiteData, campsiteImages, updateCampsiteImages }}>
           {children}
         </CampsiteContext.Provider>
       );
