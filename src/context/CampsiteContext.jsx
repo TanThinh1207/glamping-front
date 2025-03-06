@@ -27,6 +27,7 @@ export const CampsiteProvider = ({ children }) => {
     const updateCampsiteImages = (images) => {
         setCampsiteImages(images);
     };
+    
     return (
         <CampsiteContext.Provider value={{ campsiteData, updateCampsiteData, campsiteImages, updateCampsiteImages }}>
           {children}

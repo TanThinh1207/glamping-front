@@ -29,12 +29,17 @@ const CreateCampsiteFooter = () => {
         },
       });
       const campsiteId = response.data.data.id;
+      console.log(campsiteImages);
       if (campsiteImages.length > 0) {
         const formData = new FormData();
-        campsiteImages.forEach((image) => formData.append("file", image)); 
-
+        formData.append("id", campsiteId);
+        campsiteImages.forEach((image, index) => {
+          console.log(`Adding file: ${image.name}, size: ${image.size}`);
+          formData.append("file", image);
+      });
+        console.log(formData);
         await axios.post(
-            `${import.meta.env.VITE_API_CAMPSITE_IMAGE}?id=${campsiteId}`, 
+            `${import.meta.env.VITE_API_CAMPSITE_IMAGE}`, 
             formData,
             {
                 headers: { "Content-Type": "multipart/form-data" },
