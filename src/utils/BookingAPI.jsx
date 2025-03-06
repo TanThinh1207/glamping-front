@@ -35,6 +35,7 @@ export const fetchAllCampsites = async () => {
         if (!response.ok) throw new Error(`Failed to fetch campsite: ${response.statusText}`);
 
         const data = await response.json();
+        console.log(data.data.content);
         return data.data.content;
     } catch (error) {
         throw new Error(error.message);

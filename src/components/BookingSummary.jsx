@@ -41,17 +41,17 @@ const BookingSummary = ({ selectedServices = [] }) => {
       const bookingId = responseData.data.id;
       console.log(responseData)
 
-      // const paymentResponse = await fetch(`http://localhost:8080/api/vn-pay?bookingId=${bookingId}`);
-      // const paymentData = await paymentResponse.json();
-      // console.log(paymentData)
+      const paymentResponse = await fetch(`http://localhost:8080/api/payments/vn-pay?amount=1002&bankCode=NCB&bookingId=${bookingId}`);
+      const paymentData = await paymentResponse.json();
+      console.log(paymentData)
 
-      // if (paymentResponse.ok) {
-      //   const paymentUrl = paymentData.data;
-  
-      //   window.location.href = paymentUrl;
-      // } else {
-      //   throw new Error(paymentData.message || "VNPay payment failed.");
-      // }
+      if (paymentResponse.ok) {
+        const paymentUrl = paymentData.data;
+
+        window.location.href = paymentUrl;
+      } else {
+        throw new Error(paymentData.message || "VNPay payment failed.");
+      }
       localStorage.removeItem("booking");
       localStorage.removeItem("checkInDate");
       localStorage.removeItem("checkOutDate");
@@ -144,7 +144,7 @@ const BookingSummary = ({ selectedServices = [] }) => {
           {booking.bookingDetails.map((item, index) => {
             const campType = camptypes.find((type) => type.id === item.campTypeId);
             return (
-              <div key={index} className="mt-2">
+              <div key={index} className="mt-2 text-xl">
                 <p>
                   <span className="font-semibold">Camp {index + 1}:</span>{" "}
                   {campType ? campType.type : "Unknown Camp Type"}
@@ -160,16 +160,18 @@ const BookingSummary = ({ selectedServices = [] }) => {
         <p className="text-gray-600">No accommodations selected.</p>
       )}
       <p className="text-xl font-semibold">Extra Services</p>
-      {selectedServices.length > 0 ? selectedServices.map(service => (
-        <p key={service.id}>{service.name} x{service.quantity}</p>
-      )) : <p>No extra services selected.</p>}
+      <div className="text-xl">
+        {selectedServices.length > 0 ? selectedServices.map(service => (
+          <p key={service.id}>{service.name} x{service.quantity}</p>
+        )) : <p>No extra services selected.</p>}
+      </div>
 
       <div className="border-t border-gray-300 pt-3">
-        <p className="text-sm text-gray-600">Total {nights} nights (taxes incl.):</p>
+        <p className="text-lg text-gray-600">Total {nights} nights (taxes incl.):</p>
         <p className="text-xl font-bold mt-1">VND {totalPrice.toLocaleString()}</p>
       </div>
 
-      <button className="bg-black w-full text-white text-xs border-black border uppercase my-5 p-4 transform duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black mr-2"
+      <button className="bg-black w-full text-white text-lg border-black border uppercase my-5 p-4 transform duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black mr-2"
         onClick={handleConfirmBooking}
       >
         CONFIRM BOOKING
