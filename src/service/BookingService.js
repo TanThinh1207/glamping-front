@@ -1,6 +1,3 @@
-import { toast } from "sonner";
-import { useBooking } from "../context/BookingContext";
-
 export const fetchCampsiteById = async (campSiteId) => {
     try {
         const url = new URL(`${import.meta.env.VITE_API_GET_CAMPSITES}`);

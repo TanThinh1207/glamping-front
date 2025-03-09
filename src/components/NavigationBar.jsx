@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import "../css/NavigationBar.css";
 import logo from "../assets/word-logo.png";
 import { useBooking } from "../context/BookingContext";
+import { useUser } from "../context/UserContext";
 
 const getMenuItems = (path) => {
     switch (true) {
@@ -35,7 +36,10 @@ const NavigationBar = () => {
     const [isMinimized, setIsMinimized] = useState(window.innerWidth < 1280);
     const location = useLocation();
     const isHomePage = location.pathname === "/";
+
+    const { user } = useUser();
     const { booking } = useBooking();
+    const isLoggedIn = Boolean(user);
 
     const toggleMenu = () => {
         setMenuOpen(!menuOpen);
@@ -76,7 +80,7 @@ const NavigationBar = () => {
         { name: "Glamping", link: "/glamping" },
         { name: "About", link: "/about" },
         { name: "Become a Host", link: "/hosting" },
-        { name: "My Account", link: "/account" },
+        { name: "My Account", link: isLoggedIn ? "/account" : "/login" },
         { name: "My trip", link: "/trip" },
     ]
 
@@ -102,7 +106,9 @@ const NavigationBar = () => {
             default:
                 return (
                     <>
-                        <Link to="/account" className="font-canto uppercase text-xs hidden xl:inline-block">
+                        <Link
+                            to={isLoggedIn ? "/account" : "/login"}
+                            className="font-canto uppercase text-xs hidden xl:inline-block">
                             <FontAwesomeIcon className="cursor-pointer hover:scale-110 transition-transform duration-200" icon={faUser} />
                             <span className="pl-1">My Account</span>
                         </Link>

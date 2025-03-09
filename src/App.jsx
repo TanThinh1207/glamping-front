@@ -1,5 +1,7 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import "./index.css";
+import { createBrowserRouter, RouterProvider, redirect } from 'react-router-dom'
+import { BookingProvider } from './context/BookingContext';
+import { UserProvider } from './context/UserContext';
 import CustomerFrame from './pages/frame/CustomerFrame';
 import HostFrame from './pages/frame/HostFrame';
 import AdminFrame from './pages/frame/SidebarFrame';
@@ -14,7 +16,6 @@ import ManageAccount from './pages/admin-pages/ManageAccount';
 import ManageUtility from './pages/admin-pages/ManageUtility';
 import ManageFacility from './pages/admin-pages/ManageFacility';
 import CreateCampsiteStepPage from './pages/host-pages/createCampsite/CreateCampsiteStepPage';
-import { BookingProvider } from './context/BookingContext';
 import GuestInfo from './pages/booking-pages/GuestInfo';
 import TripList from './pages/TripList';
 import LoginPage from './pages/LoginPage';
@@ -45,7 +46,15 @@ function App() {
       errorElement: <h1>Oops! This page doesn't exist.</h1>,
       children: [
         { path: "", element: <HomePage /> },
-        { path: "login", element: <LoginPage /> },
+        {
+          path: "login",
+          element: <LoginPage />,
+          loader: () => {
+            const user = localStorage.getItem("user");
+            if (user) return redirect("/account");
+            return null;
+          }
+        },
         { path: "about", element: <About /> },
         { path: "campsite", element: <CampsitePage /> },
         { path: "campsite/:campsiteId", element: <CamptypePage /> },
@@ -67,7 +76,7 @@ function App() {
           path: "reservations",
           element: <Reservations />,
           children: [
-            { index: true, element: <ReservationUpcoming /> }, 
+            { index: true, element: <ReservationUpcoming /> },
             { path: "upcoming", element: <ReservationUpcoming /> },
             { path: "completed", element: <ReservationCompleted /> },
             { path: "canceled", element: <ReservationCanceled /> },
@@ -101,11 +110,13 @@ function App() {
   ])
   return (
     <>
-      <BookingProvider>
-        <CampsiteProvider>
-          <RouterProvider router={router} />
-        </CampsiteProvider>
-      </BookingProvider>
+      <UserProvider>
+        <BookingProvider>
+          <CampsiteProvider>
+            <RouterProvider router={router} />
+          </CampsiteProvider>
+        </BookingProvider>
+      </UserProvider>
     </>
   )
 }

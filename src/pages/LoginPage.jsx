@@ -1,23 +1,20 @@
-import React from "react";
-import { initializeApp } from "firebase/app";
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBT07TWFz40eFvCuaHcLkx5XHN0XEIK94g",
-  authDomain: "glamping-450314.firebaseapp.com",
-  projectId: "glamping-450314",
-  storageBucket: "glamping-450314.firebasestorage.app",
-  messagingSenderId: "216718482095",
-  appId: "1:216718482095:web:c6b19c46d2c64bbafed25a",
-  measurementId: "G-S31Q3K13JG",
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
-provider.setCustomParameters({ prompt: "select_account" });
+import React, { useEffect } from "react";
+import { signInWithPopup } from "firebase/auth";
+import { auth, provider } from "../config/firebaseConfig";
+import { toast } from "sonner";
+import { useUser } from "../context/UserContext";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
+  const { user, login } = useUser();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate("/account");
+    }
+  }, [user, navigate]);
+
   const handleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, provider);
@@ -31,17 +28,18 @@ const LoginPage = () => {
       });
 
       const data = await response.json();
+      console.log("Login Response:", data);
 
       if (response.ok) {
         localStorage.setItem("accessToken", data.data.accessToken);
-        console.log("User authenticated:", data.data);
-        alert("Login successful!");
+        login(data.data.user)
+        toast.success("Login successful!");
       } else {
+        toast.error("Login error code: " + data.statusCode)
         throw new Error(data.message || "Authentication failed!");
       }
     } catch (error) {
-      console.error("Login Error:", error);
-      alert(error.message);
+      console.error(error)
     }
   };
 
@@ -49,7 +47,7 @@ const LoginPage = () => {
     <div className="min-h-screen flex justify-center">
       <div className="container">
         <div className="title pt-12 flex justify-center">
-          <h1 className="text-3xl font-thin italic">MY COIFFURE ACCOUNT</h1>
+          <h1 className="text-3xl font-thin italic">MY ASTROGLAMPÉ ACCOUNT</h1>
         </div>
         <div className="form-container px-48 pt-10 pb-10">
           <div className="login-form lg:bg-gray-50 py-20 flex justify-center">

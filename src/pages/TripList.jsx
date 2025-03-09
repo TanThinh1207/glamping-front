@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { fetchCamptypeById } from '../utils/BookingAPI';
+import { fetchCamptypeById } from '../service/BookingService';
 import { useBooking } from '../context/BookingContext';
 import { Link } from 'react-router-dom';
 

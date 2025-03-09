@@ -1,35 +1,90 @@
-import React from 'react'
-import { useState } from 'react';
-import thumb from '../assets/terrace.jpg';
-import Modal from '../components/Modal';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useUser } from '../context/UserContext';
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
-
+import { toast } from 'sonner';
+import Modal from '../components/Modal';
+import thumb from '../assets/terrace.jpg';
+import { updateUserData } from '../service/UserService';
 
 const Account = () => {
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [phone, setPhone] = useState("");
-    const [email, setEmail] = useState("");
-    const [address, setAddress] = useState("");
-    const [birthday, setBirthday] = useState("");
+    const { user, logout } = useUser();
+    const navigate = useNavigate();
+
+    const defaultText = "Vui lòng cập nhật";
+    const [userData, setUserData] = useState({
+        firstname: defaultText,
+        lastname: defaultText,
+        phone: defaultText,
+        email: defaultText,
+        address: defaultText,
+        birthday: defaultText
+    });
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    const fields = [
+        { label: "First Name", key: "firstName" },
+        { label: "Last Name", key: "lastName" },
+        { label: "Phone", key: "phone" },
+        { label: "Email", key: "email" },
+        { label: "Address", key: "address" },
+        { label: "Birthday", key: "birthday" }
+    ];
+
+    const modalFields = fields.filter(field => field.key !== 'email');
+
+    useEffect(() => {
+        if (!user) {
+            navigate("/login");
+            toast.error("Please login to view your account!");
+            return;
+        }
+
+        setUserData({
+            firstName: user.firstname ?? defaultText,
+            lastName: user.lastname ?? defaultText,
+            phone: user.phone ?? defaultText,
+            email: user.email ?? defaultText,
+            address: user.address ?? defaultText,
+            birthday: user.birthday ?? defaultText
+        });
+    }, [user, navigate]);
+
+    const handleUpdateUserData = async () => {
+        try {
+            const updatedUser = await updateUserData(user.id, userData);
+            toast.success("User data updated successfully!");
+            console.log(updatedUser);
+        } catch (error) {
+            toast.error(`Failed to update user data: ${error.message}`);
+        }
+    };
+
+    const handleLogout = () => {
+        logout();
+        navigate("/");
+    };
+
+    const handleInputChange = (key, value) => {
+        setUserData(prev => ({ ...prev, [key]: value }));
+    };
 
     return (
         <div className='container-fluid mx-auto flex flex-col items-center min-h-screen'>
-            <div className='flex relative h-80 w-full mb-12'>
-                <img src={thumb} alt="" className='w-full h-full object-cover' />
-                <div className="absolute inset-0 text-white flex items-center justify-center text-2xl md:text-3xl lg:text-4xl font-canto w-full uppercase text-center">
+            <div className='relative h-80 w-full mb-12'>
+                <img src={thumb} alt="Terrace" className='w-full h-full object-cover' />
+                <div className="absolute inset-0 flex items-center justify-center text-white text-2xl md:text-3xl lg:text-4xl font-canto uppercase">
                     <p>Welcome, </p>
                 </div>
             </div>
 
             <div className='flex justify-end w-full max-w-2xl px-10 lg:px-0'>
-                <button className='text-sm text-purple-900 hover:text-blue-700 transition-colors duration-300 cursor-pointer'
+                <button
+                    className='text-sm px-4 py-2 text-purple-900 hover:text-white hover:bg-purple-900 transition-colors duration-300 cursor-pointer'
                     onClick={() => setIsModalOpen(true)}
                 >
                     EDIT PROFILE
@@ -38,150 +93,70 @@ const Account = () => {
 
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
                 <p className='text-center text-lg text-purple-900'>EDIT PROFILE</p>
-                <div className='grid grid-cols-1 sm:grid-cols-2 gap-x-10 py-8 px-4'>
-                    <div className="relative my-6 pb-5">
-                        <input
-                            type="text"
-                            onChange={(e) => setFirstName(e.target.value)}
-                            className="block w-full py-2 px-0 text-sm text-black bg-transparent border-0 
-                                    border-b border-black appearance-none 
-                                    focus:outline-none focus:ring-0 focus:text-black peer"
-                            placeholder=""
-                            required
-                        />
-                        <label
-                            className="absolute text-sm duration-300 transform -translate-y-6 scale-75
-                                    top-3 left-0 z-9 origin-[0] text-gray-400
-                                    peer-focus:left-0 peer-focus:text-blue-400
-                                    peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1 "
-                        >
-                            First Name
-                        </label>
-                    </div>
-                    <div className="relative my-6 pb-5">
-                        <input
-                            type="text"
-                            onChange={(e) => setLastName(e.target.value)}
-                            className="block w-full py-2 px-0 text-sm text-black bg-transparent border-0 
-                                    border-b border-black appearance-none 
-                                    focus:outline-none focus:ring-0 focus:text-black peer"
-                            placeholder=""
-                            required
-                        />
-                        <label
-                            className="absolute text-sm duration-300 transform -translate-y-6 scale-75
-                                    top-3 left-0 z-9 origin-[0] text-gray-400
-                                    peer-focus:left-0 peer-focus:text-blue-400
-                                    peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1 "
-                        >
-                            Last Name
-                        </label>
-                    </div>
-                    <div className="relative my-6 pb-5">
-                        <input
-                            type="text"
-                            onChange={(e) => setPhone(e.target.value)}
-                            className="block w-full py-2 px-0 text-sm text-black bg-transparent border-0 
-                                    border-b border-black appearance-none 
-                                    focus:outline-none focus:ring-0 focus:text-black peer"
-                            placeholder=""
-                            required
-                        />
-                        <label
-                            className="absolute text-sm duration-300 transform -translate-y-6 scale-75
-                                    top-3 left-0 z-9 origin-[0] text-gray-400
-                                    peer-focus:left-0 peer-focus:text-blue-400
-                                    peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1 "
-                        >
-                            Phone
-                        </label>
-                    </div>
-                    <div className="relative my-6 pb-5">
-                        <input
-                            type="text"
-                            onChange={(e) => setAddress(e.target.value)}
-                            className="block w-full py-2 px-0 text-sm text-black bg-transparent border-0 
-                                    border-b border-black appearance-none 
-                                    focus:outline-none focus:ring-0 focus:text-black peer"
-                            placeholder=""
-                            required
-                        />
-                        <label
-                            className="absolute text-sm duration-300 transform -translate-y-6 scale-75
-                                    top-3 left-0 z-9 origin-[0] text-gray-400
-                                    peer-focus:left-0 peer-focus:text-blue-400
-                                    peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1 "
-                        >
-                            Address
-                        </label>
-                    </div>
-                    <div className="relative my-6 pb-5">
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DatePicker
-                                label="Select Birthday"
-                                value={birthday ? dayjs(birthday) : null}
-                                onChange={(newValue) => setBirthday(newValue ? newValue.format("YYYY-MM-DD") : "")}
-                                slotProps={{ textField: { variant: "standard", fullWidth: true } }}
-                            />
-                        </LocalizationProvider>
-                    </div>
-
+                <div className='grid grid-cols-1 sm:grid-cols-2 gap-x-10 py-6 px-4'>
+                    {modalFields.map(({ key, label }) => (
+                        key === 'birthday' ? (
+                            <div key={key} className="relative my-6">
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DatePicker
+                                        label="Birthday"
+                                        value={userData.birthday ? dayjs(userData.birthday) : null}
+                                        onChange={(newValue) =>
+                                            handleInputChange('birthday', newValue?.format("YYYY-MM-DD") || "")
+                                        }
+                                        slotProps={{ textField: { variant: "standard", fullWidth: true } }}
+                                    />
+                                </LocalizationProvider>
+                            </div>
+                        ) : (
+                            <div key={key} className="relative my-6">
+                                <input
+                                    type="text"
+                                    value={userData[key]}
+                                    onChange={(e) => handleInputChange(key, e.target.value)}
+                                    className="block w-full py-2 px-0 text-sm text-black bg-transparent border-0 border-b border-black appearance-none focus:outline-none focus:ring-0 peer"
+                                    placeholder=" "
+                                />
+                                <label className="absolute text-sm duration-300 transform -translate-y-6 scale-75 top-3 left-0 text-gray-400 peer-focus:text-blue-400 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1">
+                                    {label}
+                                </label>
+                            </div>
+                        )
+                    ))}
                 </div>
+                {/* <div className='flex justify-end'>
+                    <button
+                        className='text-sm px-4 py-2 text-purple-900 hover:text-white hover:bg-purple-900 transition-colors duration-300 cursor-pointer'
+                        onClick={handleUpdateUserData}
+                    >
+                        UPDATE
+                    </button>
+                </div> */}
             </Modal>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-8 w-full max-w-4xl mb-4 px-4 lg:px-0">
-                <div>
-                    <label className="block text-xs mb-1 uppercase tracking-wider font-medium">
-                        first name
-                    </label>
-                    <div className="w-full text-sm lg:text-lg font-light">
-                        <p>first name</p>
+                {fields.map(({ label, key }) => (
+                    <div key={key}>
+                        <label className="block text-xs mb-1 uppercase tracking-wider font-medium">
+                            {label}
+                        </label>
+                        <div className="w-full text-sm lg:text-lg font-light">
+                            <p>{userData[key]}</p>
+                        </div>
                     </div>
-                </div>
-                <div>
+                ))}
+            </div>
 
-                    <label className="block text-xs mb-1 uppercase tracking-wider font-medium">
-                        last name
-                    </label>
-                    <div className="w-full text-sm lg:text-lg font-light">
-                        <p>last name</p>
-                    </div>
-                </div>
-                <div>
-                    <label className="block text-xs mb-1 uppercase tracking-wider font-medium">
-                        PHONE
-                    </label>
-                    <div className="w-full text-sm lg:text-lg font-light">
-                        <p>Phone</p>
-                    </div>
-                </div>
-                <div>
-                    <label className="block text-xs mb-1 uppercase tracking-wider font-medium">
-                        Email
-                    </label>
-                    <div className="w-full text-sm lg:text-lg font-light">
-                        <p>Email</p>
-                    </div>
-                </div>
-                <div>
-                    <label className="block text-xs mb-1 uppercase tracking-wider font-medium">
-                        ADDRESS
-                    </label>
-                    <div className="w-full text-sm lg:text-lg font-light">
-                        <p>Address</p>
-                    </div>
-                </div>
-                <div>
-                    <label className="block text-xs mb-1 uppercase tracking-wider font-medium">
-                        BIRTHDAY
-                    </label>
-                    <div className="w-full text-sm lg:text-lg font-light">
-                        <p>birthday</p>
-                    </div>
-                </div>
+            <div className='flex justify-end w-full max-w-2xl px-10 lg:px-0 pb-6'>
+                <button
+                    className='text-sm px-4 py-2 text-purple-900 hover:text-white hover:bg-purple-900 transition-colors duration-300 cursor-pointer'
+                    onClick={handleLogout}
+                >
+                    LOG OUT
+                </button>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default Account
+export default Account;

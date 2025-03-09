@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useBooking } from "../context/BookingContext";
-import { fetchCampsiteById, fetchCamptypeById, createBooking } from "../utils/BookingAPI";
+import { fetchCampsiteById, fetchCamptypeById, createBooking } from "../service/BookingService";
 import dayjs from "dayjs";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import SearchBar from '../../components/SearchBar'
 import CampsiteCard from '../../components/CampsiteCard'
-import { fetchAllCampsites } from '../../utils/BookingAPI'
+import { fetchAllCampsites } from '../../service/BookingService'
 // import antony from '../../assets/antony.gif'
 
 const CampsitePage = () => {
