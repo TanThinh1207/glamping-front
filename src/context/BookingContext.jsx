@@ -1,13 +1,23 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react'
+import { useUser } from './UserContext';
 
 const BookingContext = createContext();
 
+
 export const BookingProvider = ({ children }) => {
+    const { user } = useUser();
+
     const [booking, setBooking] = useState(() => {
         const savedBooking = localStorage.getItem('booking');
-        return savedBooking ? JSON.parse(savedBooking) : {
+        if (savedBooking) {
+            const parsed = JSON.parse(savedBooking);
+            if (parsed.userId === user?.id) {
+                return parsed;
+            }
+        }
+        return {
             bookingDetails: [],
-            userId: 1,
+            userId: user?.id || null,
             campSiteId: null,
             totalAmount: 0,
             bookingSelectionRequestList: [],
@@ -17,12 +27,12 @@ export const BookingProvider = ({ children }) => {
     const resetBooking = useCallback(() => {
         setBooking({
             bookingDetails: [],
-            userId: 1,
+            userId: user?.id || null,
             campSiteId: null,
             totalAmount: 0,
             bookingSelectionRequestList: [],
         });
-    }, []);
+    }, [user?.id]);
 
     const updateTotalAmount = useCallback((total) => {
         setBooking((prev) => ({ ...prev, totalAmount: total }));
@@ -48,7 +58,7 @@ export const BookingProvider = ({ children }) => {
             if (prev.campSiteId && prev.campSiteId !== campSiteId) {
                 return {
                     bookingDetails: [],
-                    userId: 1,
+                    userId: user?.id || null,
                     campSiteId,
                     totalAmount: 0,
                     bookingSelectionRequestList: [],
@@ -56,7 +66,7 @@ export const BookingProvider = ({ children }) => {
             }
             return { ...prev, campSiteId };
         });
-    }, []);
+    }, [user?.id]);
 
     const updateCamptype = useCallback((campTypeId, quantity) => {
         setBooking((prev) => {
@@ -105,8 +115,11 @@ export const BookingProvider = ({ children }) => {
     }, []);
 
     useEffect(() => {
-        localStorage.setItem("booking", JSON.stringify(booking));
-    }, [booking]);
+        // only save booking if user is logged in
+        if (user?.id) {
+            localStorage.setItem("booking", JSON.stringify(booking));
+        }
+    }, [booking, user?.id]);
 
     return (
         <BookingContext.Provider value={{

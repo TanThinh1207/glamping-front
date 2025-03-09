@@ -8,11 +8,13 @@ import { fetchCampsiteById, fetchCamptypeById } from '../../service/BookingServi
 import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
 import Modal from '../../components/Modal'
+import { useUser } from '../../context/UserContext'
 
 const CamptypePage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const { user } = useUser();
 
     const { updateCamptype, updateCampsite, resetBooking, booking } = useBooking();
     const { campsiteId } = useParams();
@@ -54,19 +56,24 @@ const CamptypePage = () => {
     };
 
     const handleCamptypeSelection = (camptype) => {
-        const checkInAt = localStorage.getItem('checkInDate')
-        const checkOutAt = localStorage.getItem('checkOutDate')
+        if (user) {
+            const checkInAt = localStorage.getItem('checkInDate')
+            const checkOutAt = localStorage.getItem('checkOutDate')
 
-        if (!checkInAt || !checkOutAt) {
-            toast.info('Please select check-in and check-out dates first');
-            return;
-        }
-        if (booking.campSiteId && booking.campSiteId !== campsiteId) {
-            setPendingSelection(camptype);
-            setModalOpen(true);
-            return;
+            if (!checkInAt || !checkOutAt) {
+                toast.info('Please select check-in and check-out dates first');
+                return;
+            }
+            if (booking.campSiteId && booking.campSiteId !== campsiteId) {
+                setPendingSelection(camptype);
+                setModalOpen(true);
+                return;
+            } else {
+                proceedWithSelection(camptype);
+            }
         } else {
-            proceedWithSelection(camptype);
+            toast.info('Please login to continue');
+
         }
     }
 
@@ -132,7 +139,8 @@ const CamptypePage = () => {
                         <div className='bg-white flex items-center gap-6 p-4 rounded-xl border border-purple-100'>
                             <p className='tracking-wide text-purple-900'>Price per night: ${camptype.price}</p>
                             <button
-                                className='bg-purple-900 text-white rounded-full px-8 py-4'
+                                className='bg-transparent border border-purple-900 text-purple-900 hover:bg-purple-900 
+                                hover:text-white rounded-full px-8 py-4 transform transition duration-300'
                                 onClick={() => handleCamptypeSelection(camptype)}
                             >
                                 <p>Reservation Inquiry</p>

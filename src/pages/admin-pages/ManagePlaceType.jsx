@@ -6,7 +6,10 @@ const ManagePlaceType = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPlaceType, setSelectedPlaceType] = useState({ id: "", name: "", image: "", status: "active" });
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const pageSize = 10;
 
   const filteredPlacetypes = placeTypes
     .filter((p) => p.name && p.name.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -28,13 +31,20 @@ const ManagePlaceType = () => {
   const handleSave = async () => {
     try {
       if (selectedPlaceType.id) {
-        const url = `${import.meta.env.VITE_API_UPDATE_PLACETYPES}`;
+        const url = `${import.meta.env.VITE_API_PLACETYPES_ENDPOINT}`;
 
         const object = {
           id: selectedPlaceType.id,
           name: selectedPlaceType.name,
         }
-        const response = await axios.post(url, object);
+        const response = await axios({
+          method: 'PUT',
+          url: url,
+          data: object,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
         const returnedData = response.data.data;
 
         if (returnedData.id === selectedPlaceType.id) {
@@ -47,10 +57,14 @@ const ManagePlaceType = () => {
           closeModal();
         }
       } else {
-        const url = `${import.meta.env.VITE_API_CREATE_PLACETYPES}`;
-        const formData = new FormData();
-        formData.append('name', selectedPlaceType.name);
-        const response = await axios.post(url, formData);
+        const url = `${import.meta.env.VITE_API_PLACETYPES_ENDPOINT}`;
+        const response = await axios({
+          method: 'POST',
+          url: `${url}?name=${encodeURIComponent(selectedPlaceType.name)}`,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
         const newPlaceType = response.data.data;
 
         setPlaceTypes((prev) => [...prev, newPlaceType]);
@@ -67,11 +81,11 @@ const ManagePlaceType = () => {
       const confirmDelete = window.confirm("Are you sure you want to delete this place type?");
       if (!confirmDelete) return;
 
-      const url = `${import.meta.env.VITE_API_DELETE_PLACETYPES}${placeTypeId}`;
+      const url = `${import.meta.env.VITE_API_PLACETYPE_BY_ID_ENDPOINT}${placeTypeId}`;
       await axios.delete(url);
 
-      const response = await axios.get(`${import.meta.env.VITE_API_GET_PLACETYPES}`);
-      setPlaceTypes(response.data.data);
+      const response = await axios.get(`${import.meta.env.VITE_API_PLACETYPES_ENDPOINT}`);
+      setPlaceTypes(response.data.data.content);
     } catch (error) {
       console.error("Error deleting place type:", error);
     }
@@ -86,22 +100,81 @@ const ManagePlaceType = () => {
     }));
   };
 
+  const fetchPlaceTypes = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_PLACETYPES_ENDPOINT}?page=${currentPage}&size=${pageSize}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      setPlaceTypes(response.data.data.content);
+      setTotalPages(response.data.data.totalPages)
+    } catch (error) {
+      console.error("Error fetching place type data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchPlaceTypes = async () => {
-      try {
-        const response = await axios.get(`${import.meta.env.VITE_API_GET_PLACETYPES}`, {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-        setPlaceTypes(response.data.data);
-        console.log(response.data.data);
-      } catch (error) {
-        console.error("Error fetching place type data:", error);
-      }
-    };
     fetchPlaceTypes();
-  }, []);
+  }, [currentPage]);
+
+  const renderPagination = () => {
+    return (
+      <div className="flex justify-center mt-4 gap-2">
+        <button
+          onClick={() => setCurrentPage(0)}
+          disabled={currentPage === 0}
+          className="px-3 py-1 bg-gray-200 disabled:opacity-50"
+        >
+          First
+        </button>
+        <button
+          onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+          disabled={currentPage === 0}
+          className="px-3 py-1 bg-gray-200 disabled:opacity-50"
+        >
+          Previous
+        </button>
+
+        {Array.from({ length: totalPages }, (_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrentPage(i)}
+            className={`px-3 py-1 ${currentPage === i ? 'bg-black text-white' : 'bg-gray-200'}`}
+          >
+            {i + 1}
+          </button>
+        ))}
+
+        <button
+          onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
+          disabled={currentPage === totalPages - 1}
+          className="px-3 py-1 bg-gray-200 disabled:opacity-50"
+        >
+          Next
+        </button>
+        <button
+          onClick={() => setCurrentPage(totalPages - 1)}
+          disabled={currentPage === totalPages - 1}
+          className="px-3 py-1 bg-gray-200 disabled:opacity-50"
+        >
+          Last
+        </button>
+      </div>
+    );
+  };
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-80 z-50">
+        <div className="animate-spin rounded-full border-t-4 border-teal-400 border-solid h-16 w-16"></div>
+      </div>
+    );
+  }
 
   return (
     <div className='flex-1 p-5'>
@@ -150,6 +223,8 @@ const ManagePlaceType = () => {
           </tbody>
         </table>
       </div>
+
+      {renderPagination()}
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <div className=" text-center py-2 mb-4">

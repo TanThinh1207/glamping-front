@@ -8,7 +8,10 @@ const ManageAccount = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState({ id: "", firstname: "", lastname: "", address: "", email: "", birthday: "", phone: "", status: true });
     const [searchTerm, setSearchTerm] = useState("");
-
+    const [isLoading, setIsLoading] = useState(false);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const pageSize = 10;
 
     const filteredUsers = users
         .filter((p) => p.firstname && p.firstname.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -84,21 +87,80 @@ const ManageAccount = () => {
         }));
     };
 
+    const fetchUsers = async () => {
+        setIsLoading(true);
+        try {
+            const response = await axios.get(`${import.meta.env.VITE_API_GET_USERS}?page=${currentPage}&size=${pageSize}`, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            setUsers(response.data.data);
+            setTotalPages(response.data.data.totalPages);
+        } catch (error) {
+            console.error("Error fetching users data:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const renderPagination = () => {
+        return (
+            <div className="flex justify-center mt-4 gap-2">
+                <button
+                    onClick={() => setCurrentPage(0)}
+                    disabled={currentPage === 0}
+                    className="px-3 py-1 bg-gray-200 disabled:opacity-50"
+                >
+                    First
+                </button>
+                <button
+                    onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+                    disabled={currentPage === 0}
+                    className="px-3 py-1 bg-gray-200 disabled:opacity-50"
+                >
+                    Previous
+                </button>
+
+                {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                        key={i}
+                        onClick={() => setCurrentPage(i)}
+                        className={`px-3 py-1 ${currentPage === i ? 'bg-black text-white' : 'bg-gray-200'}`}
+                    >
+                        {i + 1}
+                    </button>
+                ))}
+
+                <button
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
+                    disabled={currentPage === totalPages - 1}
+                    className="px-3 py-1 bg-gray-200 disabled:opacity-50"
+                >
+                    Next
+                </button>
+                <button
+                    onClick={() => setCurrentPage(totalPages - 1)}
+                    disabled={currentPage === totalPages - 1}
+                    className="px-3 py-1 bg-gray-200 disabled:opacity-50"
+                >
+                    Last
+                </button>
+            </div>
+        );
+    };
+
     useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const response = await axios.get(`${import.meta.env.VITE_API_GET_USERS}`, {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-                setUsers(response.data.data);
-            } catch (error) {
-                console.error("Error fetching users data:", error);
-            }
-        };
         fetchUsers();
-    }, []);
+    }, [currentPage]);
+
+    if (isLoading) {
+        return (
+            <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-80 z-50">
+                <div className="animate-spin rounded-full border-t-4 border-teal-400 border-solid h-16 w-16"></div>
+            </div>
+        );
+    }
 
     return (
         <div className='flex-1 p-5'>
@@ -147,6 +209,9 @@ const ManageAccount = () => {
                     </tbody>
                 </table>
             </div>
+
+            {renderPagination()}
+
             <Modal isOpen={isModalOpen} onClose={closeModal}>
                 <div className="text-center py-2 mb-4">
                     <h2 className="text-lg font-semibold">

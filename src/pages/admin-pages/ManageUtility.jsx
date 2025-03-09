@@ -1,13 +1,22 @@
 import React, { useState, useEffect } from "react"
 import Modal from '../../components/Modal';
 import axios from 'axios';
+import { toast } from "sonner";
 
 const ManageUtility = () => {
   const [utilities, setUtilities] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedUtility, setSelectedUtility] = useState({ id: "", name: "", image: "", status: true });
+  const [selectedUtility, setSelectedUtility] = useState({
+    id: "",
+    name: "",
+    image: "",
+    status: true
+  });
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const pageSize = 10;
 
   const filteredUtilities = utilities
     .filter((p) => p.name && p.name.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -29,32 +38,31 @@ const ManageUtility = () => {
   const handleSave = async () => {
     try {
       if (selectedUtility.id) {
-        const url = `${import.meta.env.VITE_API_UPDATE_UTILITIES}`;
+        const url = `${import.meta.env.VITE_API_UTILITIES_ENDPOINT}`;
         const formData = new FormData();
         formData.append('id', selectedUtility.id);
         formData.append('name', selectedUtility.name);
-        const response = await axios.post(url, formData);
+        const response = await axios.put(url, formData);
         const returnedData = response.data.data;
 
         if (returnedData.id === selectedUtility.id) {
-          setUtilities((prev) =>
-            prev.map((utility) => (utility.id === returnedData.id ? returnedData : utility))
+          setUtilities(prev =>
+            prev.map(utility => utility.id === returnedData.id ? returnedData : utility)
           );
           closeModal();
         } else {
-          toast.error("Failed to update  utility. Please try again.");
+          toast.error("Failed to update utility. Please try again.");
           closeModal();
         }
       } else {
-        const url = `${import.meta.env.VITE_API_CREATE_UTILITIES}`;
+        const url = `${import.meta.env.VITE_API_UTILITIES_ENDPOINT}`;
         const formData = new FormData();
         formData.append('name', selectedUtility.name);
         const response = await axios.post(url, formData);
         const newUtility = response.data.data;
 
-        setUtilities((prev) => [...prev, newUtility]);
+        setUtilities(prev => [...prev, newUtility]);
       }
-
       closeModal();
     } catch (error) {
       console.error("Error saving utility:", error);
@@ -66,40 +74,99 @@ const ManageUtility = () => {
       const confirmDelete = window.confirm("Are you sure you want to delete this utility?");
       if (!confirmDelete) return;
 
-      const url = `${import.meta.env.VITE_API_DELETE_UTILITIES}?id=${utilityId}`;
-      await axios.post(url);
-
-      const response = await axios.get(`${import.meta.env.VITE_API_GET_UTILITIES}`);
-      setUtilities(response.data.data);
+      await axios.delete(`${import.meta.env.VITE_API_UTILITIES_BY_ID_ENDPOINT}${utilityId}`);
+      await fetchUtilities();
+      toast.success("Utility deleted successfully");
     } catch (error) {
       console.error("Error deleting utility:", error);
+      toast.error("Failed to delete utility");
     }
   };
 
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setSelectedUtility((prev) => ({
+    setSelectedUtility(prev => ({
       ...prev,
       [name]: value,
     }));
   };
 
+  const fetchUtilities = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_UTILITIES_ENDPOINT}?page=${currentPage}&size=${pageSize}`
+      );
+      const responseData = response.data.data;
+      setUtilities(responseData.content);
+      setTotalPages(responseData.totalPages);
+    } catch (error) {
+      console.error("Error fetching utilities:", error);
+      toast.error("Failed to load utilities");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchUtilities = async () => {
-      try {
-        const response = await axios.get(`${import.meta.env.VITE_API_GET_UTILITIES}`, {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-        setUtilities(response.data.data);
-      } catch (error) {
-        console.error("Error fetching utilities data:", error);
-      }
-    };
     fetchUtilities();
-  }, []);
+  }, [currentPage]);
+
+  const renderPagination = () => {
+    return (
+      <div className="flex justify-center mt-4 gap-2">
+        <button
+          onClick={() => setCurrentPage(0)}
+          disabled={currentPage === 0}
+          className="px-3 py-1 bg-gray-200 disabled:opacity-50"
+        >
+          First
+        </button>
+        <button
+          onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+          disabled={currentPage === 0}
+          className="px-3 py-1 bg-gray-200 disabled:opacity-50"
+        >
+          Previous
+        </button>
+
+        {Array.from({ length: totalPages }, (_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrentPage(i)}
+            className={`px-3 py-1 ${currentPage === i ? 'bg-black text-white' : 'bg-gray-200'}`}
+          >
+            {i + 1}
+          </button>
+        ))}
+
+        <button
+          onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
+          disabled={currentPage === totalPages - 1}
+          className="px-3 py-1 bg-gray-200 disabled:opacity-50"
+        >
+          Next
+        </button>
+        <button
+          onClick={() => setCurrentPage(totalPages - 1)}
+          disabled={currentPage === totalPages - 1}
+          className="px-3 py-1 bg-gray-200 disabled:opacity-50"
+        >
+          Last
+        </button>
+      </div>
+    );
+  };
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-80 z-50">
+        <div className="animate-spin rounded-full border-t-4 border-teal-400 border-solid h-16 w-16"></div>
+      </div>
+    );
+  }
+
   return (
     <div className='flex-1 p-5'>
       <div className="flex justify-between items-center mb-5">
@@ -147,6 +214,8 @@ const ManageUtility = () => {
           </tbody>
         </table>
       </div>
+
+      {renderPagination()}
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <div className=" text-center py-2 mb-4">

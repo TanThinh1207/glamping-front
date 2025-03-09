@@ -1,18 +1,29 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react";
 import Modal from '../../components/Modal';
 import axios from 'axios';
+import { toast } from "sonner";
 
 const ManageFacility = () => {
   const [facilities, setFacilities] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedFacility, setSelectedFacility] = useState({ id: "", name: "", description: "", image: "", status: true });
+  const [selectedFacility, setSelectedFacility] = useState({
+    id: "",
+    name: "",
+    description: "",
+    image: "",
+    status: true
+  });
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const pageSize = 10;
 
   const filteredFacilities = facilities
-    .filter((p) => p.name && p.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    .filter((p) => p.status === true);
-
+    .filter(p =>
+      p.name?.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      p.status === true
+    );
 
   const openModal = (facility = null) => {
     setSelectedFacility(
@@ -29,12 +40,13 @@ const ManageFacility = () => {
   const handleSave = async () => {
     try {
       if (selectedFacility.id) {
-        const url = `${import.meta.env.VITE_API_UPDATE_FACILITIES}`;
+        const url = `${import.meta.env.VITE_API_FACILITIES_ENDPOINT}`;
         const formData = new FormData();
         formData.append('id', selectedFacility.id);
         formData.append('name', selectedFacility.name);
         formData.append('description', selectedFacility.description);
-        const response = await axios.post(url, formData);
+        const response = await axios.put(url, formData);
+        console.log(response);
         const returnedData = response.data.data;
 
         if (returnedData.id === selectedFacility.id) {
@@ -43,18 +55,19 @@ const ManageFacility = () => {
           );
           closeModal();
         } else {
-          toast.error("Failed to update  facility. Please try again.");
+          toast.error("Failed to update facility. Please try again.");
           closeModal();
         }
       } else {
-        const url = `${import.meta.env.VITE_API_CREATE_FACILITIES}`;
+        const url = `${import.meta.env.VITE_API_FACILITIES_ENDPOINT}`;
         const formData = new FormData();
         formData.append('name', selectedFacility.name);
         formData.append('description', selectedFacility.description);
         const response = await axios.post(url, formData);
         const newFacility = response.data.data;
-
+        console.log(newFacility);
         setFacilities((prev) => [...prev, newFacility]);
+        console.log(facilities);
       }
 
       closeModal();
@@ -68,13 +81,13 @@ const ManageFacility = () => {
       const confirmDelete = window.confirm("Are you sure you want to delete this facility?");
       if (!confirmDelete) return;
 
-      const url = `${import.meta.env.VITE_API_DELETE_FACILITIES}${facilityId}`;
-      await axios.post(url);
+      await axios.delete(`${import.meta.env.VITE_API_FACILITIES_BY_ID_ENDPOINT}${facilityId}`);
 
-      const response = await axios.get(`${import.meta.env.VITE_API_GET_FACILITIES}`);
-      setFacilities(response.data.data);
+      await fetchFacilities();
+      toast.success("Facility deleted successfully");
     } catch (error) {
       console.error("Error deleting facility:", error);
+      toast.error("Failed to delete facility");
     }
   };
 
@@ -87,22 +100,82 @@ const ManageFacility = () => {
     }));
   };
 
+  const fetchFacilities = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_FACILITIES_ENDPOINT}?page=${currentPage}&size=${pageSize}`
+      );
+
+      const responseData = response.data.data;
+      setFacilities(responseData.content);
+      setTotalPages(responseData.totalPages);
+    } catch (error) {
+      console.error("Error fetching facilities:", error);
+      toast.error("Failed to load facilities");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const renderPagination = () => {
+    return (
+      <div className="flex justify-center mt-4 gap-2">
+        <button
+          onClick={() => setCurrentPage(0)}
+          disabled={currentPage === 0}
+          className="px-3 py-1 bg-gray-200 disabled:opacity-50"
+        >
+          First
+        </button>
+        <button
+          onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+          disabled={currentPage === 0}
+          className="px-3 py-1 bg-gray-200 disabled:opacity-50"
+        >
+          Previous
+        </button>
+
+        {Array.from({ length: totalPages }, (_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrentPage(i)}
+            className={`px-3 py-1 ${currentPage === i ? 'bg-black text-white' : 'bg-gray-200'}`}
+          >
+            {i + 1}
+          </button>
+        ))}
+
+        <button
+          onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
+          disabled={currentPage === totalPages - 1}
+          className="px-3 py-1 bg-gray-200 disabled:opacity-50"
+        >
+          Next
+        </button>
+        <button
+          onClick={() => setCurrentPage(totalPages - 1)}
+          disabled={currentPage === totalPages - 1}
+          className="px-3 py-1 bg-gray-200 disabled:opacity-50"
+        >
+          Last
+        </button>
+      </div>
+    );
+  };
+
   useEffect(() => {
-    const fetchFacilities = async () => {
-      try {
-        const response = await axios.get(`${import.meta.env.VITE_API_GET_FACILITIES}`, {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-        setFacilities(response.data.data);
-        console.log(response.data.data);
-      } catch (error) {
-        console.error("Error fetching facilities data:", error);
-      }
-    };
     fetchFacilities();
-  }, []);
+  }, [currentPage]);
+
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-80 z-50">
+        <div className="animate-spin rounded-full border-t-4 border-teal-400 border-solid h-16 w-16"></div>
+      </div>
+    );
+  }
+
   return (
     <div className='flex-1 p-5'>
       <div className="flex justify-between items-center mb-5">
@@ -152,6 +225,8 @@ const ManageFacility = () => {
           </tbody>
         </table>
       </div>
+
+      {renderPagination()}
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <div className=" text-center py-2 mb-4">
