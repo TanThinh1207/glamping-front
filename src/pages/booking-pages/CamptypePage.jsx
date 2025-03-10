@@ -137,7 +137,7 @@ const CamptypePage = () => {
                             <p className='text-gray-500 text-lg pt-3 gap-3'><span className='pr-1'><FontAwesomeIcon icon={faMugHot} /></span>Breakfast included</p>
                         </div>
                         <div className='bg-white flex items-center gap-6 p-4 rounded-xl border border-purple-100'>
-                            <p className='tracking-wide text-purple-900'>Price per night: ${camptype.price}</p>
+                            <p className='tracking-wide text-purple-900'>Price per night: VND{camptype.price}</p>
                             <button
                                 className='bg-transparent border border-purple-900 text-purple-900 hover:bg-purple-900 
                                 hover:text-white rounded-full px-8 py-4 transform transition duration-300'

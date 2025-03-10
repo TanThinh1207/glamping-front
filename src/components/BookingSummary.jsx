@@ -36,31 +36,38 @@ const BookingSummary = ({ selectedServices = [] }) => {
     }
     try {
       setLoading(true);
-
       const responseData = await createBooking(booking);
       const bookingId = responseData.data.id;
-      console.log(responseData)
-
-      const paymentResponse = await fetch(`http://localhost:8080/api/payments/vn-pay?amount=1002&bankCode=NCB&bookingId=${bookingId}`);
+      const bookingName = responseData.data.campSite.name;
+      console.log("Booking Response:", responseData);
+  
+      const paymentResponse = await fetch(`${import.meta.env.VITE_API_PAYMENT}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bookingId: bookingId,
+          amount: totalPrice,
+          name: bookingName,
+          currency: "vnd",
+        }),
+      });
       const paymentData = await paymentResponse.json();
-      console.log(paymentData)
-
+      console.log("Payment Response:", paymentData);
+  
       if (paymentResponse.ok) {
-        const paymentUrl = paymentData.data;
-
-        window.location.href = paymentUrl;
+        window.location.href = paymentData.sessionUrl;
       } else {
-        throw new Error(paymentData.message || "VNPay payment failed.");
+        throw new Error(paymentData.message || "Payment session creation failed.");
       }
       localStorage.removeItem("booking");
       localStorage.removeItem("checkInDate");
       localStorage.removeItem("checkOutDate");
       localStorage.removeItem("guests");
-      console.log(booking)
       navigate('/complete-booking');
-
+  
     } catch (error) {
-      console.log(`Booking failed: ${error.message}`);
+      console.error("Booking failed:", error);
+      toast.error("Booking failed. Please try again.");
     } finally {
       setLoading(false);
     }
