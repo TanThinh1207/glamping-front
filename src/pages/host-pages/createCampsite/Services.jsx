@@ -13,6 +13,7 @@ const Services = () => {
   const [serviceDesc, setServiceDesc] = useState('');
   const [servicePrice, setServicePrice] = useState('');
   const [serviceImage, setServiceImage] = useState(null);
+  const { serviceImages, updateServiceImages } = useCampsite();
   const modalRef = useRef(null);
 
   useEffect(() => {
@@ -42,22 +43,23 @@ const Services = () => {
         price: servicePrice,
         image: serviceImage,
       };
-      setAddedServices((prevServices) => [...prevServices, newService]);
+      setAddedServices([...addedServices, newService]);
+      updateServiceImages(serviceImage);
       handleClosePopUp();
     }
   };
-
   useEffect(() => {
     const updateServices = addedServices.map(({image, ...rest}) => rest);
-    updateCampsiteData('campSiteSelections', updateServices);
+    updateCampsiteData("campSiteSelections", updateServices);
   }, [addedServices]);
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
-      setServiceImage(URL.createObjectURL(file));
+      setServiceImage(file);
     }
   };
+
   const handleClosePopUp = () => {
     setIsOpen(false);
     setServiceName('');
@@ -65,22 +67,30 @@ const Services = () => {
     setServicePrice('');
     setServiceImage(null);
   }
+  
   return (
     <div className='w-full bg-white py-24 px-96'>
       <div className='mb-8'>
-        <h1 className='text-4xl font-semibold'>Which are the services you offer?</h1>
-        <h2 className='text-gray-500'>Add services that you offer to your guests</h2>
+        <h1 className='text-4xl font-semibold'>
+          Which are the services you offer?
+        </h1>
+        <h2 className='text-gray-500'>
+          Add services that you offer to your guests
+        </h2>
       </div>
       <div className='flex gap-4 flex-wrap'>
         {addedServices.filter(service => service.name).map((service, index) => (
           <div key={index} className='w-64 border rounded-xl p-4 shadow-lg'>
-            {service.image && <img src={service.image} alt='Service' className='w-full h-auto object-cover rounded-xl' />}
+            {service.image && <img src={URL.createObjectURL(service.image)} alt='Service' className='w-full h-auto object-cover rounded-xl' />}
             <h3 className='text-lg font-semibold mt-2'>{service.name}</h3>
             <p className='text-gray-500'>{service.description}</p>
             <p className='font-bold mt-2'>${service.price}</p>
           </div>
         ))}
-        <label className='w-32 h-32 border-2 border-gray-300 rounded-xl flex items-center justify-center cursor-pointer hover:bg-gray-100 p-2 mt-5' onClick={() => setIsOpen(true)}>
+        <label
+          className='w-32 h-32 border-2 border-gray-300 rounded-xl flex items-center justify-center cursor-pointer hover:bg-gray-100 p-2 mt-5'
+          onClick={() => setIsOpen(true)}
+        >
           <FontAwesomeIcon icon={faPlus} className='text-gray-400 text-3xl' />
         </label>
       </div>
@@ -91,13 +101,24 @@ const Services = () => {
               <div className='flex space-x-4'>
                 <div className='w-3/4'>
                   <h1 className='text-xl font-semibold mb-2'>Service Name</h1>
-                  <input className='w-full h-10 border-2 rounded-xl border-gray-200 p-2' placeholder='Enter your service name' value={serviceName} onChange={(e) => setServiceName(e.target.value)} />
+                  <input
+                    className='w-full h-10 border-2 rounded-xl border-gray-200 p-2'
+                    placeholder='Enter your service name'
+                    value={serviceName}
+                    onChange={(e) => setServiceName(e.target.value)}
+                  />
                 </div>
                 <div className='1/4'>
                   <h1 className='text-xl font-semibold mb-2'>Service Image</h1>
                   <div className='flex items-center justify-center'>
-                    <label className='w-20 h-20 border-2 border-gray-300 rounded-xl flex items-center justify-center  cursor-pointer hover:bg-gray-100 ' htmlFor='imageUpload'>
-                      {serviceImage ? <img src={serviceImage} alt='Preview' className='w-full h-full object-cover rounded-xl' /> : <FontAwesomeIcon icon={faPlus} className='text-gray-400 text-3xl' />}
+                    <label
+                      className='w-20 h-20 border-2 border-gray-300 rounded-xl flex items-center justify-center  cursor-pointer hover:bg-gray-100 '
+                      htmlFor='imageUpload'>
+                      {serviceImage ? <img
+                        src={URL.createObjectURL(serviceImage)}
+                        alt='Preview' className='w-full h-full object-cover rounded-xl'
+                      />
+                        : <FontAwesomeIcon icon={faPlus} className='text-gray-400 text-3xl' />}
                     </label>
                   </div>
                   <input type='file' id='imageUpload' className='hidden' onChange={handleImageUpload} />
@@ -105,11 +126,22 @@ const Services = () => {
               </div>
               <div>
                 <h1 className='text-xl font-semibold mb-2'>Service Description</h1>
-                <textarea className='w-full h-32 border-2 rounded-xl border-gray-200 p-2' placeholder='Enter your service description' value={serviceDesc} onChange={(e) => setServiceDesc(e.target.value)} />
+                <textarea
+                  className='w-full h-32 border-2 rounded-xl border-gray-200 p-2'
+                  placeholder='Enter your service description'
+                  value={serviceDesc}
+                  onChange={(e) => setServiceDesc(e.target.value)}
+                />
               </div>
               <div>
                 <h1 className='text-xl font-semibold mb-2'>Service Price</h1>
-                <input className='w-full h-10 border-2 rounded-xl border-gray-200 p-2' placeholder='Enter your service price' type='number' value={servicePrice} onChange={(e) => setServicePrice(e.target.value)} />
+                <input
+                  className='w-full h-10 border-2 rounded-xl border-gray-200 p-2'
+                  placeholder='Enter your service price'
+                  type='number'
+                  value={servicePrice}
+                  onChange={(e) => setServicePrice(e.target.value)}
+                />
               </div>
             </div>
             <div className='text-right'>

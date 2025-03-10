@@ -8,8 +8,8 @@ import axios from 'axios';
 const StandOut = () => {
     const [placeTypes, setPlaceTypes] = useState([]);
     const [utilities, setUtilities] = useState([]);
-    const { campsiteData, updateCampsiteData } = useCampsite();
-    const { campsiteImages, updateCampsiteImages } = useCampsite();
+    const {campsiteData, updateCampsiteData} = useCampsite();
+    const {campsiteImages, updateCampsiteImages} = useCampsite();
     const [selectedUtilities, setSelectedUtilities] = useState(campsiteData.campsiteUtilities || []);
     const [selectedTypes, setSelectedTypes] = useState(campsiteData.campsiteType || []);
 
