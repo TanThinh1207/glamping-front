@@ -76,7 +76,7 @@ const CampType = () => {
         facilities: selectedFacilities,
         image: campTypeImage,
       };
-      setAddedCampTypes((prevCampTypes) => [...prevCampTypes, newCampType]);
+      setAddedCampTypes([...addedCampTypes, newCampType]);
       updateCampTypeImages(campTypeImage);
       handleClosePopUp();
     }
@@ -98,8 +98,8 @@ const CampType = () => {
     setIsOpen(false);
     setCampTypeName('');
     setCampTypePrice('');
-    setNumberOfGuests(0);
-    setCampTypeQuantity(0);
+    setNumberOfGuests('');
+    setCampTypeQuantity('');
     setCampTypeImage(null);
     setCampTypeWeekendRate('');
     setSelectedFacilities([]);

@@ -39,19 +39,19 @@ const CreateCampsiteFooter = () => {
       console.log(serviceIds);
       console.log(serviceImages);
 
-      for (let i = 0; i < serviceImages.length; i++) {
-        const formData = new FormData();
-        formData.append("id", serviceIds[i]);
-        formData.append("file", serviceImages[i]); 
-        formData.append("type", "selection");
-        await axios.post(
-          `${import.meta.env.VITE_API_IMAGE}`,
-          formData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          }
-        );
-      }
+      // for (let i = 0; i < serviceImages.length; i++) {
+      //   const formData = new FormData();
+      //   formData.append("id", serviceIds[i]);
+      //   formData.append("file", serviceImages[i]); 
+      //   formData.append("type", "selection");
+      //   await axios.post(
+      //     `${import.meta.env.VITE_API_IMAGE}`,
+      //     formData,
+      //     {
+      //       headers: { "Content-Type": "multipart/form-data" },
+      //     }
+      //   );
+      // }
 
       for (let i = 0; i < campTypeImages.length; i++) {
         const formData = new FormData();
