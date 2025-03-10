@@ -21,6 +21,7 @@ const CampType = () => {
   const modalRef = useRef(null);
   const [selectedFacilities, setSelectedFacilities] = useState([]);
   const [facilities, setFacilities] = useState([]);
+  const {campTypeImages, updateCampTypeImages} = useCampsite();
 
   useEffect(() => {
     const fetchFacilities = async () => {
@@ -75,7 +76,8 @@ const CampType = () => {
         facilities: selectedFacilities,
         image: campTypeImage,
       };
-      setAddedCampTypes((prevCampTypes) => [...prevCampTypes, newCampType]);
+      setAddedCampTypes([...addedCampTypes, newCampType]);
+      updateCampTypeImages(campTypeImage);
       handleClosePopUp();
     }
   };
@@ -88,7 +90,7 @@ const CampType = () => {
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
-      setCampTypeImage(URL.createObjectURL(file));
+      setCampTypeImage(file);
     }
   };
 
@@ -96,8 +98,8 @@ const CampType = () => {
     setIsOpen(false);
     setCampTypeName('');
     setCampTypePrice('');
-    setNumberOfGuests(0);
-    setCampTypeQuantity(0);
+    setNumberOfGuests('');
+    setCampTypeQuantity('');
     setCampTypeImage(null);
     setCampTypeWeekendRate('');
     setSelectedFacilities([]);
@@ -112,7 +114,7 @@ const CampType = () => {
       <div className='flex gap-4 flex-wrap'>
         {addedCampTypes.filter(camp => camp.type).map((camp, index) => (
           <div key={index} className='w-64 border rounded-xl p-4 shadow-lg'>
-            {camp.image && <img src={camp.image} alt='Camp' className='w-full h-auto object-cover rounded-xl' />}
+            {camp.image && <img src={URL.createObjectURL(camp.image)} alt='Camp' className='w-full h-auto object-cover rounded-xl' />}
             <h3 className='text-lg font-semibold mt-2'>{camp.type}</h3>
             <p className='text-gray-500'>{camp.quantity}</p>
             <p className='text-gray-500'>{camp.capacity}</p>
@@ -123,7 +125,10 @@ const CampType = () => {
             </div>
           </div>
         ))}
-        <label className='w-32 h-32 border-2 border-gray-300 rounded-xl flex items-center justify-center cursor-pointer hover:bg-gray-100 p-2 mt-5' onClick={() => setIsOpen(true)}>
+        <label 
+        className='w-32 h-32 border-2 border-gray-300 rounded-xl flex items-center justify-center cursor-pointer hover:bg-gray-100 p-2 mt-5' 
+        onClick={() => setIsOpen(true)}
+        >
           <FontAwesomeIcon icon={faPlus} className='text-gray-400 text-3xl' />
         </label>
       </div>
@@ -155,24 +160,13 @@ const CampType = () => {
                   <h1 className='text-xl font-semibold mb-2'>Camp Type Image</h1>
                   <div className='flex items-center justify-center'>
                     <label className='w-20 h-20 border-2 border-gray-300 rounded-xl flex items-center justify-center cursor-pointer hover:bg-gray-100' htmlFor='imageUpload'>
-                      {campTypeImage ? <img src={campTypeImage} alt='Preview' className='w-full h-full object-cover rounded-xl' /> : <FontAwesomeIcon icon={faPlus} className='text-gray-400 text-3xl' />}
+                      {campTypeImage ? <img src={URL.createObjectURL(campTypeImage)} alt='Preview' className='w-full h-full object-cover rounded-xl' /> : <FontAwesomeIcon icon={faPlus} className='text-gray-400 text-3xl' />}
                     </label>
                   </div>
                   <input type='file' id='imageUpload' className='hidden' onChange={handleImageUpload} />
                 </div>
               </div>
-              {/* <div>
-                <h1 className='text-xl font-semibold mb-2'>Camp Type Description</h1>
-                <textarea
-                  className='w-full h-32 border-2 rounded-xl border-gray-200 p-2'
-                  placeholder='Enter camp type description'
-                  value={campTypeDesc}
-                  onChange={(e) => setCampTypeDesc(e.target.value)}
-                />
-              </div> */}
-
               <div className='flex space-x-4'>
-
                 <div className='w-1/4'>
                   <h1 className='text-xl font-semibold mb-2'>Quantity</h1>
                   <input

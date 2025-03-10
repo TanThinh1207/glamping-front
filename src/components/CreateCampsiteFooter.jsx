@@ -12,14 +12,16 @@ const pageSteps = [
 ];
 
 const CreateCampsiteFooter = () => {
-  const {campsiteData} = useCampsite();
-  const {campsiteImages} = useCampsite();
+  const { campsiteData } = useCampsite();
+  const { campsiteImages } = useCampsite();
+  const { campTypeImages } = useCampsite();
+  const { serviceImages } = useCampsite();
   const navigate = useNavigate();
   const { step } = useParams();
   const currentStepIndex = pageSteps.indexOf(step);
   const prevStep = currentStepIndex > 0 ? pageSteps[currentStepIndex - 1] : null;
   const nextStep = currentStepIndex < pageSteps.length - 1 ? pageSteps[currentStepIndex + 1] : null;
-  
+
   const handleFinish = async () => {
     try {
       const url = `${import.meta.env.VITE_API_GET_CAMPSITES}`;
@@ -29,23 +31,56 @@ const CreateCampsiteFooter = () => {
         },
       });
       const campsiteId = response.data.data.id;
-      console.log(campsiteImages);
+      const serviceIds = response.data.data.campSiteSelectionsList.map(service => service.id);
+      const campTypeIds = response.data.data.campSiteCampTypeList.map(campType => campType.id);
+
+      console.log(campTypeIds);
+      console.log(campTypeImages);
+      console.log(serviceIds);
+      console.log(serviceImages);
+
+      // for (let i = 0; i < serviceImages.length; i++) {
+      //   const formData = new FormData();
+      //   formData.append("id", serviceIds[i]);
+      //   formData.append("file", serviceImages[i]); 
+      //   formData.append("type", "selection");
+      //   await axios.post(
+      //     `${import.meta.env.VITE_API_IMAGE}`,
+      //     formData,
+      //     {
+      //       headers: { "Content-Type": "multipart/form-data" },
+      //     }
+      //   );
+      // }
+
+      for (let i = 0; i < campTypeImages.length; i++) {
+        const formData = new FormData();
+        formData.append("id", campTypeIds[i]);
+        formData.append("file", campTypeImages[i]);
+        formData.append("type", "campType");
+        await axios.post(
+          `${import.meta.env.VITE_API_IMAGE}`,
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        );
+      }
+
       if (campsiteImages.length > 0) {
         const formData = new FormData();
         formData.append("id", campsiteId);
-        campsiteImages.forEach((image, index) => {
-          console.log(`Adding file: ${image.name}, size: ${image.size}`);
+        campsiteImages.forEach((image) => {
           formData.append("file", image);
-      });
-        console.log(formData);
+        });
         await axios.post(
-            `${import.meta.env.VITE_API_CAMPSITE_IMAGE}`, 
-            formData,
-            {
-                headers: { "Content-Type": "multipart/form-data" },
-            }
+          `${import.meta.env.VITE_API_CAMPSITE_IMAGE}`,
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
         );
-    }
+      }
       navigate("/hosting");
     } catch (error) {
       console.error("Error creating campsite:", error);
@@ -75,22 +110,22 @@ const CreateCampsiteFooter = () => {
         ) : (
           <div className='flex justify-between'>
             {prevStep && (
-                <button
-                  className= "text-black px-5 underline mx-4 text-xl font-semibold"
-                  onClick={() => navigate(`/hosting/create-campsite/${prevStep}`)}
-                >
-                  Back
-                </button>
+              <button
+                className="text-black px-5 underline mx-4 text-xl font-semibold"
+                onClick={() => navigate(`/hosting/create-campsite/${prevStep}`)}
+              >
+                Back
+              </button>
             )}
             {step === "camp-type" ? (
-                <button
+              <button
                 className="bg-gradient-to-r from-green-500 to-green-600 text-white px-5 py-3 rounded-md text-xl font-semibold mx-4"
                 onClick={handleFinish}
               >
                 Finish
               </button>
             ) : (
-                <button
+              <button
                 className="bg-black text-white px-5 py-3 rounded-md text-xl font-semibold mx-4"
                 onClick={() => navigate(`/hosting/create-campsite/${nextStep}`)}
               >
