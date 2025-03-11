@@ -38,12 +38,32 @@ export const CampsiteProvider = ({ children }) => {
     setCampTypeImages((prevImages) => [...prevImages, images]);
   };
 
+  const resetCampsiteData = () => {
+    setCampsiteData({
+      hostId: 1,
+      name: "",
+      address: "",
+      latitude: 0,
+      longitude: 0,
+      city: "",
+      description: "",
+      placeTypeIds: [],
+      campSiteSelections: [],
+      utilityIds: [],
+      campTypeList: [],
+    });
+    setCampsiteImages([]);
+    setServiceImages([]);
+    setCampTypeImages([]);
+  };
+
   return (
     <CampsiteContext.Provider value={{
       campsiteData, updateCampsiteData,
       campsiteImages, updateCampsiteImages,
       serviceImages, updateServiceImages,
-      campTypeImages, updateCampTypeImages
+      campTypeImages, updateCampTypeImages,
+      resetCampsiteData,
     }}>
       {children}
     </CampsiteContext.Provider>
