@@ -24,7 +24,7 @@ const StandOut = () => {
     useEffect(() => {
         const fetchUtilities = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_API_GET_UTILITIES}`, {
+                const response = await axios.get(`${import.meta.env.VITE_API_UTILITIES_ENDPOINT}`, {
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -40,7 +40,7 @@ const StandOut = () => {
     useEffect(() => {
         const fetchPlaceTypes = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_API_GET_PLACETYPES}`, {
+                const response = await axios.get(`${import.meta.env.VITE_API_PLACETYPES_ENDPOINT}`, {
                     headers: {
                         "Content-Type": "application/json",
                     },

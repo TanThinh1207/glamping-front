@@ -17,6 +17,7 @@ const Listings = () => {
                     }
                 });
                 setCampsiteList(response.data.data.content);
+                console.log(response.data);
             }  catch (error) {
                 console.error('Error fetching campsite data:', error);
             }

@@ -26,7 +26,7 @@ const CampType = () => {
   useEffect(() => {
     const fetchFacilities = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_GET_FACILITIES}`, {
+        const response = await axios.get(`${import.meta.env.VITE_API_FACILITIES_ENDPOINT}`, {
           headers: {
             'Content-Type': 'application/json'
           }

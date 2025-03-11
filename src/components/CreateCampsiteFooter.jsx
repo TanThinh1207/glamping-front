@@ -22,6 +22,46 @@ const CreateCampsiteFooter = () => {
   const prevStep = currentStepIndex > 0 ? pageSteps[currentStepIndex - 1] : null;
   const nextStep = currentStepIndex < pageSteps.length - 1 ? pageSteps[currentStepIndex + 1] : null;
 
+  const handleUploadImage = async (id, image, type) => {
+    for(let i = 0; i < image.length; i++) {
+      const formData = new FormData();
+      formData.append("id", id[i]);
+      formData.append("file", image[i]);
+      formData.append("type", type);
+      await axios.post(
+        `${import.meta.env.VITE_API_IMAGE}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+    }
+  }
+
+  // const handleUploadImage = async (ids, images, type) => {
+  //   try {
+  //     if (!ids || !images || ids.length !== images.length) {
+  //       console.error("Mismatch in IDs and images array lengths");
+  //       return;
+  //     }
+  
+  //     const uploadPromises = ids.map((id, index) => {
+  //       const formData = new FormData();
+  //       formData.append("id", id); // Pair ID with the corresponding image
+  //       formData.append("file", images[index]); // Ensure correct mapping
+  //       formData.append("type", type);
+  
+  //       return axios.post(`${import.meta.env.VITE_API_IMAGE}`, formData, {
+  //         headers: { "Content-Type": "multipart/form-data" },
+  //       });
+  //     });
+  
+  //     await Promise.all(uploadPromises); // Execute all uploads in parallel
+  //   } catch (error) {
+  //     console.error("Error uploading images:", error);
+  //   }
+  // };
+
   const handleFinish = async () => {
     try {
       const url = `${import.meta.env.VITE_API_GET_CAMPSITES}`;
@@ -34,38 +74,8 @@ const CreateCampsiteFooter = () => {
       const serviceIds = response.data.data.campSiteSelectionsList.map(service => service.id);
       const campTypeIds = response.data.data.campSiteCampTypeList.map(campType => campType.id);
 
-      console.log(campTypeIds);
-      console.log(campTypeImages);
-      console.log(serviceIds);
-      console.log(serviceImages);
-
-      // for (let i = 0; i < serviceImages.length; i++) {
-      //   const formData = new FormData();
-      //   formData.append("id", serviceIds[i]);
-      //   formData.append("file", serviceImages[i]); 
-      //   formData.append("type", "selection");
-      //   await axios.post(
-      //     `${import.meta.env.VITE_API_IMAGE}`,
-      //     formData,
-      //     {
-      //       headers: { "Content-Type": "multipart/form-data" },
-      //     }
-      //   );
-      // }
-
-      for (let i = 0; i < campTypeImages.length; i++) {
-        const formData = new FormData();
-        formData.append("id", campTypeIds[i]);
-        formData.append("file", campTypeImages[i]);
-        formData.append("type", "campType");
-        await axios.post(
-          `${import.meta.env.VITE_API_IMAGE}`,
-          formData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          }
-        );
-      }
+      await handleUploadImage(serviceIds, serviceImages, "selection");
+      await handleUploadImage(campTypeIds, campTypeImages, "campType");
 
       if (campsiteImages.length > 0) {
         const formData = new FormData();
