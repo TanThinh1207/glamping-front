@@ -3,11 +3,13 @@ import SearchBar from '../../components/SearchBar'
 import CampsiteCard from '../../components/CampsiteCard'
 import { fetchAllCampsites } from '../../service/BookingService'
 // import antony from '../../assets/antony.gif'
+import { useParams } from 'react-router-dom'
 
 const CampsitePage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [campsites, setCampsites] = useState([]);
+    const { location } = useParams();
 
     useEffect(() => {
         const fetchCampsites = async () => {
@@ -40,7 +42,7 @@ const CampsitePage = () => {
             // </div>
         );
     }
-    if (error) return <p>Error: {error}</p>;
+    if (error) return <p className='min-h-screen'>Error: {error}</p>;
 
     return (
         <div className='container mx-auto pt-20 min-h-screen'>

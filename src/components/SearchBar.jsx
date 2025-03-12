@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faUserFriends, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import Modal from "../components/Modal";
 import Dropdown from "../components/Dropdown";
 import { useMatch } from "react-router-dom";
+import { fetchAllCampsites } from "../service/BookingService";
+import { useNavigate } from "react-router-dom";
 
 const vietnamCities = [
   { id: 1, name: "Hà Nội" },
@@ -20,6 +22,10 @@ const vietnamCities = [
 ];
 
 const SearchBar = () => {
+  const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const isCampsiteRoute = useMatch("/glamping/:location");
 
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
@@ -29,11 +35,9 @@ const SearchBar = () => {
   const [checkInDate, setCheckInDate] = useState(
     localStorage.getItem("checkInDate") ? dayjs(localStorage.getItem("checkInDate")) : null
   );
-
   const [checkOutDate, setCheckOutDate] = useState(
     localStorage.getItem("checkOutDate") ? dayjs(localStorage.getItem("checkOutDate")) : null
-  );  
-
+  );
   const [guests, setGuests] = useState(localStorage.getItem("guests") ? JSON.parse(localStorage.getItem("guests")) : 1);
 
   const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
@@ -41,6 +45,9 @@ const SearchBar = () => {
   const [currentDate, setCurrentDate] = useState(dayjs());
   const daysInMonth = currentDate.daysInMonth();
   const weekdayLabels = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+
+  const [campsites, setCampsites] = useState([]);
+  const [campsiteCities, setCampsiteCities] = useState([]);
 
   const handleMonthChange = (direction) => {
     setCurrentDate(currentDate.add(direction, "month"));
@@ -64,6 +71,7 @@ const SearchBar = () => {
     localStorage.setItem("checkOutDate", selectedDate.toISOString());
   };
 
+
   const increaseGuest = () => {
     setGuests((prev) => prev + 1);
     localStorage.setItem("guests", JSON.stringify(guests));
@@ -73,13 +81,49 @@ const SearchBar = () => {
     localStorage.setItem("guests", JSON.stringify(guests));
   }
 
+  const getCampsiteCity = async (campsites) => {
+    try {
+      const cityList = [...new Set(campsites.map(campsite => campsite.city))]
+        .filter(city => city)
+        .map((city, index) => ({ id: index + 1, name: city }));
+      setCampsiteCities(cityList);
+    } catch (error) {
+      setError(error.message);
+    }
+  }
+
+  const handleSearch = () => {
+    if (destination) {
+      navigate(`/glamping/${destination.name.toLowerCase().replace(/\s+/g, "-")}`);
+    } else {
+      navigate("/campsite");
+    }
+  };
+
+  useEffect(() => {
+    const fetchCampsites = async () => {
+      setLoading(true);
+      try {
+        const response = await fetchAllCampsites();
+        setCampsites(response);
+        getCampsiteCity(response);
+      } catch (error) {
+        setError(error.message);
+      }
+      finally {
+        setLoading(false);
+      }
+    }
+    fetchCampsites();
+  }, []);
+
   return (
     <div className="pb-6 pt-10 w-full flex justify-center">
       <div className={`border border-black flex flex-col md:flex-row ${isCampsiteRoute ? "w-3/4" : "w-full"} gap-4 md:shadow-md md:rounded-xl py-4 px-2 md:mx-auto 
                       justify-center items-center`}>
         {!isCampsiteRoute && (
           <Dropdown
-            items={vietnamCities}
+            items={campsiteCities}
             selected={destination}
             onSelect={setDestination}
           />

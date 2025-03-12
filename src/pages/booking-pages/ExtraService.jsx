@@ -101,7 +101,7 @@ const ExtraService = () => {
     if (error) return <p>Error: {error}</p>;
 
     return (
-        <div className='container fluid mx-auto pt-16 flex flex-col lg:flex-row gap-10'>
+        <div className='container fluid mx-auto pt-16 flex flex-col lg:flex-row gap-10 min-h-screen'>
             <div className='lg:w-2/3 w-full'>
                 <p className='text-4xl font-canto'>Extras & Services</p>
                 {services.map((service) => (
