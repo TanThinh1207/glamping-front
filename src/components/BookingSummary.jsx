@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 const BookingSummary = ({ selectedServices = [] }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { booking } = useBooking();
+  const { booking, resetBooking } = useBooking();
   const { updateTotalAmount } = useBooking();
 
   const navigate = useNavigate();
@@ -58,7 +58,7 @@ const BookingSummary = ({ selectedServices = [] }) => {
       console.log("Payment Response:", paymentData);
       
       if (paymentResponse.ok) {
-        window.open(paymentData.sessionUrl, '_blank');
+        window.location.href = paymentData.sessionUrl;
       } else {
         throw new Error(paymentData.message || "Payment session creation failed.");
       }
@@ -66,6 +66,8 @@ const BookingSummary = ({ selectedServices = [] }) => {
       localStorage.removeItem("checkInDate");
       localStorage.removeItem("checkOutDate");
       localStorage.removeItem("guests");
+      resetBooking();
+
       navigate('/complete-booking');
   
     } catch (error) {
