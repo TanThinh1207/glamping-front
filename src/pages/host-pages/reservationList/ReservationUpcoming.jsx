@@ -1,10 +1,12 @@
 import axios from 'axios'
 import React, { useEffect, useState, useRef } from 'react'
 import { TablePagination } from '@mui/material';
+import { useUser } from '../../../context/UserContext';
 
 const ReservationUpcoming = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [id, setId] = useState('');
+  const { user } = useUser();
 
   //Table Pagination
   const [page, setPage] = useState(0);
@@ -42,11 +44,14 @@ const ReservationUpcoming = () => {
   const [upcomingReservations, setUpcomingReservations] = useState([]);
 
   useEffect(() => {
-    const fetchUpcomingReservations = async () => {
+    const fetchUpcomingReservations = async (user) => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_BOOKING}`, {
           headers: {
             'Content-Type': 'application/json'
+          },
+          params:{
+            hostId: user.id
           }
         });
         setUpcomingReservations(response.data.data.content.filter(reservation => reservation.status === 'Pending' || reservation.status === 'Deposit'));
@@ -54,9 +59,8 @@ const ReservationUpcoming = () => {
         console.error('Error fetching upcoming reservations:', error);
       }
     }
-    fetchUpcomingReservations();
+    fetchUpcomingReservations(user);
   }, []);
-
 
   //Handle api change status for Deposit status reservation to Accepted status
   const handleAccept = async (id) => {
@@ -69,7 +73,7 @@ const ReservationUpcoming = () => {
           'Content-Type': 'multipart/form-data'
         }
       });
-      setUpcomingReservations(UpcomingReservations.filter(reservation => reservation.id !== id));
+      setUpcomingReservations(upcomingReservations.filter(reservation => reservation.id !== id));
     } catch (error) {
       console.error('Error accepting reservation:', error);
     }
