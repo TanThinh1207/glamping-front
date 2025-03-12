@@ -7,7 +7,7 @@ const Dropdown = ({ items, selected, onSelect }) => {
   const dropdownRef = useRef(null);
 
   const filteredItems = items.filter(item =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    item?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   useEffect(() => {
