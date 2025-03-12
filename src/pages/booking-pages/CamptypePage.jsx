@@ -4,7 +4,7 @@ import SearchBar from '../../components/SearchBar'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMugHot } from '@fortawesome/free-solid-svg-icons'
 import { useBooking } from '../../context/BookingContext'
-import { fetchCampsiteById, fetchCamptypeById } from '../../service/BookingService'
+import { fetchCampsiteById, fetchCamptypeById, fetchCamptypeByIdWithDate } from '../../service/BookingService'
 import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
 import Modal from '../../components/Modal'
@@ -26,19 +26,36 @@ const CamptypePage = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [pendingSelection, setPendingSelection] = useState('');
 
+    const [checkIn, setCheckIn] = useState(localStorage.getItem('checkInDate') || '');
+    const [checkOut, setCheckOut] = useState(localStorage.getItem('checkOutDate') || '');
+
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
             try {
                 const campsiteData = await fetchCampsiteById(campsiteId);
-                const camptypesData = await fetchCamptypeById(campsiteId);
+
+                if (checkIn && checkOut) {
+                    const camptypesData = await fetchCamptypeByIdWithDate({ campSiteId: campsiteId, checkIn, checkOut });
+                    setCamptypes(camptypesData);
+                    console.log(camptypesData);
+                    const initialQuantities = {};
+                    camptypesData.forEach(camptype => {
+                        initialQuantities[camptype.id] = 1;
+                    });
+                    setQuantities(initialQuantities);
+                }
+                else {
+                    const camptypesData = await fetchCamptypeById(campsiteId);
+                    setCamptypes(camptypesData);
+                    const initialQuantities = {};
+                    camptypesData.forEach(camptype => {
+                        initialQuantities[camptype.id] = 1;
+                    });
+                    setQuantities(initialQuantities);
+                }
                 setCampsite(campsiteData);
-                setCamptypes(camptypesData);
-                const initialQuantities = {};
-                camptypesData.forEach(camptype => {
-                    initialQuantities[camptype.id] = 1;
-                });
-                setQuantities(initialQuantities);
+
 
             } catch (error) {
                 setError(error.message);
@@ -71,7 +88,6 @@ const CamptypePage = () => {
             } else {
                 proceedWithSelection(camptype);
                 updateDatesBookingSummary(checkInAt, checkOutAt);
-                console.log(booking)
             }
         } else {
             toast.info('Please login to continue');
@@ -131,6 +147,11 @@ const CamptypePage = () => {
                                     className="w-16 border border-gray-400 rounded px-2 text-center"
                                 />
                             </div>
+                            <p className="text-gray-500 font-light pt-3">
+                                {camptype.availableSlot !== null
+                                    ? `Available slot(s): ${camptype.availableSlot}`
+                                    : "Enter dates to view availability"}
+                            </p>
                         </div>
                     </div>
                     <div className='price-container rounded-md bg-blue-50 mx-8 flex justify-between p-8'>

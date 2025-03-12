@@ -55,14 +55,20 @@ const SearchBar = () => {
 
   const handleCheckInDate = (day) => {
     const selectedDate = currentDate.date(day);
+
+    if (selectedDate.isBefore(dayjs(), "day")) return;
+
     setCheckInDate(selectedDate);
     setIsCheckInOpen(false);
-    if (checkOutDate && selectedDate.isAfter(checkOutDate) + 1) {
+
+    if (checkOutDate && selectedDate.isAfter(checkOutDate)) {
       setCheckOutDate(null);
       localStorage.removeItem("checkOutDate");
     }
+
     localStorage.setItem("checkInDate", selectedDate.toISOString());
   };
+
 
   const handleCheckOutDate = (day) => {
     const selectedDate = currentDate.date(day);
@@ -182,20 +188,21 @@ const SearchBar = () => {
             {[...Array(daysInMonth).keys()].map((day) => {
               const selectedDate = currentDate.date(day + 1);
               const isSelected = checkInDate?.isSame(selectedDate, "day");
+              const isPastDate = selectedDate.isBefore(dayjs(), "day");
 
               return (
                 <button
                   key={day}
-                  onClick={() => handleCheckInDate(day + 1)}
-                  className={`p-3 text-sm rounded ${isSelected
-                    ? "bg-black text-white"
-                    : "hover:bg-gray-200"
+                  onClick={() => !isPastDate && handleCheckInDate(day + 1)}
+                  className={`p-3 text-sm rounded ${isSelected ? "bg-black text-white" : isPastDate ? "bg-gray-300 cursor-not-allowed" : "hover:bg-gray-200"
                     }`}
+                  disabled={isPastDate}
                 >
                   {day + 1}
                 </button>
               );
             })}
+
           </div>
         </Modal>
 
@@ -281,11 +288,11 @@ const SearchBar = () => {
           </div>
         </Modal>
 
-        <div className="border-l border-gray-400 h-6 hidden md:block"></div>
+        {/* <div className="border-l border-gray-400 h-6 hidden md:block"></div>
         <button className="bg-black text-white text-sm rounded-3xl border-black border uppercase px-6 py-3 transform 
                       duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black space-x-2">
           <span>Search</span> <FontAwesomeIcon icon={faMagnifyingGlass} />
-        </button>
+        </button> */}
       </div>
     </div>
   );

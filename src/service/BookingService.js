@@ -27,6 +27,29 @@ export const fetchCamptypeById = async (campSiteId) => {
     }
 }
 
+export const fetchCamptypeByIdWithDate = async ({ campSiteId, checkIn, checkOut }) => {
+    try {
+        const formattedCheckIn = new Date(checkIn).toISOString().slice(0, 19);
+        const formattedCheckOut = new Date(checkOut).toISOString().slice(0, 19);
+
+        const url = new URL(`${import.meta.env.VITE_API_GET_CAMPTYPES}`);
+        url.searchParams.append('campSiteId', campSiteId);
+        url.searchParams.append('checkIn', formattedCheckIn);
+        url.searchParams.append('checkOut', formattedCheckOut);
+
+        const response = await fetch(url.toString());
+
+        if (!response.ok) throw new Error(`Failed to fetch campsite: ${response.statusText}`);
+
+        const data = await response.json();
+        console.log(data);
+        return data.data.content;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
+
 export const fetchAllCampsites = async () => {
     try {
         const formData = new FormData();
