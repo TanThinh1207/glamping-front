@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios';
+import { useUser } from '../../../context/UserContext';
+
 const ReservationAll = () => {
   const [allReservations, setAllReservations] = useState([]);
-
+  const { user } = useUser();
   useEffect(() => {
-    const fetchReservations = async () => {
+    const fetchReservations = async (user) => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_BOOKING}`, {
           headers: {
             'Content-Type': 'application/json'
+          },
+          params: {
+            hostId: user.id
           }
         });
         setAllReservations(response.data.data.content);
@@ -16,7 +21,7 @@ const ReservationAll = () => {
         console.error("Error fetching reservations data:", error);
       }
     };
-    fetchReservations();
+    fetchReservations(user);
   }
   , []);
   return (
@@ -35,7 +40,6 @@ const ReservationAll = () => {
               <th className='text-left py-4'>Email</th>
               <th className='text-left py-4'>Campsite's name</th>
               <th className='text-center py-4'>Status</th>
-              <th className='text-center py-4'>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -46,10 +50,6 @@ const ReservationAll = () => {
                 <td className='text-left py-4'>{reservation.user.email}</td>
                 <td className='text-left py-4'>{reservation.campSite.name}</td>
                 <td className='text-center py-4'>{reservation.status}</td>
-                <td className='text-center py-4 space-x-4'>
-                  <button className='bg-green-500 text-white px-4 py-2 rounded-lg'>Accept</button>
-                  <button className='bg-red-500 text-white px-4 py-2 rounded-lg '>Decline</button>
-                </td>
               </tr>
             ))}
           </tbody>

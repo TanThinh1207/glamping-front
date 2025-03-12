@@ -40,6 +40,34 @@ export const CampsiteProvider = ({ children }) => {
     setCampTypeImages((prevImages) => [...prevImages, images]);
   };
 
+  const [selectedUtilities, setSelectedUtilities] = useState([]);
+  const updateSelectedUtilities = (utility) => {
+    setSelectedUtilities((prev) => {
+      const exists = prev.some((item) => item.id === utility.id);
+      const updatedList = exists
+        ? prev.filter((item) => item.id !== utility.id)
+        : [...prev, utility];
+
+      updateCampsiteData("utilityIds", updatedList.map((item) => item.id));
+
+      return updatedList;
+    });
+  }
+
+  const [selectedPlaceTypes, setSelectedPlaceTypes] = useState([]);
+  const updateSelectedPlaceTypes = (placeType) => {
+    setSelectedPlaceTypes((prev) => {
+      const exists = prev.some((item) => item.id === placeType.id);
+      const updatedList = exists
+        ? prev.filter((item) => item.id !== placeType.id)
+        : [...prev, placeType];
+
+      updateCampsiteData("placeTypeIds", updatedList.map((item) => item.id));
+
+      return updatedList;
+    });
+  }
+
   const resetCampsiteData = () => {
     setCampsiteData({
       hostId: 1,
@@ -57,6 +85,8 @@ export const CampsiteProvider = ({ children }) => {
     setCampsiteImages([]);
     setServiceImages([]);
     setCampTypeImages([]);
+    setSelectedUtilities([]);
+    setSelectedPlaceTypes([]);
   };
 
   return (
@@ -65,6 +95,8 @@ export const CampsiteProvider = ({ children }) => {
       campsiteImages, updateCampsiteImages,
       serviceImages, updateServiceImages,
       campTypeImages, updateCampTypeImages,
+      selectedUtilities, updateSelectedUtilities,
+      selectedPlaceTypes, updateSelectedPlaceTypes,
       resetCampsiteData,
     }}>
       {children}

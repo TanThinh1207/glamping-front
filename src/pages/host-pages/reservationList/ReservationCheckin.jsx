@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 import { TablePagination } from '@mui/material';
+import { useUser } from '../../../context/UserContext';
 
 const ReservationCheckin = () => {
 
@@ -18,12 +19,16 @@ const ReservationCheckin = () => {
 
   //Call api for checkin reservations
   const [checkinReservations, setCheckinReservations] = useState([]);
+  const { user } = useUser();
   useEffect(() => {
-    const fetchCheckinReservations = async () => {
+    const fetchCheckinReservations = async (user) => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_BOOKING}`, {
           headers: {
             'Content-Type': 'application/json'
+          },
+          params: {
+            hostId: user.id
           }
         });
         setCheckinReservations(response.data.data.content.filter(reservation => reservation.status === 'Accepted'));
@@ -31,7 +36,7 @@ const ReservationCheckin = () => {
         console.error("Error fetching checkin reservations data:", error);
       }
     };
-    fetchCheckinReservations();
+    fetchCheckinReservations(user);
   }
     , []);
 

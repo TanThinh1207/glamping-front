@@ -1,8 +1,50 @@
 import React from 'react'
+import axios from 'axios';
+import { useUser } from '../../../context/UserContext';
+import { useEffect, useState } from 'react';
 
 const ReservationCheckout = () => {
-  const CheckoutReservations = [
-  ];
+  
+  //Call api for checkout reservations
+  const [CheckoutReservations, setCheckoutReservations] = useState([]);
+  const { user } = useUser();
+  useEffect(() => {
+    const fetchCheckoutReservations = async (user) => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_BOOKING}`, {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          params: {
+            hostId: user.id
+          }
+        });
+        setCheckoutReservations(response.data.data.content.filter(reservation => reservation.status === 'Check_In'));
+      } catch (error) {
+        console.error("Error fetching checkout reservations data:", error);
+      }
+    };
+    fetchCheckoutReservations(user);
+  }
+  , []);
+
+  //Handle api change status for Check_In status reservation to Completed status
+  const handleCheckout = async (id) => {
+    try {
+      const formData = new FormData();
+      formData.append('status', 'completed');
+      formData.append('bookingId', id);
+      await axios.put(`${import.meta.env.VITE_API_BOOKING}/${id}/update-status`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      setCheckoutReservations(CheckoutReservations.filter(reservation => reservation.id !== id));
+    } catch (error) {
+      console.error("Error checking out reservation:", error);
+    }
+  }
+
   return (
     <div className='w-full'>
       {CheckoutReservations.length === 0 ? (
@@ -35,7 +77,13 @@ const ReservationCheckout = () => {
                 <td>{reservation.checkOutDate}</td>
                 <td>{reservation.status}</td>
                 <td>
-                  <button className="bg-green-500 text-white px-4 py-1 rounded-lg">Check out</button>
+                  <button 
+                  className="bg-green-500 text-white px-4 py-1 rounded-lg"
+                  onClick={() => handleCheckout(reservation.id)}
+                  disabled
+                  >
+                    Check out
+                  </button>
                 </td>
               </tr>
             ))}
