@@ -6,21 +6,12 @@ import { useCampsite } from '../../../context/CampsiteContext';
 import axios from 'axios';
 
 const StandOut = () => {
-    const [placeTypes, setPlaceTypes] = useState([]);
-    const [utilities, setUtilities] = useState([]);
-    const {campsiteData, updateCampsiteData} = useCampsite();
+    const { selectedUtilities, updateSelectedUtilities, selectedPlaceTypes, updateSelectedPlaceTypes } = useCampsite();
     const {campsiteImages, updateCampsiteImages} = useCampsite();
-    const [selectedUtilities, setSelectedUtilities] = useState(campsiteData.campsiteUtilities || []);
-    const [selectedTypes, setSelectedTypes] = useState(campsiteData.campsiteType || []);
 
-    useEffect(() => {
-        updateCampsiteData("utilityIds", selectedUtilities);
-    }, [selectedUtilities]);
 
-    useEffect(() => {
-        updateCampsiteData("placeTypeIds", selectedTypes);
-    }, [selectedTypes]);
-
+    //Call api for utilities
+    const [utilities, setUtilities] = useState([]);
     useEffect(() => {
         const fetchUtilities = async () => {
             try {
@@ -37,6 +28,8 @@ const StandOut = () => {
         fetchUtilities();
     }, []);
 
+    //Call api for place types
+    const [placeTypes, setPlaceTypes] = useState([]);
     useEffect(() => {
         const fetchPlaceTypes = async () => {
             try {
@@ -54,22 +47,15 @@ const StandOut = () => {
     }, []);
 
 
-    const toggleUtility = (utilityId) => {
-        setSelectedUtilities((prev) => {
-            return prev.includes(utilityId)
-                ? prev.filter((id) => id !== utilityId)
-                : [...prev, utilityId];
-        });
+    const toggleUtility = (utility) => {
+        updateSelectedUtilities(utility)
     };
 
-    const toggleType = (typeId) => {
-        setSelectedTypes((prev) => {
-            return prev.includes(typeId)
-                ? prev.filter((id) => id !== typeId)
-                : [...prev, typeId];
-        });
+    const toggleType = (type) => {
+        updateSelectedPlaceTypes(type)
     };
 
+    //Image upload
     const handleImageUpload = (event) => {
         const files = event.target.files;
         if (files) {
@@ -125,11 +111,11 @@ const StandOut = () => {
                     {placeTypes?.map((type) => (
                         <div
                             key={type.id}
-                            className={`border-2 rounded-2xl p-2 cursor-pointer transition ${selectedTypes.includes(type.id)
+                            className={`border-2 rounded-2xl p-2 cursor-pointer transition ${selectedPlaceTypes.some((item) => item.id === type.id)
                                 ? 'border-gray-400 bg-gradient-to-r from-green-500 to-green-600 text-white'
                                 : 'border-gray-300'
                                 }`}
-                            onClick={() => toggleType(type.id)}
+                            onClick={() => toggleType({ id: type.id, name: type.name })}
                         >
                             {type.name}
                         </div>
@@ -144,11 +130,11 @@ const StandOut = () => {
                     {utilities?.map((utility) => (
                         <div
                             key={utility.id}
-                            className={`border-2 rounded-2xl p-2 cursor-pointer transition ${selectedUtilities.includes(utility.id)
+                            className={`border-2 rounded-2xl p-2 cursor-pointer transition ${selectedUtilities.some((item) => item.id === utility.id)
                                 ? 'border-gray-400 bg-gradient-to-r from-green-500 to-green-600 text-white'
                                 : 'border-gray-300'
                                 }`}
-                            onClick={() => toggleUtility(utility.id)}
+                            onClick={() => toggleUtility({ id: utility.id, name: utility.name })}
                         >
                             {utility.name}
                         </div>

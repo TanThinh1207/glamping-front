@@ -18,7 +18,7 @@ const AboutYourPlace = () => {
           <textarea
             className='w-[80%] h-32 border-2 rounded-xl border-gray-200 p-2 mt-5'
             placeholder='Create a beautiful name for your campsite'
-            value={campsiteData.campsiteName}
+            value={campsiteData.name}
             onChange={(e) => updateCampsiteData('name', e.target.value)}
           />
         </div>
@@ -29,7 +29,7 @@ const AboutYourPlace = () => {
           <textarea
             className='w-[80%] h-32 border-2 rounded-xl border-gray-200 p-2 mt-5'
             placeholder='Describe your campsite'
-            value={campsiteData.campsiteDescription}
+            value={campsiteData.description}
             onChange={(e) => updateCampsiteData('description', e.target.value)}
           />
         </div>

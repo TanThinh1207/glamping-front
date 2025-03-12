@@ -1,9 +1,33 @@
 import React from 'react'
+import axios from 'axios';
+import { useUser } from '../../../context/UserContext';
+import { useEffect, useState } from 'react';
+
 
 const ReservationCanceled = () => {
-  const CanceledReservations = [
-
-  ];
+  
+  //Call api for canceled reservations
+  const [CanceledReservations, setCanceledReservations] = useState([]);
+  const { user } = useUser();
+  useEffect(() => {
+    const fetchCanceledReservations = async (user) => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_BOOKING}`, {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          params: {
+            hostId: user.id
+          }
+        });
+        setCanceledReservations(response.data.data.content.filter(reservation => reservation.status === 'Refund'));
+      } catch (error) {
+        console.error("Error fetching canceled reservations data:", error);
+      }
+    };
+    fetchCanceledReservations(user);
+  }
+  , []);
   return (
     <div className='w-full'>
       {CanceledReservations.length === 0 ? (

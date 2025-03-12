@@ -6,6 +6,7 @@ import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { TablePagination } from '@mui/material';
+import { useUser } from '../../context/UserContext';
 
 const Listings = () => {
     const navigate = useNavigate();
@@ -27,14 +28,17 @@ const Listings = () => {
     //Call api for campsite listings
     const [campsiteList, setCampsiteList] = useState([]);
     const [loading, setLoading] = useState(true);
-
+    const { user } = useUser();
     useEffect(() => {
-        const fetchCampsiteList = async () => {
+        const fetchCampsiteList = async (user) => {
             setLoading(true);
             try {
                 const response = await axios.get(`${import.meta.env.VITE_API_GET_CAMPSITES}`, {
                     headers: {
                         'Content-Type': 'application/json'
+                    },
+                    params: {
+                        userId: user.id
                     }
                 });
                 setCampsiteList(response.data.data.content);
@@ -44,7 +48,7 @@ const Listings = () => {
                 setLoading(false);
             }
         };
-        fetchCampsiteList();
+        fetchCampsiteList(user);
     }, []);
 
     //Status color

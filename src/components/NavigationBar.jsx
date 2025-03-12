@@ -7,6 +7,7 @@ import "../css/NavigationBar.css";
 import logo from "../assets/word-logo.png";
 import { useBooking } from "../context/BookingContext";
 import { useUser } from "../context/UserContext";
+import { useCampsite } from "../context/CampsiteContext";
 
 const getMenuItems = (path) => {
     switch (true) {
@@ -36,7 +37,7 @@ const NavigationBar = () => {
     const [isMinimized, setIsMinimized] = useState(window.innerWidth < 1280);
     const location = useLocation();
     const isHomePage = location.pathname === "/";
-
+    const { resetCampsiteData } = useCampsite();
     const { user } = useUser();
     const { booking } = useBooking();
     const isLoggedIn = Boolean(user);
@@ -90,7 +91,10 @@ const NavigationBar = () => {
                 return (
                     <button
                         className="bg-transparent text-black text-xl border-gray-1500 border-2 rounded-full  mb-2 py-2 px-8 font-semibold mr-2 transform duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black"
-                        onClick={() => window.location.href = "/hosting"}
+                        onClick={() => {
+                            resetCampsiteData();
+                            window.location.href = "/hosting";
+                        }}
                     >
                         Exit
                     </button>
