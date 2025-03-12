@@ -37,6 +37,9 @@ const BookingSummary = ({ selectedServices = [] }) => {
     try {
       setLoading(true);
       const responseData = await createBooking(booking);
+      
+      console.log("Booking Response:", responseData);
+
       const bookingId = responseData.data.id;
       const bookingName = responseData.data.campSite.name;
       console.log("Booking Response:", responseData);
@@ -53,9 +56,9 @@ const BookingSummary = ({ selectedServices = [] }) => {
       });
       const paymentData = await paymentResponse.json();
       console.log("Payment Response:", paymentData);
-  
+      
       if (paymentResponse.ok) {
-        window.location.href = paymentData.sessionUrl;
+        window.open(paymentData.sessionUrl, '_blank');
       } else {
         throw new Error(paymentData.message || "Payment session creation failed.");
       }

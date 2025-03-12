@@ -16,7 +16,7 @@ const CamptypePage = () => {
     const navigate = useNavigate();
     const { user } = useUser();
 
-    const { updateCamptype, updateCampsite, resetBooking, booking } = useBooking();
+    const { updateCamptype, updateCampsite, resetBooking, booking, updateDatesBookingSummary } = useBooking();
     const { campsiteId } = useParams();
 
     const [campsite, setCampsite] = useState(null);
@@ -70,6 +70,8 @@ const CamptypePage = () => {
                 return;
             } else {
                 proceedWithSelection(camptype);
+                updateDatesBookingSummary(checkInAt, checkOutAt);
+                console.log(booking)
             }
         } else {
             toast.info('Please login to continue');

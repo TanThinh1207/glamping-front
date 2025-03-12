@@ -114,6 +114,15 @@ export const BookingProvider = ({ children }) => {
         });
     }, []);
 
+    const updateDatesBookingSummary = (checkIn, checkOut) => {
+        setBooking((prev) => ({
+            ...prev,
+            checkInTime: checkIn,
+            checkOutTime: checkOut
+        }));
+    };
+    
+
     useEffect(() => {
         // only save booking if user is logged in
         if (user?.id) {
@@ -125,6 +134,7 @@ export const BookingProvider = ({ children }) => {
         <BookingContext.Provider value={{
             booking,
             resetBooking,
+            updateDatesBookingSummary,
             updateTotalAmount,
             updateServices,
             updateCampsite,
