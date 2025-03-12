@@ -7,6 +7,7 @@ const ReservationUpcoming = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [id, setId] = useState('');
   const { user } = useUser();
+  const [totalRefund, setTotalRefund] = useState(0);
 
   //Table Pagination
   const [page, setPage] = useState(0);
@@ -50,7 +51,7 @@ const ReservationUpcoming = () => {
           headers: {
             'Content-Type': 'application/json'
           },
-          params:{
+          params: {
             hostId: user.id
           }
         });
@@ -82,13 +83,13 @@ const ReservationUpcoming = () => {
 
   //Handle api change status for Deposit status reservation to Refund status
   const [reason, setReason] = useState('');
-  const handleDeny = async (id,reason) => {
+  const handleDeny = async (id, reason) => {
     try {
-      console.log(id,reason);
+      console.log(id, reason);
       const formData = new FormData();
       formData.append('bookingId', id);
       formData.append('message', reason);
-      await axios.post(`${import.meta.env.VITE_API_PAYMENT_REFUND}`,formData, {
+      await axios.post(`${import.meta.env.VITE_API_PAYMENT_REFUND}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         },
@@ -104,10 +105,11 @@ const ReservationUpcoming = () => {
   const handleClosePopUp = () => {
     setIsOpen(false);
     setReason('');
+    setTotalRefund(0);
   }
 
   //Handle button of action
-  const handleButton = (id, status) => {
+  const handleButton = (id, status, totalRefund) => {
     switch (status) {
       case 'Pending':
         return (
@@ -139,6 +141,7 @@ const ReservationUpcoming = () => {
               className='px-4 py-2 bg-red-500 text-white rounded-lg'
               onClick={() => {
                 setId(id);
+                setTotalRefund(totalRefund)
                 setIsOpen(true);
               }}
             >
@@ -158,7 +161,7 @@ const ReservationUpcoming = () => {
         return 'text-green-500';
     }
   }
-  
+
   return (
     <div className='w-full'>
       {upcomingReservations.length === 0 ? (
@@ -190,7 +193,7 @@ const ReservationUpcoming = () => {
                   <td className='text-left py-4'>{reservation.campSite.name}</td>
                   <td className={`text-center py-4 font-bold ${statusColor(reservation.status)}`}>{reservation.status}</td>
                   <td className='text-center py-4 space-x-4'>
-                    {handleButton(reservation.id, reservation.status)}
+                    {handleButton(reservation.id, reservation.status, reservation.paymentResponseList[0]?.totalAmount)}
                   </td>
                 </tr>
               ))}
@@ -212,6 +215,9 @@ const ReservationUpcoming = () => {
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
           <div ref={modalRef} className='bg-white shadow-lg p-6 lg:w-2/4 relative rounded-xl'>
             <div>
+              <h1 className='text-4xl font-bold mb-4'>Total refund: {totalRefund} VND </h1>
+            </div>
+            <div>
               <h1 className='text-xl font-semibold mb-2'>Tell us the reason why you deny</h1>
               <textarea
                 className='w-full h-32 border-2 rounded-xl border-gray-200 p-2'
@@ -222,10 +228,16 @@ const ReservationUpcoming = () => {
             </div>
             <div className='text-right mt-4'>
               <button
-                className='px-4 py-2 bg-red-500 text-white rounded-lg '
+                className='px-4 py-2 bg-green-500 text-white rounded-lg '
                 onClick={() => handleDeny(id, reason)}
               >
                 Refund
+              </button>
+              <button
+                className='px-4 py-2 bg-red-500 text-white rounded-lg ml-2'
+                onClick={handleClosePopUp}
+              >
+                Cancel
               </button>
             </div>
           </div>
