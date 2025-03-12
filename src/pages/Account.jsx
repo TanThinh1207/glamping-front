@@ -8,7 +8,7 @@ import dayjs from "dayjs";
 import { toast } from 'sonner';
 import Modal from '../components/Modal';
 import thumb from '../assets/terrace.jpg';
-import { updateUserData } from '../service/UserService';
+import { updateUserData, fetchUserData } from '../service/UserService';
 
 const Account = () => {
     const { user, logout } = useUser();
@@ -16,12 +16,12 @@ const Account = () => {
 
     const defaultText = "Vui lòng cập nhật";
     const [userData, setUserData] = useState({
-        firstname: defaultText,
-        lastname: defaultText,
+        firstName: defaultText,
+        lastName: defaultText,
         phone: defaultText,
         email: defaultText,
         address: defaultText,
-        birthday: defaultText
+        dob: defaultText
     });
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -32,7 +32,7 @@ const Account = () => {
         { label: "Phone", key: "phone" },
         { label: "Email", key: "email" },
         { label: "Address", key: "address" },
-        { label: "Birthday", key: "birthday" }
+        { label: "Birthday", key: "dob" }
     ];
 
     const modalFields = fields.filter(field => field.key !== 'email');
@@ -43,22 +43,46 @@ const Account = () => {
             toast.error("Please login to view your account!");
             return;
         }
-
-        setUserData({
-            firstName: user.firstname ?? defaultText,
-            lastName: user.lastname ?? defaultText,
-            phone: user.phone ?? defaultText,
-            email: user.email ?? defaultText,
-            address: user.address ?? defaultText,
-            birthday: user.birthday ?? defaultText
-        });
-    }, [user, navigate]);
+        const reloadUser = async () => {
+            const newUser = await fetchUserData(user.id);
+            setUserData({
+                firstName: newUser.firstname ?? defaultText,
+                lastName: newUser.lastname ?? defaultText,
+                phone: newUser.phone ?? defaultText,
+                email: newUser.email ?? defaultText,
+                address: newUser.address ?? defaultText,
+                dob: newUser.birthday ?? defaultText
+            });
+        }
+        reloadUser();
+    }, []);
 
     const handleUpdateUserData = async () => {
         try {
-            const updatedUser = await updateUserData(user.id, userData);
+            const backendData = {
+                firstName: userData.firstName,
+                lastName: userData.lastName,
+                phone: userData.phone,
+                address: userData.address,
+                dob: userData.dob,
+              };
+            console.log(backendData)
+            await updateUserData(user.id, backendData);
+            const updatedUser = await fetchUserData(user.id);
+            console.log(updatedUser)
+            console.log("updatedUser")
+            setUserData({
+                firstName: updatedUser.firstname || defaultText,
+                lastName: updatedUser.lastname || defaultText,
+                phone: updatedUser.phone || defaultText,
+                email: updatedUser.email || defaultText,
+                address: updatedUser.address || defaultText,
+                dob: updatedUser.birthday || defaultText,
+            });
+            console.log(userData)
+            console.log("userData")
+    
             toast.success("User data updated successfully!");
-            console.log(updatedUser);
         } catch (error) {
             toast.error(`Failed to update user data: ${error.message}`);
         }
@@ -78,7 +102,7 @@ const Account = () => {
             <div className='relative h-80 w-full mb-12'>
                 <img src={thumb} alt="Terrace" className='w-full h-full object-cover' />
                 <div className="absolute inset-0 flex items-center justify-center text-white text-2xl md:text-3xl lg:text-4xl font-canto uppercase">
-                    <p>Welcome, </p>
+                    <p>Welcome, {userData.firstName !== defaultText ? userData.firstName : "Guest"}</p>
                 </div>
             </div>
 
@@ -95,14 +119,14 @@ const Account = () => {
                 <p className='text-center text-lg text-purple-900'>EDIT PROFILE</p>
                 <div className='grid grid-cols-1 sm:grid-cols-2 gap-x-10 py-6 px-4'>
                     {modalFields.map(({ key, label }) => (
-                        key === 'birthday' ? (
+                        key === 'dob' ? (
                             <div key={key} className="relative my-6">
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DatePicker
                                         label="Birthday"
-                                        value={userData.birthday ? dayjs(userData.birthday) : null}
+                                        value={userData.dob !== defaultText ? dayjs(userData.dob) : null}
                                         onChange={(newValue) =>
-                                            handleInputChange('birthday', newValue?.format("YYYY-MM-DD") || "")
+                                            handleInputChange('dob', newValue?.format("YYYY-MM-DD") || "")
                                         }
                                         slotProps={{ textField: { variant: "standard", fullWidth: true } }}
                                     />
@@ -112,7 +136,7 @@ const Account = () => {
                             <div key={key} className="relative my-6">
                                 <input
                                     type="text"
-                                    value={userData[key]}
+                                    value={userData[key] !== defaultText ? userData[key] : ""}
                                     onChange={(e) => handleInputChange(key, e.target.value)}
                                     className="block w-full py-2 px-0 text-sm text-black bg-transparent border-0 border-b border-black appearance-none focus:outline-none focus:ring-0 peer"
                                     placeholder=" "
@@ -124,14 +148,14 @@ const Account = () => {
                         )
                     ))}
                 </div>
-                {/* <div className='flex justify-end'>
+                <div className='flex justify-end'>
                     <button
                         className='text-sm px-4 py-2 text-purple-900 hover:text-white hover:bg-purple-900 transition-colors duration-300 cursor-pointer'
                         onClick={handleUpdateUserData}
                     >
                         UPDATE
                     </button>
-                </div> */}
+                </div>
             </Modal>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-8 w-full max-w-4xl mb-4 px-4 lg:px-0">
@@ -141,7 +165,7 @@ const Account = () => {
                             {label}
                         </label>
                         <div className="w-full text-sm lg:text-lg font-light">
-                            <p>{userData[key]}</p>
+                            <p>{userData[key] !== defaultText ? userData[key] : "N/A"}</p>
                         </div>
                     </div>
                 ))}

@@ -17,6 +17,7 @@ const CampsitePage = () => {
             try {
                 const response = await fetchAllCampsites();
                 setCampsites(response);
+                console.log(response);
             } catch (error) {
                 setError(error.message);
             }

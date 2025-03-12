@@ -5,7 +5,7 @@ const CampsiteContext = createContext();
 export const CampsiteProvider = ({ children }) => {
   const { user } = useUser();
   const [campsiteData, setCampsiteData] = useState({
-    hostId: user.id,
+    hostId: user?.id,
     name: "",
     address: "",
     latitude: 0,
