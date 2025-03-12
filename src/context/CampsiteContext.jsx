@@ -1,9 +1,11 @@
 import React, { createContext, useContext, useState } from 'react'
+import { useUser } from './UserContext';
 
 const CampsiteContext = createContext();
 export const CampsiteProvider = ({ children }) => {
+  const { user } = useUser();
   const [campsiteData, setCampsiteData] = useState({
-    hostId: 1,
+    hostId: user.id,
     name: "",
     address: "",
     latitude: 0,
