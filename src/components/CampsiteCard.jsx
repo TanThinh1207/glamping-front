@@ -18,7 +18,7 @@ const CampsiteCard = ({ campsite }) => {
     return (
         <div className='flex flex-col md:flex-row gap-10 pb-16'>
             <div className='left-container md:w-1/2 w-full'>
-                <img src={campsite.image} alt={campsite.name} />
+                <img src={campsite.imageList[0]?.path} alt={campsite.name} />
             </div>
             <div className='right-container md:w-1/2 w-full'>
                 <p className='uppercase text-lg text-gray-500 font-serif pb-6'>{campsite.location}</p>
