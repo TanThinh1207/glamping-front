@@ -6,15 +6,12 @@ import { useCampsite } from '../../../context/CampsiteContext';
 const Services = () => {
   const { campsiteData, updateCampsiteData } = useCampsite();
   const { services, addService, updateService, removeService } = useCampsite();
-  const [addedServices, setAddedServices] = useState(
-    Array.isArray(campsiteData.campsiteServices) ? campsiteData.campsiteServices : []
-  );
+  
   const [isOpen, setIsOpen] = useState(false);
   const [serviceName, setServiceName] = useState('');
   const [serviceDesc, setServiceDesc] = useState('');
   const [servicePrice, setServicePrice] = useState('');
   const [serviceImage, setServiceImage] = useState(null);
-  const { serviceImages, updateServiceImages } = useCampsite();
 
   // Close the modal when clicked outside
   const modalRef = useRef(null);
@@ -46,21 +43,19 @@ const Services = () => {
         price: servicePrice,
         image: serviceImage,
       };
-      setAddedServices([...addedServices, newService]);
-      updateServiceImages(serviceImage);
+      console.log(newService);
+      addService(newService);
       handleClosePopUp();
     }
   };
-  useEffect(() => {
-    const updateServices = addedServices.map(({ image, ...rest }) => rest);
-    updateCampsiteData("campSiteSelections", updateServices);
-  }, [addedServices]);
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
+    console.log(file);
     if (file) {
       setServiceImage(file);
     }
+    console.log(services)
   };
 
   const handleClosePopUp = () => {
@@ -82,7 +77,7 @@ const Services = () => {
         </h2>
       </div>
       <div className='flex gap-4 flex-wrap'>
-        {addedServices.filter(service => service.name).map((service, index) => (
+        {services.filter(service => service.name).map((service, index) => (
           <div key={index} className='w-64 border-1 rounded-xl  shadow-xl'>
             {service.image && <img src={URL.createObjectURL(service.image)} alt='Service' className='w-full h-40 object-cover rounded-t-xl' />}
             <div className='p-2'>
@@ -109,7 +104,7 @@ const Services = () => {
                   <input
                     className='w-full h-10 border-2 rounded-xl border-gray-200 p-2'
                     placeholder='Enter your service name'
-                    value={serviceName}
+                    value={services.name}
                     onChange={(e) => setServiceName(e.target.value)}
                   />
                 </div>
@@ -119,7 +114,7 @@ const Services = () => {
                     <label
                       className='w-20 h-20 border-2 border-gray-300 rounded-xl flex items-center justify-center  cursor-pointer hover:bg-gray-100 '
                       htmlFor='imageUpload'>
-                      {serviceImage ? <img
+                      {services.image ? <img
                         src={URL.createObjectURL(serviceImage)}
                         alt='Preview' className='w-full h-full object-cover rounded-xl'
                       />
@@ -134,7 +129,7 @@ const Services = () => {
                 <textarea
                   className='w-full h-32 border-2 rounded-xl border-gray-200 p-2'
                   placeholder='Enter your service description'
-                  value={serviceDesc}
+                  value={services.description}
                   onChange={(e) => setServiceDesc(e.target.value)}
                 />
               </div>
@@ -144,7 +139,7 @@ const Services = () => {
                   className='w-full h-10 border-2 rounded-xl border-gray-200 p-2'
                   placeholder='Enter your service price'
                   type='number'
-                  value={servicePrice}
+                  value={services.price}
                   onChange={(e) => setServicePrice(e.target.value)}
                 />
               </div>
