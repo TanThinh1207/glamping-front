@@ -7,7 +7,7 @@ const Overview = () => {
     return (
         <div className="w-full flex  items-center justify-center bg-white py-24 px-24 gap-10">
             <div className='w-1/2  items-start '>
-                <h1 className='text-6xl font-semibold text-left leading-tight'>It’s easy to get <br />started on Glampé</h1>
+                <h1 className='text-6xl font-semibold text-left leading-tight'>It’s easy to get <br />started on astroGlampé</h1>
             </div>
             <div className='w-1/2  items-end'>
                 <div className="flex items-start space-x-4 border-b-2 border-gray-200 pb-[32px]">
