@@ -42,6 +42,7 @@ const Listings = () => {
                     }
                 });
                 setCampsiteList(response.data.data.content);
+                console.log(response.data.data.content);
             } catch (error) {
                 console.error('Error fetching campsite data:', error);
             } finally {
@@ -56,6 +57,8 @@ const Listings = () => {
         switch (status) {
             case 'Pending':
                 return 'text-orange-500';
+            case 'Available':
+                return 'text-green-500';
             default:
                 return 'text-gray-500';
         }
@@ -79,7 +82,7 @@ const Listings = () => {
 
                     {loading ? (
                         <div className="flex justify-center items-center h-64 w-full">
-                            <div className="w-12 h-12 border-4 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+                            <div className="animate-spin rounded-full border-t-4 border-teal-400 border-solid h-16 w-16"></div>
                         </div>
                     ) : (
                         <table className="w-full border-collapse">
@@ -99,7 +102,7 @@ const Listings = () => {
                                         onClick={() => navigate(`/hosting/editor/${listing.id}`)}
                                     >
                                         <td className="p-4 flex items-center gap-3">
-                                            <img src={image} alt={listing.name} className="w-12 h-12 rounded-md object-cover" />
+                                            <img src={listing.imageList[0]?.path} alt={listing.name} className="w-12 h-12 rounded-md object-cover" />
                                             {listing.name}
                                         </td>
                                         <td className="p-4">{listing.city}</td>

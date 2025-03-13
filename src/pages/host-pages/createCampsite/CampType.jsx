@@ -21,7 +21,7 @@ const CampType = () => {
   const modalRef = useRef(null);
   const [selectedFacilities, setSelectedFacilities] = useState([]);
   const [facilities, setFacilities] = useState([]);
-  const {campTypeImages, updateCampTypeImages} = useCampsite();
+  const { campTypeImages, updateCampTypeImages } = useCampsite();
 
   useEffect(() => {
     const fetchFacilities = async () => {
@@ -85,7 +85,7 @@ const CampType = () => {
     const updatedCampTypes = addedCampTypes.map(({ image, ...rest }) => rest);
     updateCampsiteData('campTypeList', updatedCampTypes);
   }, [addedCampTypes]);
-  
+
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -113,21 +113,22 @@ const CampType = () => {
       </div>
       <div className='flex gap-4 flex-wrap'>
         {addedCampTypes.filter(camp => camp.type).map((camp, index) => (
-          <div key={index} className='w-64 border rounded-xl p-4 shadow-lg'>
-            {camp.image && <img src={URL.createObjectURL(camp.image)} alt='Camp' className='w-full h-auto object-cover rounded-xl' />}
-            <h3 className='text-lg font-semibold mt-2'>{camp.type}</h3>
-            <p className='text-gray-500'>{camp.quantity}</p>
-            <p className='text-gray-500'>{camp.capacity}</p>
-            <p className='text-gray-500'>{camp.weekendRate}</p>
-            <p className='font-bold mt-2'>${camp.price}</p>
-            <div className='mt-2 text-sm text-gray-600'>
-              {Array.isArray(camp.facilities) ? camp.facilities.join(', ') : 'No facilities'}
+          <div key={index} className='w-64 border-1 rounded-xl shadow-xl'>
+            {camp.image && <img src={URL.createObjectURL(camp.image)} alt='Camp' className='w-full h-40 object-cover rounded-t-xl' />}
+            <div className='p-2'>
+              <h3 className='text-xl font-bold '>{camp.type} - {camp.capacity} guests</h3>
+              <p className='text-gray-500'>Quantity: {camp.quantity}</p>
+              {/* <div className='text-gray-600'>
+                {Array.isArray(camp.facilities) ? camp.facilities.join(', ') : 'No facilities'}
+              </div> */}
+              <p className='font-semibold mt-2 text-lg'>Price: {camp.price} VND</p>
+              <p className='text-gray-500 text-md'>Weekend price: {camp.weekendRate} VND</p>
             </div>
           </div>
         ))}
-        <label 
-        className='w-32 h-32 border-2 border-gray-300 rounded-xl flex items-center justify-center cursor-pointer hover:bg-gray-100 p-2 mt-5' 
-        onClick={() => setIsOpen(true)}
+        <label
+          className='w-32 h-32 border-2 border-gray-300 rounded-xl flex items-center justify-center cursor-pointer hover:bg-gray-100 p-2 mt-5'
+          onClick={() => setIsOpen(true)}
         >
           <FontAwesomeIcon icon={faPlus} className='text-gray-400 text-3xl' />
         </label>

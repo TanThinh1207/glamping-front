@@ -4,6 +4,7 @@ import { TablePagination } from '@mui/material';
 import { useUser } from '../../../context/UserContext';
 
 const ReservationCheckin = () => {
+  const [loading, setLoading] = useState(true);
 
   //Table Pagination
   const [page, setPage] = useState(0);
@@ -22,6 +23,7 @@ const ReservationCheckin = () => {
   const { user } = useUser();
   useEffect(() => {
     const fetchCheckinReservations = async (user) => {
+      setLoading(true);
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_BOOKING}`, {
           headers: {
@@ -34,6 +36,8 @@ const ReservationCheckin = () => {
         setCheckinReservations(response.data.data.content.filter(reservation => reservation.status === 'Accepted'));
       } catch (error) {
         console.error("Error fetching checkin reservations data:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchCheckinReservations(user);
@@ -42,6 +46,7 @@ const ReservationCheckin = () => {
 
   //Handle api change status for Accepted status reservation to Checkin status
   const handleCheckin = async (id) => {
+    setLoading(true);
     try {
       const formData = new FormData();
       formData.append('status', 'checkin');
@@ -54,6 +59,8 @@ const ReservationCheckin = () => {
       setCheckinReservations(checkinReservations.filter(reservation => reservation.id !== id));
     } catch (error) {
       console.error("Error checking in reservation:", error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -69,55 +76,63 @@ const ReservationCheckin = () => {
 
   return (
     <div className='w-full'>
-      {checkinReservations.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-60">
-          <p className="text-black font-semibold text-lg">No results found</p>
-          <p className="text-black mt-2">Please try a different filter</p>
+      {loading ? (
+        <div className="flex justify-center items-center h-64 w-full">
+          <div className="animate-spin rounded-full border-t-4 border-teal-400 border-solid h-16 w-16"></div>
         </div>
       ) : (
-        <div className='overflow-x-auto'>
-          <table className='w-full text-left'>
-            <thead>
-              <tr>
-                <th className='text-left py-4'>Guest</th>
-                <th className='text-left py-4'>Phone Number</th>
-                <th className='text-left py-4'>Email</th>
-                <th className='text-left py-4'>Campsite's name</th>
-                <th className='text-center py-4'>Status</th>
-                <th className='text-center py-4'>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {checkinReservations.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((reservation, index) => (
-                <tr key={index}>
-                  <td className='text-left py-4'>{reservation.user.lastname} {reservation.user.firstname}</td>
-                  <td className='text-left py-4'>{reservation.user.phone}</td>
-                  <td className='text-left py-4'>{reservation.user.email}</td>
-                  <td className='text-left py-4'>{reservation.campSite.name}</td>
-                  <td className={`text-center py-4 font-bold ${statusColor(reservation.status)}`}>{reservation.status}</td>
-                  <td className='text-center py-4 space-x-4'>
-                    <button
-                      className='bg-green-500 text-white px-4 py-2 rounded-lg'
-                      onClick={() => handleCheckin(reservation.id)}
-                    >
-                      Check in
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <TablePagination
-            component="div"
-            count={checkinReservations.length}
-            page={page}
-            onPageChange={handleChangePage}
-            rowsPerPage={rowsPerPage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            rowsPerPageOptions={[5, 10, 25]}
-            className='p-4'
-          />
-        </div>
+        <>
+          {checkinReservations.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-60">
+              <p className="text-black font-semibold text-lg">No results found</p>
+              <p className="text-black mt-2">Please try a different filter</p>
+            </div>
+          ) : (
+            <div className='overflow-x-auto'>
+              <table className='w-full text-left'>
+                <thead>
+                  <tr>
+                    <th className='text-left py-4'>Guest</th>
+                    <th className='text-left py-4'>Phone Number</th>
+                    <th className='text-left py-4'>Email</th>
+                    <th className='text-left py-4'>Campsite's name</th>
+                    <th className='text-center py-4'>Status</th>
+                    <th className='text-center py-4'>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {checkinReservations.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((reservation, index) => (
+                    <tr key={index}>
+                      <td className='text-left py-4'>{reservation.user.lastname} {reservation.user.firstname}</td>
+                      <td className='text-left py-4'>{reservation.user.phone}</td>
+                      <td className='text-left py-4'>{reservation.user.email}</td>
+                      <td className='text-left py-4'>{reservation.campSite.name}</td>
+                      <td className={`text-center py-4 font-bold ${statusColor(reservation.status)}`}>{reservation.status}</td>
+                      <td className='text-center py-4 space-x-4'>
+                        <button
+                          className='bg-green-500 text-white px-4 py-2 rounded-lg'
+                          onClick={() => handleCheckin(reservation.id)}
+                        >
+                          Check in
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <TablePagination
+                component="div"
+                count={checkinReservations.length}
+                page={page}
+                onPageChange={handleChangePage}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                rowsPerPageOptions={[5, 10, 25]}
+                className='p-4'
+              />
+            </div>
+          )}
+        </>
       )}
     </div>
   )

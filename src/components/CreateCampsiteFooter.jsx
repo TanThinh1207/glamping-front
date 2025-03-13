@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { useCampsite } from '../context/CampsiteContext';
 import axios from 'axios';
@@ -17,27 +17,13 @@ const CreateCampsiteFooter = () => {
   const { campTypeImages } = useCampsite();
   const { serviceImages } = useCampsite();
   const { resetCampsiteData } = useCampsite();
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { step } = useParams();
   const currentStepIndex = pageSteps.indexOf(step);
   const prevStep = currentStepIndex > 0 ? pageSteps[currentStepIndex - 1] : null;
   const nextStep = currentStepIndex < pageSteps.length - 1 ? pageSteps[currentStepIndex + 1] : null;
 
-  // const handleUploadImage = async (id, image, type) => {
-  //   for(let i = 0; i < image.length; i++) {
-  //     const formData = new FormData();
-  //     formData.append("id", id[i]);
-  //     formData.append("file", image[i]);
-  //     formData.append("type", type);
-  //     await axios.post(
-  //       `${import.meta.env.VITE_API_IMAGE}`,
-  //       formData,
-  //       {
-  //         headers: { "Content-Type": "multipart/form-data" },
-  //       }
-  //     );
-  //   }
-  // }
   const handleUploadImage = async (ids, images, type) => {
     const validImages = images.filter((_, index) => ids[index] !== undefined);
     const validIds = ids.filter(id => id !== undefined);
@@ -59,6 +45,7 @@ const CreateCampsiteFooter = () => {
   };
 
   const handleFinish = async () => {
+    setLoading(true);
     try {
       const url = `${import.meta.env.VITE_API_GET_CAMPSITES}`;
       const response = await axios.post(url, campsiteData, {
@@ -92,12 +79,15 @@ const CreateCampsiteFooter = () => {
       if (campTypeIds.length > 0 && campTypeImages.length > 0) {
         await handleUploadImage(campTypeIds, campTypeImages, "campType");
       }
-      
+
       resetCampsiteData();
       navigate("/hosting");
     } catch (error) {
       console.error("Error creating campsite:", error);
+    } finally {
+      setLoading(false);
     }
+
     console.log(campsiteData);
   }
   return (
@@ -131,11 +121,25 @@ const CreateCampsiteFooter = () => {
               </button>
             )}
             {step === "camp-type" ? (
+              // <button
+              //   className="bg-gradient-to-r from-green-500 to-green-600 text-white px-5 py-3 rounded-md text-xl font-semibold mx-4"
+              //   onClick={handleFinish}
+              // >
+              //   Finish
+              // </button>
               <button
-                className="bg-gradient-to-r from-green-500 to-green-600 text-white px-5 py-3 rounded-md text-xl font-semibold mx-4"
+                className="bg-gradient-to-r from-green-500 to-green-600 text-white px-5 py-3 rounded-md text-xl font-semibold mx-4 flex items-center justify-center"
                 onClick={handleFinish}
+                disabled={loading}
               >
-                Finish
+                {loading ? (
+                  <div className="flex items-center">
+                    <div className="animate-spin rounded-full border-t-4 border-teal-400 border-solid h-6 w-6 mr-2"></div>
+                    Creating...
+                  </div>
+                ) : (
+                  "Finish"
+                )}
               </button>
             ) : (
               <button

@@ -5,6 +5,7 @@ import { useCampsite } from '../../../context/CampsiteContext';
 
 const Services = () => {
   const { campsiteData, updateCampsiteData } = useCampsite();
+  const { services, addService, updateService, removeService } = useCampsite();
   const [addedServices, setAddedServices] = useState(
     Array.isArray(campsiteData.campsiteServices) ? campsiteData.campsiteServices : []
   );
@@ -14,6 +15,8 @@ const Services = () => {
   const [servicePrice, setServicePrice] = useState('');
   const [serviceImage, setServiceImage] = useState(null);
   const { serviceImages, updateServiceImages } = useCampsite();
+
+  // Close the modal when clicked outside
   const modalRef = useRef(null);
 
   useEffect(() => {
@@ -49,7 +52,7 @@ const Services = () => {
     }
   };
   useEffect(() => {
-    const updateServices = addedServices.map(({image, ...rest}) => rest);
+    const updateServices = addedServices.map(({ image, ...rest }) => rest);
     updateCampsiteData("campSiteSelections", updateServices);
   }, [addedServices]);
 
@@ -67,7 +70,7 @@ const Services = () => {
     setServicePrice('');
     setServiceImage(null);
   }
-  
+
   return (
     <div className='w-full bg-white py-24 px-96'>
       <div className='mb-8'>
@@ -80,11 +83,13 @@ const Services = () => {
       </div>
       <div className='flex gap-4 flex-wrap'>
         {addedServices.filter(service => service.name).map((service, index) => (
-          <div key={index} className='w-64 border rounded-xl p-4 shadow-lg'>
-            {service.image && <img src={URL.createObjectURL(service.image)} alt='Service' className='w-full h-auto object-cover rounded-xl' />}
-            <h3 className='text-lg font-semibold mt-2'>{service.name}</h3>
-            <p className='text-gray-500'>{service.description}</p>
-            <p className='font-bold mt-2'>${service.price}</p>
+          <div key={index} className='w-64 border-1 rounded-xl  shadow-xl'>
+            {service.image && <img src={URL.createObjectURL(service.image)} alt='Service' className='w-full h-40 object-cover rounded-t-xl' />}
+            <div className='p-2'>
+              <h3 className='text-xl font-bold '>{service.name}</h3>
+              <p className='text-gray-500'>{service.description}</p>
+              <p className='font-semibold mt-2 text-lg'>Price: {service.price} VND</p>
+            </div>
           </div>
         ))}
         <label

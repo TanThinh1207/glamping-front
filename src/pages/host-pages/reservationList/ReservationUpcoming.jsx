@@ -8,6 +8,7 @@ const ReservationUpcoming = () => {
   const [id, setId] = useState('');
   const { user } = useUser();
   const [totalRefund, setTotalRefund] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   //Table Pagination
   const [page, setPage] = useState(0);
@@ -46,6 +47,7 @@ const ReservationUpcoming = () => {
 
   useEffect(() => {
     const fetchUpcomingReservations = async (user) => {
+      setLoading(true);
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_BOOKING}`, {
           headers: {
@@ -58,6 +60,8 @@ const ReservationUpcoming = () => {
         setUpcomingReservations(response.data.data.content.filter(reservation => reservation.status === 'Pending' || reservation.status === 'Deposit'));
       } catch (error) {
         console.error('Error fetching upcoming reservations:', error);
+      } finally {
+        setLoading(false);
       }
     }
     fetchUpcomingReservations(user);
@@ -65,6 +69,7 @@ const ReservationUpcoming = () => {
 
   //Handle api change status for Deposit status reservation to Accepted status
   const handleAccept = async (id) => {
+    setLoading(true);
     try {
       const formData = new FormData();
       formData.append('status', 'accept');
@@ -77,6 +82,8 @@ const ReservationUpcoming = () => {
       setUpcomingReservations(upcomingReservations.filter(reservation => reservation.id !== id));
     } catch (error) {
       console.error('Error accepting reservation:', error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -84,6 +91,7 @@ const ReservationUpcoming = () => {
   //Handle api change status for Deposit status reservation to Refund status
   const [reason, setReason] = useState('');
   const handleDeny = async (id, reason) => {
+    setLoading(true);
     try {
       console.log(id, reason);
       const formData = new FormData();
@@ -98,6 +106,8 @@ const ReservationUpcoming = () => {
       handleClosePopUp();
     } catch (error) {
       console.error('Error declining reservation:', error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -164,84 +174,92 @@ const ReservationUpcoming = () => {
 
   return (
     <div className='w-full'>
-      {upcomingReservations.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-60">
-          <p className="text-black font-semibold text-lg">You have no upcoming reservations</p>
-          <a href="/hosting/reservations/all" className="text-black underline mt-2">
-            See all reservations
-          </a>
+      {loading ? (
+        <div className="flex justify-center items-center h-64 w-full">
+          <div className="animate-spin rounded-full border-t-4 border-teal-400 border-solid h-16 w-16"></div>
         </div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className='w-full text-left'>
-            <thead>
-              <tr>
-                <th className='text-left py-4'>Guest</th>
-                <th className='text-left py-4'>Phone Number</th>
-                <th className='text-left py-4'>Email</th>
-                <th className='text-left py-4'>Campsite's name</th>
-                <th className='text-center py-4'>Status</th>
-                <th className='text-center py-4'>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {upcomingReservations.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((reservation, index) => (
-                <tr key={index}>
-                  <td className='text-left py-4'>{reservation.user.lastname} {reservation.user.firstname}</td>
-                  <td className='text-left py-4'>{reservation.user.phone}</td>
-                  <td className='text-left py-4'>{reservation.user.email}</td>
-                  <td className='text-left py-4'>{reservation.campSite.name}</td>
-                  <td className={`text-center py-4 font-bold ${statusColor(reservation.status)}`}>{reservation.status}</td>
-                  <td className='text-center py-4 space-x-4'>
-                    {handleButton(reservation.id, reservation.status, reservation.paymentResponseList[0]?.totalAmount)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <TablePagination
-            component="div"
-            count={upcomingReservations.length}
-            page={page}
-            onPageChange={handleChangePage}
-            rowsPerPage={rowsPerPage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            rowsPerPageOptions={[5, 10, 25]}
-            className='p-4'
-          />
-        </div>
-      )}
-      {isOpen && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
-          <div ref={modalRef} className='bg-white shadow-lg p-6 lg:w-2/4 relative rounded-xl'>
-            <div>
-              <h1 className='text-4xl font-bold mb-4'>Total refund: {totalRefund} VND </h1>
+        <>
+          {upcomingReservations.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-60">
+              <p className="text-black font-semibold text-lg">You have no upcoming reservations</p>
+              <a href="/hosting/reservations/all" className="text-black underline mt-2">
+                See all reservations
+              </a>
             </div>
-            <div>
-              <h1 className='text-xl font-semibold mb-2'>Tell us the reason why you deny</h1>
-              <textarea
-                className='w-full h-32 border-2 rounded-xl border-gray-200 p-2'
-                placeholder='Enter your reason'
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
+          ) : (
+            <div className="overflow-x-auto">
+              <table className='w-full text-left'>
+                <thead>
+                  <tr>
+                    <th className='text-left py-4'>Guest</th>
+                    <th className='text-left py-4'>Phone Number</th>
+                    <th className='text-left py-4'>Email</th>
+                    <th className='text-left py-4'>Campsite's name</th>
+                    <th className='text-center py-4'>Status</th>
+                    <th className='text-center py-4'>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {upcomingReservations.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((reservation, index) => (
+                    <tr key={index}>
+                      <td className='text-left py-4'>{reservation.user.lastname} {reservation.user.firstname}</td>
+                      <td className='text-left py-4'>{reservation.user.phone}</td>
+                      <td className='text-left py-4'>{reservation.user.email}</td>
+                      <td className='text-left py-4'>{reservation.campSite.name}</td>
+                      <td className={`text-center py-4 font-bold ${statusColor(reservation.status)}`}>{reservation.status}</td>
+                      <td className='text-center py-4 space-x-4'>
+                        {handleButton(reservation.id, reservation.status, reservation.paymentResponseList[0]?.totalAmount)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <TablePagination
+                component="div"
+                count={upcomingReservations.length}
+                page={page}
+                onPageChange={handleChangePage}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                rowsPerPageOptions={[5, 10, 25]}
+                className='p-4'
               />
             </div>
-            <div className='text-right mt-4'>
-              <button
-                className='px-4 py-2 bg-green-500 text-white rounded-lg '
-                onClick={() => handleDeny(id, reason)}
-              >
-                Refund
-              </button>
-              <button
-                className='px-4 py-2 bg-red-500 text-white rounded-lg ml-2'
-                onClick={handleClosePopUp}
-              >
-                Cancel
-              </button>
+          )}
+          {isOpen && (
+            <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
+              <div ref={modalRef} className='bg-white shadow-lg p-6 lg:w-2/4 relative rounded-xl'>
+                <div>
+                  <h1 className='text-4xl font-bold mb-4'>Total refund: {totalRefund} VND </h1>
+                </div>
+                <div>
+                  <h1 className='text-xl font-semibold mb-2'>Tell us the reason why you deny</h1>
+                  <textarea
+                    className='w-full h-32 border-2 rounded-xl border-gray-200 p-2'
+                    placeholder='Enter your reason'
+                    value={reason}
+                    onChange={(e) => setReason(e.target.value)}
+                  />
+                </div>
+                <div className='text-right mt-4'>
+                  <button
+                    className='px-4 py-2 bg-green-500 text-white rounded-lg '
+                    onClick={() => handleDeny(id, reason)}
+                  >
+                    Refund
+                  </button>
+                  <button
+                    className='px-4 py-2 bg-red-500 text-white rounded-lg ml-2'
+                    onClick={handleClosePopUp}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          )}
+        </>
       )}
     </div>
   )

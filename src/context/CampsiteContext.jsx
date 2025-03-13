@@ -68,6 +68,41 @@ export const CampsiteProvider = ({ children }) => {
     });
   }
 
+  //Service context
+  const [services, setServices] = useState([]);
+  const addService = (service) => {
+    setServices((prevServices) => [...prevServices, service]);
+    updateCampsiteData(
+      'campSiteSelections',
+      [...services, service].map(({ image, ...rest }) => rest)
+    );
+    updateServiceImages(service.image);
+  };
+
+  const updateService = (index, updatedService) => {
+    setServices((prevServices) => {
+      const newServices = [...prevServices];
+      newServices[index] = updatedService;
+      updateCampsiteData(
+        'campSiteSelections',
+        newServices.map(({ image, ...rest }) => rest)
+      );
+      updateServiceImages(updatedService.image);
+      return newServices;
+    });
+  };
+
+  const removeService = (index) => {
+    setServices((prevServices) => {
+      const newServices = prevServices.filter((_, i) => i !== index);
+      updateCampsiteData(
+        'campSiteSelections',
+        newServices.map(({ image, ...rest }) => rest)
+      );
+      return newServices;
+    });
+  };
+
   const resetCampsiteData = () => {
     setCampsiteData({
       hostId: 1,
@@ -87,6 +122,7 @@ export const CampsiteProvider = ({ children }) => {
     setCampTypeImages([]);
     setSelectedUtilities([]);
     setSelectedPlaceTypes([]);
+    setServices([]);
   };
 
   return (
@@ -97,6 +133,7 @@ export const CampsiteProvider = ({ children }) => {
       campTypeImages, updateCampTypeImages,
       selectedUtilities, updateSelectedUtilities,
       selectedPlaceTypes, updateSelectedPlaceTypes,
+      services, addService, updateService, removeService,
       resetCampsiteData,
     }}>
       {children}

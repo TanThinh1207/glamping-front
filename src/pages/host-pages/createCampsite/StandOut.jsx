@@ -46,7 +46,7 @@ const StandOut = () => {
         fetchPlaceTypes();
     }, []);
 
-
+    //add data to context
     const toggleUtility = (utility) => {
         updateSelectedUtilities(utility)
     };
