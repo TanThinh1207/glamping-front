@@ -5,11 +5,8 @@ import { useCampsite } from '../../../context/CampsiteContext';
 import axios from 'axios';
 
 
+
 const CampType = () => {
-  const { campsiteData, updateCampsiteData } = useCampsite();
-  const [addedCampTypes, setAddedCampTypes] = useState(
-    Array.isArray(campsiteData.campType) ? campsiteData.campType : []
-  );
   const [isOpen, setIsOpen] = useState(false);
   const [campTypeQuantity, setCampTypeQuantity] = useState('');
   const [numberOfGuests, setNumberOfGuests] = useState('');
@@ -17,8 +14,8 @@ const CampType = () => {
   const [campTypePrice, setCampTypePrice] = useState('');
   const [campTypeImage, setCampTypeImage] = useState(null);
   const [campTypeWeekendRate, setCampTypeWeekendRate] = useState('');
-  
-  const { campTypes, addCampType, updateCampType, removeCampType, selectedFacilities, updateSelectedFacilities } = useCampsite();
+  const [selectedFacilities, setSelectedFacilities] = useState([]);
+  const { campTypes, addCampType, updateCampType, removeCampType } = useCampsite();
   const [loading, setLoading] = useState(false);
 
 
@@ -61,18 +58,17 @@ const CampType = () => {
     };
   }, [isOpen]);
 
-  const toggleFacility = (facilityId) => {
-    setSelectedFacilities((prev) =>
-      prev.includes(facilityId) ? prev.filter((id) => id !== facilityId) : [...prev, facilityId]
-    );
+  // Facility selection
+  const toggleFacility = (facility) => {
+    setSelectedFacilities((prev) => [...prev, facility]);
   };
 
   // Add camp type
-  
   const handleAddCampType = () => {
     if (!campTypeName.trim() || !campTypePrice) {
       return;
     }
+    console.log(selectedFacilities);
     if (campTypeName && campTypePrice) {
       const newCampType = {
         type: campTypeName,
@@ -85,16 +81,12 @@ const CampType = () => {
         facilities: selectedFacilities,
         image: campTypeImage,
       };
-      setAddedCampTypes([...addedCampTypes, newCampType]);
-      updateCampTypeImages(campTypeImage);
+
+      console.log(newCampType);
+      addCampType(newCampType);
       handleClosePopUp();
     }
   };
-  useEffect(() => {
-    const updatedCampTypes = addedCampTypes.map(({ image, ...rest }) => rest);
-    updateCampsiteData('campTypeList', updatedCampTypes);
-  }, [addedCampTypes]);
-
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -121,15 +113,17 @@ const CampType = () => {
         <h2 className='text-gray-500'>Provide different glamping styles (e.g., safari tents, yurts, cabins, treehouses)</h2>
       </div>
       <div className='flex gap-4 flex-wrap'>
-        {addedCampTypes.filter(camp => camp.type).map((camp, index) => (
+        {campTypes.map((camp, index) => (
           <div key={index} className='w-64 border-1 rounded-xl shadow-xl'>
             {camp.image && <img src={URL.createObjectURL(camp.image)} alt='Camp' className='w-full h-40 object-cover rounded-t-xl' />}
             <div className='p-2'>
               <h3 className='text-xl font-bold '>{camp.type} - {camp.capacity} guests</h3>
               <p className='text-gray-500'>Quantity: {camp.quantity}</p>
-              {/* <div className='text-gray-600'>
-                {Array.isArray(camp.facilities) ? camp.facilities.join(', ') : 'No facilities'}
-              </div> */}
+              <div className='text-gray-600'>
+                {camp.facilities.map((facility) => (
+                  <span key={facility.id} className='mr-2'>{facility.name}</span>
+                ))}
+              </div>
               <p className='font-semibold mt-2 text-lg'>Price: {camp.price} VND</p>
               <p className='text-gray-500 text-md'>Weekend price: {camp.weekendRate} VND</p>
             </div>
@@ -211,12 +205,14 @@ const CampType = () => {
               <div>
                 <h1 className='text-xl font-semibold mb-2'>Facilities</h1>
                 <div className='flex gap-4 flex-wrap'>
-                  {facilities?.map((facility) => (
+                  {facilities?.map((facility, index) => (
                     <div
                       key={facility.id}
-                      className={`border-2 rounded-2xl p-2 cursor-pointer transition ${selectedFacilities.includes(facility.id) ? 'border-gray-400 bg-gradient-to-r from-green-500 to-green-600 text-white' : 'border-gray-300'
+                      className={`border-2 rounded-2xl p-2 cursor-pointer transition ${selectedFacilities.some((item) => item.id === facility.id)
+                        ? 'border-gray-400 bg-gradient-to-r from-green-500 to-green-600 text-white'
+                        : 'border-gray-300'
                         }`}
-                      onClick={() => toggleFacility(facility.id)}
+                      onClick={() => toggleFacility({ id: facility.id, name: facility.name }, index)}
                     >
                       {facility.name}
                     </div>

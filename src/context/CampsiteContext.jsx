@@ -75,32 +75,22 @@ export const CampsiteProvider = ({ children }) => {
     });
   }
 
-  // Facility selection
-  const [selectedFacilities, setSelectedFacilities] = useState([]);
-  const updateSelectedFacilities = (facility) => {
-    setSelectedFacilities((prev) => {
-      const exists = prev.some((item) => item.id === facility.id);
-      const updatedList = exists
-        ? prev.filter((item) => item.id !== facility.id)
-        : [...prev, facility];
-
-      updateCampsiteData("facilityIds", updatedList.map((item) => item.id));
-
-      return updatedList;
-    });
-  };
 
   // Camp type context
-  const [campTypes, setCampTypes] = useState([]);
+ const [campTypes, setCampTypes] = useState([]);
   const addCampType = (campType) => {
-    setCampTypes((prev) => [...prev, campType]);
-    updateCampsiteData(
-      "campTypeList",
-      [...campTypes, campType].map(({ image, facilities, ...rest }) => ({
-        ...rest,
-        facilityIds: facilities.map((f) => f.id), // Store only IDs in campsiteData
-      }))
-    );
+    setCampTypes((prev) => {
+      const updatedCampTypes = [...prev, campType];
+      updateCampsiteData(
+        "campTypeList",
+        updatedCampTypes.map(({ facilities, image, ...rest }) => ({
+          ...rest,
+          facilities: facilities.map((f) => f.id),
+        }))
+      );
+      return updatedCampTypes;
+    });
+    updateCampTypeImages(campType.image);
   };
 
   const updateCampType = (index, updatedCampType) => {
@@ -109,9 +99,9 @@ export const CampsiteProvider = ({ children }) => {
       newCampTypes[index] = updatedCampType;
       updateCampsiteData(
         "campTypeList",
-        newCampTypes.map(({ image, facilities, ...rest }) => ({
+        newCampTypes.map(({ facilities, image, ...rest }) => ({
           ...rest,
-          facilityIds: facilities.map((f) => f.id),
+          facilities: facilities.map((f) => f.id),
         }))
       );
       return newCampTypes;
@@ -123,9 +113,9 @@ export const CampsiteProvider = ({ children }) => {
       const newCampTypes = prev.filter((_, i) => i !== index);
       updateCampsiteData(
         "campTypeList",
-        newCampTypes.map(({ image, facilities, ...rest }) => ({
+        newCampTypes.map(({ facilities, image, ...rest }) => ({
           ...rest,
-          facilityIds: facilities.map((f) => f.id),
+          facilities: facilities.map((f) => f.id),
         }))
       );
       return newCampTypes;
@@ -187,6 +177,7 @@ export const CampsiteProvider = ({ children }) => {
     setSelectedUtilities([]);
     setSelectedPlaceTypes([]);
     setServices([]);
+    setCampTypes([]);
   };
 
   return (
@@ -199,7 +190,6 @@ export const CampsiteProvider = ({ children }) => {
       selectedPlaceTypes, updateSelectedPlaceTypes,
       services, addService, updateService, removeService,
       campTypes, addCampType, updateCampType, removeCampType,
-      selectedFacilities, updateSelectedFacilities,
       resetCampsiteData,
     }}>
       {children}
