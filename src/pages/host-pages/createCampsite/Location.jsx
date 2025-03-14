@@ -2,11 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useCampsite } from '../../../context/CampsiteContext';
-import { use } from "react";
 
+// Maptiler API key
 const MAPTILER_KEY = "6PzV7JPUgWxephJUe1TH";
+
+// Default coordinates for map
 const INITIAL_COORDS = { lat: 10.7769, lng: 106.7009 };
 
+// List of countries
 const countries = [
   { label: "Vietnam - VN", code: "VN" },
   { label: "United States - US", code: "US" },
@@ -20,24 +23,28 @@ const countries = [
 
 const Location = () => {
   const { campsiteData, updateCampsiteData } = useCampsite();
-  const mapContainer = useRef(null);
+  
   const [map, setMap] = useState(null);
   const [marker, setMarker] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  const [address, setAddress] = useState("");
-  const [city, setCity] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("");
-  const [lat, setLat] = useState(INITIAL_COORDS.lat);
-  const [lng, setLng] = useState(INITIAL_COORDS.lng);
+  const [address, setAddress] = useState(campsiteData.address || "");
+  const [city, setCity] = useState(campsiteData.city || "");
+  const [lat, setLat] = useState(campsiteData.latitude || INITIAL_COORDS.lat);
+  const [lng, setLng] = useState(campsiteData.longitude || INITIAL_COORDS.lng);
 
+  // Update state
   useEffect(() => {
-    updateCampsiteData("latitude", lat);
-    updateCampsiteData("longitude", lng);
-    updateCampsiteData("address", address);
-    updateCampsiteData("city", city);
-  }, [lat, lng, address, city]);
+    setAddress(campsiteData.address || "");
+    setCity(campsiteData.city || "");
+    setLat(campsiteData.latitude || INITIAL_COORDS.lat);
+    setLng(campsiteData.longitude || INITIAL_COORDS.lng);
+  }, [campsiteData]);
 
+  // Initialize map
+  const mapContainer = useRef(null);
+  
   useEffect(() => {
     const mapInstance = new maplibregl.Map({
       container: mapContainer.current,
@@ -59,6 +66,8 @@ const Location = () => {
     return () => mapInstance.remove();
   }, [lat, lng]);
 
+
+  // Function to handle click for searching result
   const handleSelectLocation = (place) => {
     if (!place || !place.geometry || !place.geometry.coordinates) {
       console.error("Invalid place object:", place);
@@ -77,10 +86,14 @@ const Location = () => {
       .filter((part) => part)
       .join(", ");
 
-    setLat(lat);
-    setLng(lng);
-    setAddress(formattedAddress);
-    setCity(city);
+      setLat(lat);
+      setLng(lng);
+      setAddress(formattedAddress);
+      setCity(city);
+      updateCampsiteData("latitude", lat);
+      updateCampsiteData("longitude", lng);
+      updateCampsiteData("address", formattedAddress);
+      updateCampsiteData("city", city);
     if (marker) {
       marker.setLngLat([lng, lat]);
     }
@@ -90,6 +103,8 @@ const Location = () => {
     setSearchResults([]);
     setSearchQuery("");
   };
+  
+  // Function to handle reverse geocode
   const reverseGeocode = async (latitude, longitude) => {
     try {
       const response = await fetch(
@@ -102,12 +117,14 @@ const Location = () => {
         const newAddress = place.properties.address || address;
         const newCity = place.properties.locality || city;
         setAddress(newAddress);
-        setCity(newCity);       
+        setCity(newCity);
       }
     } catch (error) {
       console.error("Error fetching reverse geocode:", error);
     }
   };
+
+  // Function to handle search
   const handleSearch = async (e) => {
     const query = e.target.value;
     setSearchQuery(query);
@@ -129,10 +146,11 @@ const Location = () => {
       setSearchResults([]);
     }
   };
+
   return (
-    <div className="w-full  bg-white py-24 px-96">
+    <div className="w-full bg-white py-24 px-96">
       <div className='mb-8'>
-        <h1 className="text-4xl font-semibold mb-4">Where's your place located?</h1>
+        <h1 className="text-4xl font-semibold">Where's your campsite located?</h1>
         <h2 className=" text-gray-500">Your address is only shared with guests after they’ve made a reservation.</h2>
       </div>
       <div className="">
@@ -187,11 +205,27 @@ const Location = () => {
       <div ref={mapContainer} className="w-full h-64 mt-4 border rounded-md" />
       <div className="mt-4">
         <label className="block text-sm font-medium">Address</label>
-        <input type="text" className="w-full p-2 border rounded-md" value={address} onChange={(e) => setAddress(e.target.value)} />
+        <input
+          type="text"
+          className="w-full p-2 border rounded-md"
+          value={campsiteData.address}
+          onChange={(e) => {
+            setAddress(e.target.value)
+            updateCampsiteData('address', e.target.value)
+          }}
+        />
       </div>
       <div className="mt-2">
         <label className="block text-sm font-medium">City</label>
-        <input type="text" className="w-full p-2 border rounded-md" value={city} onChange={(e) => setCity(e.target.value)} />
+        <input
+          type="text"
+          className="w-full p-2 border rounded-md"
+          value={campsiteData.city}
+          onChange={(e) => {
+            setCity(e.target.value)
+            updateCampsiteData('city', e.target.value)
+          }}
+        />
       </div>
     </div>
   );

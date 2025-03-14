@@ -14,17 +14,20 @@ const CampType = () => {
   const [campTypeQuantity, setCampTypeQuantity] = useState('');
   const [numberOfGuests, setNumberOfGuests] = useState('');
   const [campTypeName, setCampTypeName] = useState('');
-  // const [campTypeDesc, setCampTypeDesc] = useState('');
   const [campTypePrice, setCampTypePrice] = useState('');
   const [campTypeImage, setCampTypeImage] = useState(null);
   const [campTypeWeekendRate, setCampTypeWeekendRate] = useState('');
-  const modalRef = useRef(null);
-  const [selectedFacilities, setSelectedFacilities] = useState([]);
+  
+  const { campTypes, addCampType, updateCampType, removeCampType, selectedFacilities, updateSelectedFacilities } = useCampsite();
+  const [loading, setLoading] = useState(false);
+
+
+  //Call api for facilities
   const [facilities, setFacilities] = useState([]);
-  const { campTypeImages, updateCampTypeImages } = useCampsite();
 
   useEffect(() => {
     const fetchFacilities = async () => {
+      setLoading(true);
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_FACILITIES_ENDPOINT}`, {
           headers: {
@@ -34,10 +37,15 @@ const CampType = () => {
         setFacilities(response.data.data.content);
       } catch (error) {
         console.error("Error fetching facilities data:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchFacilities();
   }, []);
+
+  // Close the modal when clicked outside
+  const modalRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -59,7 +67,8 @@ const CampType = () => {
     );
   };
 
-
+  // Add camp type
+  
   const handleAddCampType = () => {
     if (!campTypeName.trim() || !campTypePrice) {
       return;

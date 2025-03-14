@@ -13,6 +13,11 @@ const Services = () => {
   const [servicePrice, setServicePrice] = useState('');
   const [serviceImage, setServiceImage] = useState(null);
 
+
+  useEffect(() => {
+    console.log(serviceImage);
+  }, [serviceImage]);
+
   // Close the modal when clicked outside
   const modalRef = useRef(null);
 
@@ -51,11 +56,10 @@ const Services = () => {
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
-    console.log(file);
     if (file) {
       setServiceImage(file);
+      console.log(file);
     }
-    console.log(services)
   };
 
   const handleClosePopUp = () => {
@@ -114,7 +118,7 @@ const Services = () => {
                     <label
                       className='w-20 h-20 border-2 border-gray-300 rounded-xl flex items-center justify-center  cursor-pointer hover:bg-gray-100 '
                       htmlFor='imageUpload'>
-                      {services.image ? <img
+                      {serviceImage ? <img
                         src={URL.createObjectURL(serviceImage)}
                         alt='Preview' className='w-full h-full object-cover rounded-xl'
                       />
