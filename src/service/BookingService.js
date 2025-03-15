@@ -20,7 +20,6 @@ export const fetchCamptypeById = async (campSiteId) => {
         
         if (!response.ok) throw new Error(`Failed to fetch campsite: ${response.statusText}`);
         const data = await response.json();
-        console.log(data);
         return data.data.content;
     } catch (error) {
         throw new Error(error.message);
@@ -42,7 +41,6 @@ export const fetchCamptypeByIdWithDate = async ({ campSiteId, checkIn, checkOut 
         if (!response.ok) throw new Error(`Failed to fetch campsite: ${response.statusText}`);
 
         const data = await response.json();
-        console.log(data);
         return data.data.content;
     } catch (error) {
         throw new Error(error.message);
@@ -82,8 +80,6 @@ export const createBooking = async (bookingData) => {
             throw new Error(`Booking failed: ${response.statusText}`);
         }
         const responseData = await response.json();
-        console.log(responseData);
-
         return responseData;
     } catch (error) {
         throw new Error(error.message);

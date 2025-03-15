@@ -11,6 +11,7 @@ import thumb from '../assets/terrace.jpg';
 import { updateUserData, fetchUserData } from '../service/UserService';
 
 const Account = () => {
+    const [loading , setLoading] = useState(true);
     const { user, logout } = useUser();
     const navigate = useNavigate();
 
@@ -44,7 +45,9 @@ const Account = () => {
             return;
         }
         const reloadUser = async () => {
-            const newUser = await fetchUserData(user.id);
+            setLoading(true);
+            try {
+                const newUser = await fetchUserData(user.id);
             setUserData({
                 firstName: newUser.firstname ?? defaultText,
                 lastName: newUser.lastname ?? defaultText,
@@ -53,11 +56,17 @@ const Account = () => {
                 address: newUser.address ?? defaultText,
                 dob: newUser.birthday ?? defaultText
             });
+            } catch(error) {
+                toast.error(`Failed to fetch user data: ${error.message}`);
+            } finally {
+                setLoading(false);
+            }
         }
         reloadUser();
     }, []);
 
     const handleUpdateUserData = async () => {
+        setLoading(true);
         try {
             const backendData = {
                 firstName: userData.firstName,
@@ -85,6 +94,9 @@ const Account = () => {
             toast.success("User data updated successfully!");
         } catch (error) {
             toast.error(`Failed to update user data: ${error.message}`);
+        } finally {
+            setLoading(false);
+            setIsModalOpen(false);
         }
     };
 
@@ -96,6 +108,14 @@ const Account = () => {
     const handleInputChange = (key, value) => {
         setUserData(prev => ({ ...prev, [key]: value }));
     };
+
+    if (loading) {
+        return (
+            <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-80 z-50">
+                <div className="animate-spin rounded-full border-t-4 border-teal-400 border-solid h-16 w-16"></div>
+            </div>
+        );
+    }
 
     return (
         <div className='container-fluid mx-auto flex flex-col items-center min-h-screen'>

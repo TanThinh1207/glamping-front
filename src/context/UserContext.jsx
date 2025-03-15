@@ -17,6 +17,8 @@ export const UserProvider = ({ children }) => {
         setUser(null);
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
+        localStorage.removeItem("checkInDate");
+        localStorage.removeItem("checkOutDate");
     };
 
     return (

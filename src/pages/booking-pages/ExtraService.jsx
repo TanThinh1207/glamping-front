@@ -9,6 +9,8 @@ const ExtraService = () => {
     const [services, setServices] = useState([]);
     const [openStates, setOpenStates] = useState({});
     const [serviceQuantities, setServiceQuantities] = useState({});
+    const { booking } = useBooking();
+    const campSiteId = booking.campSiteId;
 
     const { updateServices } = useBooking();
 
@@ -55,10 +57,14 @@ const ExtraService = () => {
         setLoading(true);
         try {
             const url = new URL(`${import.meta.env.VITE_API_GET_SERVICES}`);
+            url.searchParams.append('campSiteId', campSiteId);
+            console.log(campSiteId)
+            console.log(url)
             const response = await fetch(url.toString());
             if (!response.ok) throw new Error(`Failed to fetch services: ${response.statusText}`);
 
             const data = await response.json();
+            console.log(data)
             setServices(data.data.content);
 
             const initialStates = data.data.content.reduce((acc, service) => {

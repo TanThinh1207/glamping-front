@@ -21,7 +21,7 @@ const vietnamCities = [
   { id: 10, name: "Vũng Tàu" }
 ];
 
-const SearchBar = () => {
+const SearchBar = ({ onSearch }) => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
@@ -99,6 +99,11 @@ const SearchBar = () => {
   }
 
   const handleSearch = () => {
+    if (onSearch) {
+      onSearch();
+      return;
+    }
+
     if (destination) {
       navigate(`/glamping/${destination.name.toLowerCase().replace(/\s+/g, "-")}`);
     } else {
@@ -288,11 +293,14 @@ const SearchBar = () => {
           </div>
         </Modal>
 
-        {/* <div className="border-l border-gray-400 h-6 hidden md:block"></div>
-        <button className="bg-black text-white text-sm rounded-3xl border-black border uppercase px-6 py-3 transform 
-                      duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black space-x-2">
+        <div className="border-l border-gray-400 h-6 hidden md:block"></div>
+        <button 
+          onClick={handleSearch}
+          className="bg-black text-white text-sm rounded-3xl border-black border uppercase px-6 py-3 transform 
+                    duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black space-x-2"
+        >
           <span>Search</span> <FontAwesomeIcon icon={faMagnifyingGlass} />
-        </button> */}
+        </button>
       </div>
     </div>
   );

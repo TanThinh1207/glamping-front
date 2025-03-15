@@ -34,7 +34,7 @@ const ManageAccount = () => {
     const handleSave = async () => {
         try {
             if (selectedUser.id) {
-                const url = `${import.meta.env.VITE_API_UPDATE_USERS}/${selectedUser.id}`;
+                const url = `${import.meta.env.VITE_API_USER_ID}${selectedUser.id}`;
                 const object = {
                     firstName: selectedUser.firstname,
                     lastName: selectedUser.lastname,
@@ -43,7 +43,7 @@ const ManageAccount = () => {
                     dob: selectedUser.birthday,
                     status: selectedUser.status,
                 }
-                const response = await axios.post(url, object);
+                const response = await axios.put(url, object);
                 const returnedData = response.data.data;
 
                 if (returnedData.id === selectedUser.id) {
@@ -68,11 +68,11 @@ const ManageAccount = () => {
             const confirmDelete = window.confirm("Are you sure you want to delete this user?");
             if (!confirmDelete) return;
 
-            const url = `${import.meta.env.VITE_API_DELETE_USERS}/${userId}`;
-            await axios.post(url);
+            const url = `${import.meta.env.VITE_API_DELETE_USERS}${userId}`;
+            await axios.delete(url);
 
             const response = await axios.get(`${import.meta.env.VITE_API_GET_USERS}`);
-            setUsers(response.data.data);
+            setUsers(response.data.data.content);
         } catch (error) {
             console.error("Error deleting user:", error);
         }
@@ -93,9 +93,9 @@ const ManageAccount = () => {
             const response = await axios.get(`${import.meta.env.VITE_API_GET_USERS}?page=${currentPage}&size=${pageSize}`, {
                 headers: {
                     'Content-Type': 'application/json'
-                }
+                },
             });
-            setUsers(response.data.data);
+            setUsers(response.data.data.content);
             setTotalPages(response.data.data.totalPages);
         } catch (error) {
             console.error("Error fetching users data:", error);
