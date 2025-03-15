@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { useCampsite } from '../context/CampsiteContext';
+import { useUser } from '../context/UserContext';
 import axios from 'axios';
 const pageSteps = [
   "overview",
@@ -23,7 +24,7 @@ const CreateCampsiteFooter = () => {
   const currentStepIndex = pageSteps.indexOf(step);
   const prevStep = currentStepIndex > 0 ? pageSteps[currentStepIndex - 1] : null;
   const nextStep = currentStepIndex < pageSteps.length - 1 ? pageSteps[currentStepIndex + 1] : null;
-
+  const {user} = useUser();
   const handleUploadImage = async (ids, images, type) => {
     const validImages = images.filter((_, index) => ids[index] !== undefined);
     const validIds = ids.filter(id => id !== undefined);
@@ -45,6 +46,10 @@ const CreateCampsiteFooter = () => {
   };
 
   const handleFinish = async () => {
+    console.log(campsiteData);
+    console.log(campsiteData.placeTypeIds);
+    console.log(campsiteData.utilityIds);
+    console.log(user.id);
     setLoading(true);
     try {
       const url = `${import.meta.env.VITE_API_GET_CAMPSITES}`;

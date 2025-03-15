@@ -6,7 +6,7 @@ import { useCampsite } from '../../../context/CampsiteContext';
 const Services = () => {
   const { campsiteData, updateCampsiteData } = useCampsite();
   const { services, addService, updateService, removeService } = useCampsite();
-  
+
   const [isOpen, setIsOpen] = useState(false);
   const [serviceName, setServiceName] = useState('');
   const [serviceDesc, setServiceDesc] = useState('');
@@ -82,8 +82,22 @@ const Services = () => {
       </div>
       <div className='flex gap-4 flex-wrap'>
         {services.filter(service => service.name).map((service, index) => (
-          <div key={index} className='w-64 border-1 rounded-xl  shadow-xl'>
-            {service.image && <img src={URL.createObjectURL(service.image)} alt='Service' className='w-full h-40 object-cover rounded-t-xl' />}
+          <div key={index} className='w-64 border-1 rounded-xl  shadow-xl relative'>
+            <div className='relative'>
+              {service.image && (
+                <img
+                  src={URL.createObjectURL(service.image)}
+                  alt='Service'
+                  className='w-full h-40 object-cover rounded-t-xl'
+                />
+              )}
+              <button
+                className="absolute -top-1 -right-1 bg-red-500 text-xs p-1 rounded-full"
+                onClick={() => removeService(index)}
+              >
+                ✖
+              </button>
+            </div>
             <div className='p-2'>
               <h3 className='text-xl font-bold '>{service.name}</h3>
               <p className='text-gray-500'>{service.description}</p>

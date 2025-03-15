@@ -159,7 +159,7 @@ export const CampsiteProvider = ({ children }) => {
 
   const resetCampsiteData = () => {
     setCampsiteData({
-      hostId: 1,
+      hostId: user?.id,
       name: "",
       address: "",
       latitude: 0,

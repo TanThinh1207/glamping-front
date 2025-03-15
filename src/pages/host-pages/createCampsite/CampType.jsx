@@ -60,7 +60,10 @@ const CampType = () => {
 
   // Facility selection
   const toggleFacility = (facility) => {
-    setSelectedFacilities((prev) => [...prev, facility]);
+    setSelectedFacilities((prev) => {
+      const exists = prev.some((item) => item.id === facility.id);
+      return exists ? prev.filter((item) => item.id !== facility.id) : [...prev, facility];
+    });
   };
 
   // Add camp type
@@ -114,15 +117,27 @@ const CampType = () => {
       </div>
       <div className='flex gap-4 flex-wrap'>
         {campTypes.map((camp, index) => (
-          <div key={index} className='w-64 border-1 rounded-xl shadow-xl'>
-            {camp.image && <img src={URL.createObjectURL(camp.image)} alt='Camp' className='w-full h-40 object-cover rounded-t-xl' />}
+          <div key={index} className='w-64 border-1 rounded-xl shadow-xl relative'>
+            <div className="relative">
+              {camp.image && (
+                <img
+                  src={URL.createObjectURL(camp.image)}
+                  alt="Camp"
+                  className="w-full h-40 object-cover rounded-t-xl"
+                />
+              )}
+              <button
+                className="absolute -top-1 -right-1 bg-red-500 text-xs p-1 rounded-full"
+                onClick={() => removeCampType(index)}
+              >
+                ✖
+              </button>
+            </div>
             <div className='p-2'>
               <h3 className='text-xl font-bold '>{camp.type} - {camp.capacity} guests</h3>
               <p className='text-gray-500'>Quantity: {camp.quantity}</p>
-              <div className='text-gray-600'>
-                {camp.facilities.map((facility) => (
-                  <span key={facility.id} className='mr-2'>{facility.name}</span>
-                ))}
+              <div className="text-gray-600">
+                {camp.facilities.map((facility) => facility.name).join(", ")}
               </div>
               <p className='font-semibold mt-2 text-lg'>Price: {camp.price} VND</p>
               <p className='text-gray-500 text-md'>Weekend price: {camp.weekendRate} VND</p>

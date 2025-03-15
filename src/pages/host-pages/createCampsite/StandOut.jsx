@@ -22,6 +22,7 @@ const StandOut = () => {
                     }
                 });
                 setUtilities(response.data.data.content);
+                console.log(response.data.data.content);
             } catch (error) {
                 console.error("Error fetching utilities data:", error);
             } finally {
@@ -43,6 +44,7 @@ const StandOut = () => {
                     },
                 });
                 setPlaceTypes(response.data.data.content);
+                console.log(response.data.data.content);
             } catch (error) {
                 console.error("Error fetching place type data:", error);
             } finally {
@@ -88,10 +90,10 @@ const StandOut = () => {
                                 className='w-full h-full object-cover rounded-xl'
                             />
                             <button
-                                className='absolute top-0 right-0 bg-red-500 text-white text-xs px-2 py-1 rounded-full'
+                                className='absolute -top-1 -right-1 bg-red-500 text-xs p-1 rounded-full'
                                 onClick={() => removeImage(index)}
                             >
-                                X
+                                ✖
                             </button>
                         </div>
                     ))}
