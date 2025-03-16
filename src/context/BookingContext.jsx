@@ -35,8 +35,14 @@ export const BookingProvider = ({ children }) => {
     }, [user?.id]);
 
     const updateTotalAmount = useCallback((total) => {
-        setBooking((prev) => ({ ...prev, totalAmount: total }));
+        setBooking((prev) => {
+            if (prev.totalAmount !== total) {
+                return { ...prev, totalAmount: total };
+            }
+            return prev;
+        });
     }, []);
+    
 
     const updateServices = useCallback((services) => {
         const serviceList = Object.entries(services)

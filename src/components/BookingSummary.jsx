@@ -21,6 +21,7 @@ const BookingSummary = ({ selectedServices = [] }) => {
 
   const campsiteId = booking.campSiteId;
   const [campsite, setCampsite] = useState({});
+  console.log(campsite)
   const [camptypes, setCamptypes] = useState([]);
   const [nights, setNights] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -37,26 +38,27 @@ const BookingSummary = ({ selectedServices = [] }) => {
     try {
       setLoading(true);
       const responseData = await createBooking(booking);
-      
+
       console.log("Booking Response:", responseData);
 
       const bookingId = responseData.data.id;
       const bookingName = responseData.data.campSite.name;
       console.log("Booking Response:", responseData);
-  
+      const depositPrice = responseData.data.totalAmount;
+
       const paymentResponse = await fetch(`${import.meta.env.VITE_API_PAYMENT}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           bookingId: bookingId,
-          amount: totalPrice,
+          amount: depositPrice,
           name: bookingName,
           currency: "vnd",
         }),
       });
       const paymentData = await paymentResponse.json();
       console.log("Payment Response:", paymentData);
-      
+
       if (paymentResponse.ok) {
         window.location.href = paymentData.sessionUrl;
       } else {
@@ -67,7 +69,7 @@ const BookingSummary = ({ selectedServices = [] }) => {
       localStorage.removeItem("checkOutDate");
       localStorage.removeItem("guests");
       resetBooking();
-  
+
     } catch (error) {
       console.error("Booking failed:", error);
       toast.error("Booking failed. Please try again.");
@@ -115,12 +117,12 @@ const BookingSummary = ({ selectedServices = [] }) => {
       total += service.price * service.quantity;
     });
 
-    if (total !== totalPrice) {
-      setTotalPrice(total);
-      updateTotalAmount(total);
-    }
+    setTotalPrice(total);
 
-  }, [booking, camptypes, nights, selectedServices]);
+    const depositRate = campsite?.depositRate ? parseFloat(campsite.depositRate) : 1;
+    updateTotalAmount(total * depositRate);
+
+  }, [booking, camptypes, nights, selectedServices, campsite]);
 
   if (loading) {
     return (
@@ -178,7 +180,14 @@ const BookingSummary = ({ selectedServices = [] }) => {
 
       <div className="border-t border-gray-300 pt-3">
         <p className="text-lg text-gray-600">Total {nights} nights (taxes incl.):</p>
-        <p className="text-xl font-bold mt-1">VND {totalPrice.toLocaleString()}</p>
+        <p className="text-xl font-bold mt-1">VND {totalPrice.toLocaleString("vi-VN")}</p>
+      </div>
+
+      <div className="pt-3">
+        <p className="text-lg">
+          You have to deposit {(parseFloat(campsite.depositRate) * parseFloat(totalPrice)).toLocaleString("vi-VN")} VND
+        </p>
+
       </div>
 
       <button className="bg-black w-full text-white text-lg border-black border uppercase my-5 p-4 transform duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black mr-2"

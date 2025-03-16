@@ -62,6 +62,7 @@ const CamptypePage = () => {
                 } else {
                     setCampsite([]);
                 }
+                console.log(campsiteData)
 
                 const params = {
                     campSiteId: campsiteId,
@@ -70,8 +71,6 @@ const CamptypePage = () => {
                 };
 
                 let camptypesData = [];
-
-
 
                 if (checkIn && checkOut) {
                     camptypesData = await fetchCamptypeByIdWithDate(params);
@@ -101,9 +100,13 @@ const CamptypePage = () => {
         fetchData();
     }, [campsiteId, checkIn, checkOut]);
 
-    const handleQuantityChange = (id, value) => {
-        const newValue = Math.max(1, Math.min(10, Number(value)));
-        setQuantities(prev => ({ ...prev, [id]: newValue }));
+    const handleQuantityChange = (id, value, availableSlot) => {
+        if (availableSlot) {
+            const newValue = Math.max(1, Math.min(availableSlot, Number(value)));
+            setQuantities(prev => ({ ...prev, [id]: newValue }));
+        } else {
+            toast.info('Please select check-in and check-out dates first');
+        }
     };
 
     const handleCamptypeSelection = (camptype) => {
@@ -152,22 +155,33 @@ const CamptypePage = () => {
     if (error) return <p>Error: {error}</p>;
 
     return (
-        <div className='container mx-auto pt-14 min-h-screen'>
-            {/* Image Slider Section */}
+        <div className='container mx-auto pt-14 min-h-screen overflow-visible'>
             {campsite.imageList && campsite.imageList.length > 0 && (
                 <Swiper
                     modules={[Navigation, Pagination]}
                     navigation
-                    loop
+                    loop={true}
+                    centeredSlides={true}
+                    slidesPerView={2.5}
+                    spaceBetween={20}
                     pagination={{ clickable: true }}
-                    className="w-full h-[500px]" // Adjust height as needed
+                    className="w-full h-[500px] flex items-center overflow-visible"
                 >
                     {campsite.imageList.map((image, index) => (
                         <SwiperSlide key={index}>
                             <img
-                                src={ex1}
+                                src={image.path}
                                 alt={`Campsite image ${index + 1}`}
-                                className="w-full h-full object-cover"
+                                className="w-full h-[500px] object-cover mx-auto"
+                            />
+                        </SwiperSlide>
+                    ))}
+                    {campsite.imageList.map((image, index) => (
+                        <SwiperSlide key={index}>
+                            <img
+                                src={image.path}
+                                alt={`Campsite image ${index + 1}`}
+                                className="w-full h-[500px] object-cover mx-auto"
                             />
                         </SwiperSlide>
                     ))}
@@ -208,7 +222,7 @@ const CamptypePage = () => {
                                 <div className="flex flex-col items-center h-full">
                                     <div className="flex items-center justify-center">
                                         <img
-                                            src={ex1}
+                                            src={utility.imagePath}
                                             alt={utility.name}
                                             className="w-30 h-30 object-contain"
                                         />
@@ -249,7 +263,7 @@ const CamptypePage = () => {
                                             min="1"
                                             max="10"
                                             value={quantities[camptype.id] || 1}
-                                            onChange={e => handleQuantityChange(camptype.id, e.target.value)}
+                                            onChange={e => handleQuantityChange(camptype.id, e.target.value, camptype.availableSlot)}
                                             className="w-16 border border-gray-400 rounded px-2 text-center"
                                         />
                                     </div>
@@ -266,14 +280,22 @@ const CamptypePage = () => {
                                     <p className='text-gray-500 text-lg pt-3 gap-3'><span className='pr-1'><FontAwesomeIcon icon={faMugHot} /></span>Breakfast included</p>
                                 </div>
                                 <div className='bg-white flex items-center gap-6 p-4 rounded-xl border border-purple-100'>
-                                    <p className='tracking-wide text-purple-900'>Price per night: VND{camptype.price}</p>
-                                    <button
-                                        className='bg-transparent border border-purple-900 text-purple-900 hover:bg-purple-900 
-                                        hover:text-white rounded-full px-8 py-4 transform transition duration-300'
-                                        onClick={() => handleCamptypeSelection(camptype)}
-                                    >
-                                        <p>Reservation Inquiry</p>
-                                    </button>
+                                    {camptype.availableSlot > 0 ? (
+                                        <>
+                                            <p className='tracking-wide text-purple-900'>Price per night: VND{camptype.price.toLocaleString("vi-VN")}</p>
+                                            <button
+                                                className='bg-transparent border border-purple-900 text-purple-900 hover:bg-purple-900 
+                                            hover:text-white rounded-full px-8 py-4 transform transition duration-300'
+                                                onClick={() => handleCamptypeSelection(camptype)}
+                                            >
+                                                <p>Reservation Inquiry</p>
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <p className='tracking-wide text-purple-900'>No availability for the selected dates, please change dates.</p>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                             <hr className='mt-6' />

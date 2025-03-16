@@ -85,3 +85,18 @@ export const createBooking = async (bookingData) => {
         throw new Error(error.message);
     }
 };
+
+export const fetchBookingByUserId = async (userId) => {
+    try {
+        const url = new URL(`${import.meta.env.VITE_API_BOOKING}`);
+        url.searchParams.append('userId', userId);
+        const response = await fetch(url.toString());
+        if (!response.ok) throw new Error(`Failed to fetch booking: ${response.statusText}`);
+
+        const data = await response.json();
+        console.log(data)
+        return data.data.content;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
