@@ -67,8 +67,6 @@ const BookingSummary = ({ selectedServices = [] }) => {
       localStorage.removeItem("checkOutDate");
       localStorage.removeItem("guests");
       resetBooking();
-
-      navigate('/complete-booking');
   
     } catch (error) {
       console.error("Booking failed:", error);

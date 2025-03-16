@@ -9,7 +9,12 @@ import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
 import Modal from '../../components/Modal'
 import { useUser } from '../../context/UserContext'
-import ex1 from '../../assets/ex1.jpg'
+import ex1 from '../../assets/thumb.jpg'
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 const CamptypePage = () => {
     const [loading, setLoading] = useState(true);
@@ -21,7 +26,6 @@ const CamptypePage = () => {
     const { campsiteId } = useParams();
 
     const [campsite, setCampsite] = useState([]);
-    console.log(campsite)
     const [camptypes, setCamptypes] = useState([]);
     const [quantities, setQuantities] = useState({});
 
@@ -53,7 +57,12 @@ const CamptypePage = () => {
             setLoading(true);
             try {
                 const campsiteData = await fetchCampsiteById(campsiteId);
-                setCampsite(campsiteData[0]);
+                if (campsiteData && campsiteData.length > 0) {
+                    setCampsite(campsiteData[0]);
+                } else {
+                    setCampsite([]);
+                }
+
                 const params = {
                     campSiteId: campsiteId,
                     ...(checkIn && { checkIn }),
@@ -143,9 +152,29 @@ const CamptypePage = () => {
     if (error) return <p>Error: {error}</p>;
 
     return (
-        <div className='container mx-auto pt-20 min-h-screen'>
-            <div className=''>
-                <p className='w-1/2 font-canto text-3xl pb-10'>{campsite.name}</p>
+        <div className='container mx-auto pt-14 min-h-screen'>
+            {/* Image Slider Section */}
+            {campsite.imageList && campsite.imageList.length > 0 && (
+                <Swiper
+                    modules={[Navigation, Pagination]}
+                    navigation
+                    loop
+                    pagination={{ clickable: true }}
+                    className="w-full h-[500px]" // Adjust height as needed
+                >
+                    {campsite.imageList.map((image, index) => (
+                        <SwiperSlide key={index}>
+                            <img
+                                src={ex1}
+                                alt={`Campsite image ${index + 1}`}
+                                className="w-full h-full object-cover"
+                            />
+                        </SwiperSlide>
+                    ))}
+                </Swiper>
+            )}
+            <div className='pt-6'>
+                <p className='w-1/2 font-canto text-3xl pb-6'>{campsite.name}</p>
                 <p className='pb-10 font-canto w-1/2'>
                     {isExpanded || campsite.description.length <= maxDescriptionLength
                         ? campsite.description
@@ -170,14 +199,14 @@ const CamptypePage = () => {
                 </h2>
 
                 <div className="flex overflow-x-auto scrollbar-hide space-x-6 px-4">
-                    {campsite.campSiteUtilityList.map((utility, index) => (
+                    {campsite?.campSiteUtilityList.map((utility, index) => (
                         <div
                             key={index}
                             className="flex-shrink-0 w-64"
                         >
                             <div className="group relative p-6 h-full">
                                 <div className="flex flex-col items-center h-full">
-                                    <div className="mb-4 flex items-center justify-center">
+                                    <div className="flex items-center justify-center">
                                         <img
                                             src={ex1}
                                             alt={utility.name}
@@ -193,7 +222,7 @@ const CamptypePage = () => {
                     ))}
                 </div>
             </div>
-            <hr className='mt-10' />
+            <hr className='' />
             {camptypes.length === 0 ?
                 (<>
                     <p className="text-gray-500 text-center mt-8">No available camp types at the moment.</p>
@@ -202,7 +231,7 @@ const CamptypePage = () => {
                 (<>
                     {camptypes.map(camptype => (
                         <div key={camptype.id} className=''>
-                            <div className='flex gap-12 pt-10 pb-16 px-8'>
+                            <div className='flex gap-12 pt-8 pb-16 px-8'>
                                 <div className='left-container w-1/3'>
                                     <img src={camptype.image} alt={camptype.type} />
                                 </div>
@@ -240,7 +269,7 @@ const CamptypePage = () => {
                                     <p className='tracking-wide text-purple-900'>Price per night: VND{camptype.price}</p>
                                     <button
                                         className='bg-transparent border border-purple-900 text-purple-900 hover:bg-purple-900 
-                                hover:text-white rounded-full px-8 py-4 transform transition duration-300'
+                                        hover:text-white rounded-full px-8 py-4 transform transition duration-300'
                                         onClick={() => handleCamptypeSelection(camptype)}
                                     >
                                         <p>Reservation Inquiry</p>
