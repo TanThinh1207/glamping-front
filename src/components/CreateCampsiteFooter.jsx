@@ -24,7 +24,7 @@ const CreateCampsiteFooter = () => {
   const currentStepIndex = pageSteps.indexOf(step);
   const prevStep = currentStepIndex > 0 ? pageSteps[currentStepIndex - 1] : null;
   const nextStep = currentStepIndex < pageSteps.length - 1 ? pageSteps[currentStepIndex + 1] : null;
-  const {user} = useUser();
+  const { user } = useUser();
   const handleUploadImage = async (ids, images, type) => {
     const validImages = images.filter((_, index) => ids[index] !== undefined);
     const validIds = ids.filter(id => id !== undefined);
@@ -50,6 +50,9 @@ const CreateCampsiteFooter = () => {
     console.log(campsiteData.placeTypeIds);
     console.log(campsiteData.utilityIds);
     console.log(user.id);
+    console.log(campsiteImages);
+    console.log(serviceImages);
+    console.log(campTypeImages);
     setLoading(true);
     try {
       const url = `${import.meta.env.VITE_API_GET_CAMPSITES}`;
@@ -100,7 +103,7 @@ const CreateCampsiteFooter = () => {
       {/* Processing bar */}
       <div className="w-full h-1 bg-gray-200">
         <div
-          className="h-1  bg-gradient-to-r from-green-400 to-yellow-300 transition-all duration-500"
+          className="h-1  bg-gradient-to-r from-purple-900 to-purple-400 transition-all duration-500"
           style={{ width: `${(currentStepIndex / (pageSteps.length - 1)) * 100}%` }}
         />
       </div>
@@ -109,7 +112,7 @@ const CreateCampsiteFooter = () => {
         {step === "overview" ? (
           <div className=' flex justify-end'>
             <button
-              className="bg-gradient-to-r from-green-500 to-green-600 text-white text-xl font-semibold px-5 py-3 rounded-md mx-4 "
+              className="bg-purple-900 text-white hover:bg-transparent border border-purple-900 hover:text-purple-900  text-xl font-semibold px-5 py-3 rounded-md mx-4 transform transition duration-300"
               onClick={() => navigate(`/hosting/create-campsite/about-your-place`)}
             >
               Get started
@@ -133,7 +136,7 @@ const CreateCampsiteFooter = () => {
               //   Finish
               // </button>
               <button
-                className="bg-gradient-to-r from-green-500 to-green-600 text-white px-5 py-3 rounded-md text-xl font-semibold mx-4 flex items-center justify-center"
+                className="bg-purple-900 text-white hover:bg-transparent border border-purple-900 hover:text-purple-900 px-5 py-3 rounded-md text-xl font-semibold mx-4 flex items-center justify-center transform transition duration-300"
                 onClick={handleFinish}
                 disabled={loading}
               >
@@ -148,7 +151,7 @@ const CreateCampsiteFooter = () => {
               </button>
             ) : (
               <button
-                className="bg-black text-white px-5 py-3 rounded-md text-xl font-semibold mx-4"
+                className="bg-purple-900 text-white hover:bg-transparent border border-purple-900 hover:text-purple-900 px-5 py-3 rounded-md text-xl font-semibold mx-4 transform transition duration-300"
                 onClick={() => navigate(`/hosting/create-campsite/${nextStep}`)}
               >
                 Next
