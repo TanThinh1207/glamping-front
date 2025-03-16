@@ -118,6 +118,7 @@ export const CampsiteProvider = ({ children }) => {
           facilities: facilities.map((f) => f.id),
         }))
       );
+      setCampTypeImages((prevImages) => prevImages.filter((_, i) => i !== index));
       return newCampTypes;
     });
   };
@@ -153,6 +154,7 @@ export const CampsiteProvider = ({ children }) => {
         'campSiteSelections',
         newServices.map(({ image, ...rest }) => rest)
       );
+      setServiceImages((prevImages) => prevImages.filter((_, i) => i !== index));
       return newServices;
     });
   };
