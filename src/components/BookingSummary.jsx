@@ -37,15 +37,11 @@ const BookingSummary = ({ selectedServices = [] }) => {
       setLoading(true);
       console.log("Booking:", booking);
       const responseData = await createBooking(booking);
-
-      console.log("Booking Response:", responseData);
-
       const bookingId = responseData.data.id;
       const bookingName = responseData.data.campSite.name;
       console.log("Booking Response:", responseData);
       const depositRate = campsite?.depositRate ? parseFloat(campsite.depositRate) : 1;
       const depositPrice = parseFloat(responseData.data.totalAmount) * parseFloat(depositRate);
-
 
       const paymentResponse = await fetch(`${import.meta.env.VITE_API_PAYMENT}`, {
         method: "POST",
@@ -134,9 +130,11 @@ const BookingSummary = ({ selectedServices = [] }) => {
         total += parseFloat(service.price) * parseFloat(service.quantity);
       });
 
-      setTotalPrice(total);
+      
 
       const depositRate = campsite?.depositRate ? parseFloat(campsite.depositRate) : 1;
+      console.log(total * depositRate)
+      setTotalPrice(total * depositRate);
       updateTotalAmount(total * depositRate);
     } catch (error) {
       console.error("Error calculating total price:", error);
