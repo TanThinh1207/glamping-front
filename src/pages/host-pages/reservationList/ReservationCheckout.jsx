@@ -16,10 +16,10 @@ const ReservationCheckout = () => {
     return price.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
   };
 
-  function mergeCampTypes(bookingDetailResponseList) {
+  function mergeCampTypes(bookingDetail) {
     const mergedCampTypes = {};
 
-    bookingDetailResponseList.forEach(detail => {
+    bookingDetail.bookingDetailResponseList.forEach(detail => {
       const campType = detail.campTypeResponse;
       if (!campType) return;
 
