@@ -25,6 +25,7 @@ const TripList = () => {
         setLoading(true);
         try {
             const campTypeList = await fetchCamptypeById(campsiteId);
+            console.log(campTypeList)
             const selectedCamptypes = campTypeList.filter(camptype =>
                 bookingDetails.some(bookingDetail => bookingDetail.campTypeId === camptype.id)
             );
@@ -54,11 +55,13 @@ const TripList = () => {
     const fetchCampsite = async () => {
         try {
             const campsite = await fetchCampsiteById(campsiteId);
-            const selectedSelections = campsite[0].campSiteSelectionsList.filter(selection =>
-                booking.bookingSelectionRequestList.some(request => request.idSelection === selection.id)
-            )
-            setSelections(selectedSelections);
-            setCampsite(campsite[0]);
+            if (!campsite) {
+                const selectedSelections = campsite[0].campSiteSelectionsList.filter(selection =>
+                    booking.bookingSelectionRequestList.some(request => request.idSelection === selection.id)
+                )
+                setSelections(selectedSelections);
+                setCampsite(campsite[0]);
+            }
             console.log(campsite)
         } catch (error) {
             setError(error);
@@ -108,16 +111,11 @@ const TripList = () => {
     }
 
     useEffect(() => {
+        fetchCampsite();
+        fetchSelectedCamptypeList();
+        fetchBookingByUser();
 
-        if (campsiteId) {
-            fetchCampsite();
-            fetchSelectedCamptypeList();
-            fetchBookingByUser();
-        } else {
-            setLoading(false);
-        }
-
-    }, [booking]);
+    }, [user, campsiteId]);
 
     if (loading) {
         return (

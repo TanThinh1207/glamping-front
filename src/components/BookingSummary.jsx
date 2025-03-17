@@ -37,6 +37,7 @@ const BookingSummary = ({ selectedServices = [] }) => {
     }
     try {
       setLoading(true);
+      console.log("Booking:", booking);
       const responseData = await createBooking(booking);
 
       console.log("Booking Response:", responseData);
@@ -60,7 +61,8 @@ const BookingSummary = ({ selectedServices = [] }) => {
       console.log("Payment Response:", paymentData);
 
       if (paymentResponse.ok) {
-        window.location.href = paymentData.sessionUrl;
+        window.open(paymentData.sessionUrl, '_blank');
+
       } else {
         throw new Error(paymentData.message || "Payment session creation failed.");
       }
@@ -114,7 +116,7 @@ const BookingSummary = ({ selectedServices = [] }) => {
     }
 
     selectedServices.forEach(service => {
-      total += service.price * service.quantity;
+      total += parseFloat(service.price) * parseFloat(service.quantity);
     });
 
     setTotalPrice(total);
