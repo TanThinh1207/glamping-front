@@ -53,6 +53,7 @@ const TripList = () => {
     }
 
     const fetchCampsite = async () => {
+        setLoading(true);
         try {
             const campsite = await fetchCampsiteById(campsiteId);
             if (!campsite) {
@@ -111,9 +112,11 @@ const TripList = () => {
     }
 
     useEffect(() => {
-        fetchCampsite();
-        fetchSelectedCamptypeList();
-        fetchBookingByUser();
+        if (campsiteId) {
+            fetchCampsite();
+            fetchSelectedCamptypeList();
+            fetchBookingByUser();
+        }
 
     }, [user, campsiteId]);
 

@@ -11,8 +11,6 @@ const BookingSummary = ({ selectedServices = [] }) => {
   const { booking, resetBooking } = useBooking();
   const { updateTotalAmount } = useBooking();
 
-  const navigate = useNavigate();
-
   const checkInDateStr = localStorage.getItem("checkInDate");
   const checkOutDateStr = localStorage.getItem("checkOutDate");
 
@@ -45,7 +43,9 @@ const BookingSummary = ({ selectedServices = [] }) => {
       const bookingId = responseData.data.id;
       const bookingName = responseData.data.campSite.name;
       console.log("Booking Response:", responseData);
-      const depositPrice = responseData.data.totalAmount;
+      const depositRate = campsite?.depositRate ? parseFloat(campsite.depositRate) : 1;
+      const depositPrice = parseFloat(responseData.data.totalAmount) * parseFloat(depositRate);
+
 
       const paymentResponse = await fetch(`${import.meta.env.VITE_API_PAYMENT}`, {
         method: "POST",
@@ -81,9 +81,14 @@ const BookingSummary = ({ selectedServices = [] }) => {
   };
 
   useEffect(() => {
-    if (checkInDate && checkOutDate) {
-      const nights = Math.max(0, checkOutDate.diff(checkInDate, "day"));
-      setNights(nights);
+    try {
+      if (checkInDate && checkOutDate) {
+        const calculatedNights = Math.max(0, checkOutDate.diff(checkInDate, "day"));
+        setNights(calculatedNights);
+      }
+    } catch (error) {
+      console.error("Error calculating nights:", error);
+      setError("Error calculating the number of nights.");
     }
   }, [checkInDate, checkOutDate]);
 
@@ -93,36 +98,50 @@ const BookingSummary = ({ selectedServices = [] }) => {
         setLoading(true);
         const campsiteData = await fetchCampsiteById(campsiteId);
         const camptypesData = await fetchCamptypeById(campsiteId);
-        setCampsite(campsiteData.length > 0 ? campsiteData[0] : {});
-        setCamptypes(camptypesData);
+
+        if (!campsiteData || campsiteData.length === 0) {
+          throw new Error("Campsite data not found.");
+        }
+
+        setCampsite(campsiteData[0] || {});
+        setCamptypes(camptypesData || []);
       } catch (error) {
+        console.error("Error fetching data:", error);
         setError(error.message);
       } finally {
         setLoading(false);
       }
     };
-    getDataDetails();
+    if (campsiteId) {
+      getDataDetails();
+    }
   }, [campsiteId]);
 
   useEffect(() => {
-    let total = 0;
-    if (booking?.bookingDetails?.length > 0 && camptypes.length > 0) {
-      booking.bookingDetails.forEach((item) => {
-        const campType = camptypes.find((type) => type.id === item.campTypeId);
-        if (campType) {
-          total += campType.price * item.quantity * nights;
-        }
+    try {
+      let total = 0;
+
+      if (booking?.bookingDetails?.length > 0 && camptypes.length > 0) {
+        booking.bookingDetails.forEach((item) => {
+          const campType = camptypes.find((type) => type.id === item.campTypeId);
+          if (campType) {
+            total += campType.price * item.quantity * nights;
+          }
+        });
+      }
+
+      selectedServices.forEach((service) => {
+        total += parseFloat(service.price) * parseFloat(service.quantity);
       });
+
+      setTotalPrice(total);
+
+      const depositRate = campsite?.depositRate ? parseFloat(campsite.depositRate) : 1;
+      updateTotalAmount(total * depositRate);
+    } catch (error) {
+      console.error("Error calculating total price:", error);
+      setError("Error calculating total price.");
     }
-
-    selectedServices.forEach(service => {
-      total += parseFloat(service.price) * parseFloat(service.quantity);
-    });
-
-    setTotalPrice(total);
-
-    const depositRate = campsite?.depositRate ? parseFloat(campsite.depositRate) : 1;
-    updateTotalAmount(total * depositRate);
 
   }, [booking, camptypes, nights, selectedServices, campsite]);
 
