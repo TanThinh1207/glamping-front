@@ -80,6 +80,7 @@ export const createBooking = async (bookingData) => {
             throw new Error(`Booking failed: ${response.statusText}`);
         }
         const responseData = await response.json();
+        console.log(bookingData);
         return responseData;
     } catch (error) {
         throw new Error(error.message);

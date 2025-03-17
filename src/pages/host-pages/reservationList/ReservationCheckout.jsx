@@ -16,16 +16,19 @@ const ReservationCheckout = () => {
     return price.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
   };
 
-  function mergeCampTypes(bookingDetailResponseList) {
+  function mergeCampTypes(bookingDetail) {
     const mergedCampTypes = {};
 
-    bookingDetailResponseList.forEach(detail => {
+    bookingDetail.bookingDetailResponseList.forEach(detail => {
       const campType = detail.campTypeResponse;
       if (!campType) return;
 
       const type = campType.type;
-      const price = campType.price; // Giá cơ bản trong ngày thường
-      const weekendRate = campType.weekendRate; // Giá vào cuối tuần
+      const price = campType.price;
+
+      const checkInDate = new Date(detail.checkInAt);
+      const checkOutDate = new Date(detail.checkOutAt);
+      const totalDays = Math.max((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24), 1);
 
       if (!mergedCampTypes[type]) {
         mergedCampTypes[type] = {
@@ -36,14 +39,10 @@ const ReservationCheckout = () => {
       }
 
       mergedCampTypes[type].totalQuantity += 1;
-
-      // Tính tiền dựa trên số lượng và giá tiền (giả sử check-in có cả ngày thường và cuối tuần)
-      const totalDays = 2; // Ví dụ ở đây từ 15 đến 17 là 2 ngày
-      const weekendDays = 1; // Giả sử có 1 ngày cuối tuần
-      const normalDays = totalDays - weekendDays;
-
-      const totalAmount = (normalDays * price + weekendDays * weekendRate);
-      mergedCampTypes[type].totalAmount += totalAmount;
+      const totalQuantity = mergedCampTypes[type].totalQuantity;
+      console.log(totalQuantity);
+      console.log(totalDays);
+      mergedCampTypes[type].totalAmount = price * totalDays * totalQuantity;
     });
     console.log(mergedCampTypes);
     return Object.values(mergedCampTypes);

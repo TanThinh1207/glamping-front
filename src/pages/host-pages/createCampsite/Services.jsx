@@ -14,10 +14,6 @@ const Services = () => {
   const [serviceImage, setServiceImage] = useState(null);
 
 
-  useEffect(() => {
-    console.log(serviceImage);
-  }, [serviceImage]);
-
   // Close the modal when clicked outside
   const modalRef = useRef(null);
 
@@ -37,6 +33,8 @@ const Services = () => {
     };
   }, [isOpen]);
 
+
+  // Add service
   const handleAddService = () => {
     if (!serviceName.trim() || !serviceDesc.trim() || !servicePrice) {
       return;
@@ -54,6 +52,8 @@ const Services = () => {
     }
   };
 
+
+  // Handle image upload
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -62,6 +62,7 @@ const Services = () => {
     }
   };
 
+  // Close the modal
   const handleClosePopUp = () => {
     setIsOpen(false);
     setServiceName('');
@@ -70,6 +71,13 @@ const Services = () => {
     setServiceImage(null);
   }
 
+  // Format VND
+  const formatVND = (price) => {
+    const numPrice = Number(price);
+    return !isNaN(numPrice) 
+      ? numPrice.toLocaleString("vi-VN", { style: "currency", currency: "VND" }) 
+      : "Invalid price";
+  };
   return (
     <div className='w-full bg-white py-24 px-96'>
       <div className='mb-8'>
@@ -101,7 +109,7 @@ const Services = () => {
             <div className='p-2'>
               <h3 className='text-xl font-bold '>{service.name}</h3>
               <p className='text-gray-500'>{service.description}</p>
-              <p className='font-semibold mt-2 text-lg'>Price: {service.price} VND</p>
+              <p className='font-semibold mt-2 text-lg'>Price: {formatVND(service.price)}</p>
             </div>
           </div>
         ))}
