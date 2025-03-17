@@ -59,6 +59,8 @@ const Listings = () => {
                 return 'text-orange-500';
             case 'Available':
                 return 'text-green-500';
+            case 'Denied':
+                return 'text-red-500';
             default:
                 return 'text-gray-500';
         }
