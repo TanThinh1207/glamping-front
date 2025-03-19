@@ -21,7 +21,7 @@ const vietnamCities = [
   { id: 10, name: "Vũng Tàu" }
 ];
 
-const SearchBar = ({ onSearch }) => {
+const SearchBar = ({ onSearch, hideDestination = false }) => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
@@ -104,11 +104,8 @@ const SearchBar = ({ onSearch }) => {
       return;
     }
 
-    if (destination) {
-      navigate(`/glamping/${destination.name.toLowerCase().replace(/\s+/g, "-")}`);
-    } else {
-      navigate("/campsite");
-    }
+    // Always navigate to /campsite, regardless of destination selection
+    navigate("/campsite");
   };
 
   useEffect(() => {
@@ -132,7 +129,8 @@ const SearchBar = ({ onSearch }) => {
     <div className="pb-6 pt-10 w-full flex justify-center">
       <div className={`border border-black flex flex-col md:flex-row ${isCampsiteRoute ? "w-3/4" : "w-full"} gap-4 md:shadow-md md:rounded-xl py-4 px-2 md:mx-auto 
                       justify-center items-center`}>
-        {!isCampsiteRoute && (
+        {/* Only show destination dropdown if hideDestination is false and not on campsite route */}
+        {!hideDestination && !isCampsiteRoute && (
           <Dropdown
             items={campsiteCities}
             selected={destination}
@@ -141,7 +139,8 @@ const SearchBar = ({ onSearch }) => {
         )}
 
         <div className="flex flex-col md:flex-row w-full md:w-auto items-center gap-4">
-          {!isCampsiteRoute && (
+          {/* Only show the divider if destination dropdown is shown */}
+          {!hideDestination && !isCampsiteRoute && (
             <div className="border-l border-gray-400 h-6 hidden md:block"></div>
           )}
 
@@ -294,7 +293,7 @@ const SearchBar = ({ onSearch }) => {
         </Modal>
 
         <div className="border-l border-gray-400 h-6 hidden md:block"></div>
-        <button 
+        <button
           onClick={handleSearch}
           className="bg-black text-white text-sm rounded-3xl border-black border uppercase px-6 py-3 transform 
                     duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black space-x-2"

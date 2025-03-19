@@ -48,7 +48,7 @@ const CampsitePage = () => {
     return (
         <div className='container mx-auto pt-20 min-h-screen'>
             <p className='text-5xl font-canto'>Campsites</p>
-            <SearchBar />
+            <SearchBar hideDestination={true}/>
             <hr className='my-10' />
             {campsites.map(campsite => (
                 <CampsiteCard key={campsite.id} campsite={campsite} />

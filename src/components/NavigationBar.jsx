@@ -101,11 +101,13 @@ const NavigationBar = () => {
                 );
             case path.startsWith("/hosting"):
                 return (
-                    <button className="bg-black text-white text-xs border-black border uppercase mb-2 p-4 transform 
+                    <Link to='/'>
+                        <button className="bg-black text-white text-xs border-black border uppercase mb-2 p-4 transform 
                         duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black 
                         mr-2">
-                        Switch to customer
-                    </button>
+                            Switch to customer
+                        </button>
+                    </Link>
                 );
             default:
                 return (
@@ -120,9 +122,6 @@ const NavigationBar = () => {
                             <FontAwesomeIcon className="cursor-pointer hover:scale-110 transition-transform duration-200 pr-1" icon={faCartShopping} />
                             <span>My Trip</span>
                         </Link>
-                        <button className="bg-black text-white text-xs border-black border uppercase mb-2 p-4 transform duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black mr-2">
-                            Check availability
-                        </button>
                     </>
                 );
 
@@ -132,7 +131,7 @@ const NavigationBar = () => {
     const menuItems = getMenuItems(location.pathname);
     return (
         <div
-            className={`fixed w-full z-10 transition-colors duration-500 ${isScrolled || !isHomePage ? "bg-white" : "bg-transparent"
+            className={`fixed w-full z-10 py-3 transition-colors duration-500 ${isScrolled || !isHomePage ? "bg-white" : "bg-transparent"
                 }`}
         >
             <div className="flex items-center px-3 pt-3">
