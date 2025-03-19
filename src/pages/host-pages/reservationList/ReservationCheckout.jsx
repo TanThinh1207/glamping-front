@@ -11,6 +11,58 @@ const ReservationCheckout = () => {
   const [loading, setLoading] = useState(true);
   const [selectedReservation, setSelectedReservation] = useState(null);
   const modalRef = useRef();
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [checkoutReservations, setCheckoutReservations] = useState([]);
+  const { user } = useUser();
+  const [orders, setOrders] = useState([]);
+  const [finalpayment, setFinalPayment] = useState(0);
+  const [newOrder, setNewOrder] = useState(
+    {
+      name: '',
+      quantity: '',
+      price: '',
+      totalAmount: '',
+      note: ''
+    }
+  );
+
+  const calculateTotalAmount = () => {
+    if (!selectedReservation) {
+      console.log("selectedReservation is null");
+      return 0;
+    }
+  
+    const totalOrderAmount = orders.reduce((sum, order) => sum + order.totalAmount, 0);
+    console.log("Total Amount:", selectedReservation.totalAmount, "Deposit:", selectedReservation.depositAmount, "Orders Total:", totalOrderAmount);
+    
+    return (selectedReservation.totalAmount - selectedReservation.paymentResponseList[0].totalAmount) + totalOrderAmount;
+  };
+
+  // Function to add new order to the list
+  const handleAddOrder = () => {
+    if (newOrder.name.trim() === '') return;
+
+    setOrders([...orders, { ...newOrder }]);
+    setNewOrder({ name: '', quantity: '', price: '', totalAmount: '', note: '' });
+  };
+
+  // Function to handle input changes
+  const handleOrderChange = (e, field) => {
+    const value = field === "quantity" || field === "price" ? Number(e.target.value) : e.target.value;
+    setNewOrder(prev => ({
+      ...prev,
+      [field]: value,
+      totalAmount: (field === "quantity" || field === "price")
+        ? (field === "quantity" ? value * prev.price : prev.quantity * value)
+        : prev.quantity * prev.price
+    }));
+  };
+
+  // Function to delete order from the list
+  const handleDeleteOrder = (index) => {
+    setOrders(prevOrders => prevOrders.filter((_, i) => i !== index));
+  };
 
   const formatVND = (price) => {
     return price.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
@@ -40,18 +92,12 @@ const ReservationCheckout = () => {
 
       mergedCampTypes[type].totalQuantity += 1;
       const totalQuantity = mergedCampTypes[type].totalQuantity;
-      console.log(totalQuantity);
-      console.log(totalDays);
       mergedCampTypes[type].totalAmount = price * totalDays * totalQuantity;
     });
-    console.log(mergedCampTypes);
     return Object.values(mergedCampTypes);
   }
 
   //Table Pagination
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -61,8 +107,6 @@ const ReservationCheckout = () => {
   };
 
   //Call api for checkout reservations
-  const [checkoutReservations, setCheckoutReservations] = useState([]);
-  const { user } = useUser();
   useEffect(() => {
     const fetchCheckoutReservations = async (user) => {
       try {
@@ -90,13 +134,16 @@ const ReservationCheckout = () => {
   const handleCheckout = async (id) => {
     try {
       const formData = new FormData();
-      formData.append('status', 'completed');
-      formData.append('bookingId', id);
-      await axios.put(`${import.meta.env.VITE_API_BOOKING}/${id}/update-status`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
+      await axios.put(`${import.meta.env.VITE_API_BOOKING}/${id}?status=checkout`, 
+        {
+          BookingDetailOrderRequest: orders
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
         }
-      });
+    );
       setCheckoutReservations(checkoutReservations.filter(reservation => reservation.id !== id));
     } catch (error) {
       console.error("Error checking out reservation:", error);
@@ -180,97 +227,154 @@ const ReservationCheckout = () => {
           <div ref={modalRef} className='bg-white shadow-md  w-3/5 h-4/5 relative rounded-xl'>
             <button
               className="absolute -top-2 -right-2 bg-red-500 text-xl p-1 rounded-full"
-              onClick={() => setSelectedReservation(null)}
+              onClick={() => {
+                setSelectedReservation(null);
+                setOrders([]);
+              }}
             >
               ✖
             </button>
-            <div className='flex space-x-4 w-full h-full'>
-              <div className='relative w-1/2 h-full'>
-                <div className='absolute bg-black bg-opacity-50 text-white text-xl font-bold px-4 py-2 rounded-lg'>
-                  {selectedReservation.campSite.name}
-                </div>
-                <img src={selectedReservation.campSite.imageList[0].path} alt='campsite' className='w-auto h-full object-cover rounded-l-xl ' />
-              </div>
-              <div className='w-1/2 p-6 flex flex-col'>
-                <div>
-                  <h1 className='text-4xl font-bold mb-4'>Booking details</h1>
-                </div>
-                <div className='mt-4 flex items-center space-x-4'>
-                  <h1 className='text-lg font-semibold mb-2 text-green-500'>Check in date:  {selectedReservation.checkIn}</h1>
-                  <h1 className='text-lg font-semibold mb-2'><FontAwesomeIcon icon={faChevronRight} /></h1>
-                  <h1 className='text-lg font-semibold mb-2 text-red-500'>Check out date: {selectedReservation.checkOut}</h1>
-                </div>
-                <div className='overflow-y-auto h-full pr-4'>
-                  <div className='border-b-2 border-gray-200 mt-4 pb-4'>
-                    <h1 className='text-xl font-semibold mb-2'>Guest information</h1>
-                    <div className='flex items-center space-x-4 shadow-xl bg-gray-100 p-4 rounded-xl'>
-                      <FontAwesomeIcon icon={faUser} className='text-6xl' />
-                      <div className='w-full'>
-                        <h2 className='text-md font-bold'>Name: {selectedReservation.user.lastname} {selectedReservation.user.firstname}</h2>
-                        <p className='text-md'>Mail: {selectedReservation.user.email}</p>
-                        <p className='text-md'>Phone number: {selectedReservation.user.phone}</p>
-                      </div>
-                    </div>
+            <div className='flex flex-col h-full overflow-hidden'>
+              <div className='flex space-x-4 w-full h-5/6'>
+                <div className='relative w-1/3 h-full border-r-2 border-gray-200 flex flex-col'>
+                  <div className='absolute bg-black bg-opacity-50 text-white text-sm font-bold px-4 py-2 rounded-lg'>
+                    {selectedReservation.campSite.name}
                   </div>
-                  <div className='mt-4 pb-4 border-b-2 border-gray-200'>
-                    <h1 className='text-xl font-semibold mb-2'>Camp type </h1>
-                    <div>
-                      {mergeCampTypes(selectedReservation.bookingDetailResponseList).map((campType, index) => (
-                        <div key={index} className="flex items-center space-x-9">
-                          <div className="flex items-center space-x-4 shadow-xl bg-gray-100 rounded-xl mt-4 relative">
-                            <div className="relative">
-                              <div className="absolute left-1 right-1 bg-black bg-opacity-50 text-white text-center text-sm font-bold rounded-xl p-1">
-                                {campType.type}
-                              </div>
-                              <img src={campType.image} alt="campType" className="w-20 h-20 object-cover rounded-lg" />
-                            </div>
-                          </div>
-                          <div>
-                            <h2 className="text-md font-bold">x{campType.totalQuantity}</h2>
-                          </div>
-                          <div className='flex items-center space-x-2'>
-                            <h1>Price:</h1>
-                            <h2 className="text-md font-bold">{formatVND(campType.totalAmount)}</h2>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  {selectedReservation.bookingSelectionResponseList.length > 0 && (
-                    <div className='mt-4 pb-4 border-b-2 border-gray-200'>
-                      <div>
-                        <h1 className='text-xl font-semibold mb-2'>Services </h1>
-                      </div>
-                      <div>
-                        {selectedReservation.bookingSelectionResponseList.map((service, index) => (
+                  <img src={selectedReservation.campSite.imageList[0].path} alt='campsite' className='w-full h-auto object-cover rounded-tl-xl' />
+                  <div className='overflow-y-auto px-2'>
+                    <div className='p-4 border-b-2 border-gray-200'>
+                      <h1 className='text-xl font-semibold mb-2'>Camp type </h1>
+                      <div className='px-4'>
+                        {mergeCampTypes(selectedReservation).map((campType, index) => (
                           <div key={index} className="flex items-center space-x-9">
-                            <div className='w-20'>
-                              <h1 className="text-md font-bold">{service.name}</h1>
+                            <div className="flex items-center space-x-4 shadow-xl bg-gray-100 rounded-xl mt-4 relative">
+                              <div className="relative">
+                                <div className="absolute left-1 right-1 bg-black bg-opacity-50 text-white text-center text-xs font-bold rounded-xl p-1">
+                                  {campType.type}
+                                </div>
+                                <img src={campType.image} alt="campType" className="w-14 h-14 object-cover rounded-lg" />
+                              </div>
                             </div>
                             <div>
-                              <h2 className="text-md font-bold">x{service.quantity}</h2>
-                            </div>
-                            <div className='flex items-center space-x-2'>
-                              <h1>Price:</h1>
-                              <h2 className="text-md font-bold">{formatVND(service.totalAmount)}</h2>
+                              <h2 className="text-md font-bold">x{campType.totalQuantity}</h2>
                             </div>
                           </div>
                         ))}
                       </div>
                     </div>
-                  )}
-
-
+                    {selectedReservation.bookingSelectionResponseList.length > 0 ? (
+                      <div className='mt-4 p-4 border-b-2 border-gray-200'>
+                        <div>
+                          <h1 className='text-xl font-semibold mb-2'>Services </h1>
+                        </div>
+                        <div className='px-4'>
+                          {selectedReservation.bookingSelectionResponseList.map((service, index) => (
+                            <div key={index} className="flex items-center space-x-9">
+                              <div className='w-14'>
+                                <h1 className="text-md font-bold">{service.name}</h1>
+                              </div>
+                              <div>
+                                <h2 className="text-md font-bold">x{service.quantity}</h2>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className='p-4 border-b-2 border-gray-200'>
+                        <div>
+                          <h1 className='text-xl font-semibold mb-2'>Services </h1>
+                        </div>
+                        <div className='px-4'>
+                          <h1 className='text-sm font-normal'>No services selected</h1>
+                        </div>
+                      </div>
+                    )}
+                    <div className='p-4'>
+                      <h1 className='text-xl font-semibold  '>Total: {formatVND(selectedReservation.totalAmount)}</h1>
+                      <h1>Deposit: {formatVND(selectedReservation.paymentResponseList[0].totalAmount)}</h1>
+                    </div>
+                  </div>
                 </div>
-                <div className='mt-4 flex justify-between'>
-                  <h1 className='text-xl font-semibold mb-2'>Total amount: {formatVND(selectedReservation.totalAmount)}</h1>
-                  <button
-                    className='bg-green-500 text-white px-4 py-2 rounded-lg'
-                    onClick={() => handleCheckout(selectedReservation.id)}
-                  >
-                    Check out
-                  </button>
+                <div className='w-2/3 p-2 flex flex-col'>
+                  <div className='flex pt-2 '>
+                    <h1 className='text-4xl font-bold mb-4'>Booking details</h1>
+                  </div>
+                  <div className='overflow-y-auto pr-2'>
+                    <div className=' flex items-center space-x-4'>
+                      <h1 className='text-md font-semibold mb-2 text-green-500'>Check in date:  {selectedReservation.checkIn}</h1>
+                      <h1 className='text-lg font-semibold mb-2'><FontAwesomeIcon icon={faChevronRight} /></h1>
+                      <h1 className='text-md font-semibold mb-2 text-red-500'>Check out date: {selectedReservation.checkOut}</h1>
+                    </div>
+                    <div className='border-b-2 border-gray-200 mt-4 pb-4'>
+                      <h1 className='text-xl font-semibold mb-2'>Guest information</h1>
+                      <div className='flex items-center space-x-4 shadow-xl bg-gray-100 p-4 rounded-xl'>
+                        <FontAwesomeIcon icon={faUser} className='text-6xl' />
+                        <div className='w-full'>
+                          <h2 className='text-md font-bold'>Name: {selectedReservation.user.lastname} {selectedReservation.user.firstname}</h2>
+                          <p className='text-md'>Mail: {selectedReservation.user.email}</p>
+                          <p className='text-md'>Phone number: {selectedReservation.user.phone}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className='mt-4 pb-4'>
+                      <h1 className='text-xl font-semibold mb-2'>Orders</h1>
+                      <div className='mt-4 pb-4 border-b-2 border-gray-200'>
+                        <div className="grid grid-cols-5 gap-2">
+                          <input type="text" placeholder="Name" value={newOrder.name} onChange={(e) => handleOrderChange(e, 'name')} className="border p-2 rounded" />
+                          <input type="number" placeholder="Qty" value={newOrder.quantity} onChange={(e) => handleOrderChange(e, 'quantity')} className="border p-2 rounded" />
+                          <input type="number" placeholder="Price" value={newOrder.price} onChange={(e) => handleOrderChange(e, 'price')} className="border p-2 rounded" />
+                          <input type="text" placeholder="Note" value={newOrder.note} onChange={(e) => handleOrderChange(e, 'note')} className="border p-2 rounded" />
+                          <button onClick={handleAddOrder} className="bg-blue-500 text-white px-4 py-2 rounded">+</button>
+                        </div>
+
+                        {orders.length > 0 && (
+                          <table className="mt-4 w-full border">
+                            <thead>
+                              <tr>
+                                <th className="border p-2">Name</th>
+                                <th className="border p-2">Quantity</th>
+                                <th className="border p-2">Price</th>
+                                <th className="border p-2">Total</th>
+                                <th className="border p-2">Note</th>
+                                <th className="border p-2">Action</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {orders.map((order, index) => (
+                                <tr key={index}>
+                                  <td className="border p-2">{order.name}</td>
+                                  <td className="border p-2">{order.quantity}</td>
+                                  <td className="border p-2">{formatVND(order.price)}</td>
+                                  <td className="border p-2">{formatVND(order.totalAmount)}</td>
+                                  <td className="border p-2">{order.note}</td>
+                                  <td className="border text-center">
+                                    <button
+                                      onClick={() => handleDeleteOrder(index)}
+                                      className="bg-red-500 text-white px-3 py-1 rounded"
+                                    >
+                                      -
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        )}
+                      </div>
+
+                    </div>
+                  </div>
                 </div>
+              </div>
+              <div className='h-1/6 p-4 flex justify-between border-t-2 border-gray-200 bg-white sticky bottom-0'>
+                <h1 className='text-2xl font-bold mb-2'>Final price: {formatVND(calculateTotalAmount())}</h1>
+                <button
+                  className='bg-green-500 text-white px-4 py-2 rounded-lg'
+                  onClick={() => handleCheckout(selectedReservation.id)}
+                >
+                  Check out
+                </button>
               </div>
             </div>
           </div>
