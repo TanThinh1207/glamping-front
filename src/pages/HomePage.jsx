@@ -17,7 +17,7 @@ const HomePage = () => {
       </div>
       <div className="flex justify-center ">
         <div className="mx-auto">
-          <SearchBar />
+          <SearchBar hideDestination={true}/>
         </div>
       </div>
       <div className="featured px-4">

@@ -323,15 +323,22 @@ const CamptypePage = () => {
                                 </div>
                             </div>
                             <div className='price-container rounded-md bg-blue-50 mx-8 flex justify-between p-8'>
-                                <div className='flex flex-col items-center justify-center'>
+                                <div className='flex flex-col items-start justify-center'>
                                     <p className='font-canto text-2xl'>Best Flexible Rate</p>
-                                    <p className='text-gray-500 text-lg pt-3 gap-3'><span className='pr-1'><FontAwesomeIcon icon={faMugHot} /></span>Breakfast included</p>
+                                    <p className='text-gray-500 text-lg pt-3 gap-3 w-full font-canto'><span className='pr-1'><FontAwesomeIcon icon={faMugHot} /></span>Breakfast included</p>
                                     {/* Display pricing breakdown */}
                                     {checkIn && checkOut && (
-                                        <div className="mt-2 text-sm text-gray-600">
-                                            <p>Regular rate: VND{camptype.price.toLocaleString("vi-VN")}/night</p>
-                                            <p>Weekend rate: VND{camptype.weekendRate.toLocaleString("vi-VN")}/night</p>
-                                            <p>Stay duration: {calculateNights()} night(s)</p>
+                                        <div className="mt-2 text-lg font-canto text-gray-600 w-full">
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <p className="text-left">Regular rate:</p>
+                                                <p className="text-left text-purple-900">{camptype.price.toLocaleString("vi-VN")} VND/night</p>
+
+                                                <p className="text-left">Weekend rate:</p>
+                                                <p className="text-left text-purple-900">{camptype.weekendRate.toLocaleString("vi-VN")} VND/night</p>
+
+                                                <p className="text-left">Stay duration:</p>
+                                                <p className="text-left text-purple-900">{calculateNights()} night(s)</p>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -339,27 +346,27 @@ const CamptypePage = () => {
                                     {camptype.availableSlot > 0 ? (
                                         <>
                                             {calculateTotalPrice(camptype) ? (
-                                                <div className="flex flex-col">
+                                                <div className="flex flex-col font-canto text-xl">
                                                     <p className='tracking-wide text-purple-900'>
-                                                        Total: VND{calculateTotalPrice(camptype).toLocaleString("vi-VN")}
+                                                        Total: {calculateTotalPrice(camptype).toLocaleString("vi-VN")} VND
                                                     </p>
-                                                    <p className="text-xs text-gray-500">
+                                                    <p className="text-lg text-gray-500">
                                                         For {calculateNights()} night(s) × {quantities[camptype.id] || 1} {quantities[camptype.id] > 1 ? 'rooms' : 'room'}
                                                     </p>
                                                 </div>
                                             ) : (
                                                 <p className='tracking-wide text-purple-900'>
-                                                    Price per night: VND{camptype.price.toLocaleString("vi-VN")}
+                                                    Price per night: {camptype.price.toLocaleString("vi-VN")} VND
                                                     {hasWeekends() && (
                                                         <span className="block text-xs text-gray-500">
-                                                            Weekend: VND{camptype.weekendRate.toLocaleString("vi-VN")}
+                                                            Weekend: {camptype.weekendRate.toLocaleString("vi-VN")} VND
                                                         </span>
                                                     )}
                                                 </p>
                                             )}
                                             <button
                                                 className='bg-transparent border border-purple-900 text-purple-900 hover:bg-purple-900 
-                hover:text-white rounded-full px-8 py-4 transform transition duration-300'
+hover:text-white rounded-full px-8 py-4 transform transition duration-300 font-canto text-xl'
                                                 onClick={() => handleCamptypeSelection(camptype)}
                                             >
                                                 <p>Reservation Inquiry</p>
@@ -367,7 +374,7 @@ const CamptypePage = () => {
                                         </>
                                     ) : (
                                         <>
-                                            <p className='tracking-wide text-purple-900'>No availability for the selected dates, please change dates.</p>
+                                            <p className='tracking-wide text-purple-900 font-canto text-lg'>No availability for the selected dates, please change dates.</p>
                                         </>
                                     )}
                                 </div>

@@ -231,7 +231,7 @@ const BookingSummary = ({ selectedServices = [] }) => {
 
       <div className="mb-3">
         <p className="text-xl font-semibold">Extra Services</p>
-        <p className="text-sm text-gray-600">Maximum capacity: {capacityLimit} people</p>
+        <p className="text-lg text-gray-600">Maximum capacity: {capacityLimit} people</p>
         <div className="text-xl">
           {selectedServices.length > 0 ? selectedServices.map(service => (
             <div key={service.id} className="flex justify-between">
