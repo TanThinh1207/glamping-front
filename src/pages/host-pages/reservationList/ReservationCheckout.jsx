@@ -6,6 +6,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { TablePagination } from '@mui/material';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation } from 'swiper/modules';
 
 const ReservationCheckout = () => {
   const [loading, setLoading] = useState(true);
@@ -15,10 +17,12 @@ const ReservationCheckout = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [checkoutReservations, setCheckoutReservations] = useState([]);
   const { user } = useUser();
+  const [selectedCampName, setSelectedCampName] = useState("");
+  const [bookingDetailId, setBookingDetailId] = useState('');
   const [orders, setOrders] = useState([]);
-  const [finalpayment, setFinalPayment] = useState(0);
   const [newOrder, setNewOrder] = useState(
     {
+      bookingDetailId: '',
       name: '',
       quantity: '',
       price: '',
@@ -27,24 +31,45 @@ const ReservationCheckout = () => {
     }
   );
 
+  // Function to calculate total amount
   const calculateTotalAmount = () => {
     if (!selectedReservation) {
       console.log("selectedReservation is null");
       return 0;
     }
-  
-    const totalOrderAmount = orders.reduce((sum, order) => sum + order.totalAmount, 0);
+
+    const totalOrderAmount = formatBookingData(orders).reduce((sum, order) => sum + order.totalAmount, 0);
     console.log("Total Amount:", selectedReservation.totalAmount, "Deposit:", selectedReservation.depositAmount, "Orders Total:", totalOrderAmount);
-    
+
     return (selectedReservation.totalAmount - selectedReservation.paymentResponseList[0].totalAmount) + totalOrderAmount;
   };
+  useEffect(() => {
+    calculateTotalAmount();
+  }, [orders, selectedReservation]);
 
   // Function to add new order to the list
   const handleAddOrder = () => {
     if (newOrder.name.trim() === '') return;
 
-    setOrders([...orders, { ...newOrder }]);
-    setNewOrder({ name: '', quantity: '', price: '', totalAmount: '', note: '' });
+    setOrders((prevOrders) => ({
+      ...prevOrders,
+      [bookingDetailId]: [
+        ...(prevOrders[bookingDetailId] || []),
+        { 
+          ...newOrder,
+          bookingDetailId: bookingDetailId
+        },
+      ]
+    }));
+
+    setNewOrder({
+      bookingDetailId: bookingDetailId,
+      name: '', 
+      quantity: '', 
+      price: '', 
+      totalAmount: '', 
+      note: '' 
+    });
   };
 
   // Function to handle input changes
@@ -61,41 +86,15 @@ const ReservationCheckout = () => {
 
   // Function to delete order from the list
   const handleDeleteOrder = (index) => {
-    setOrders(prevOrders => prevOrders.filter((_, i) => i !== index));
+    setOrders(prevOrders => ({
+      ...prevOrders,
+      [bookingDetailId]: prevOrders[bookingDetailId].filter((_, i) => i !== index)
+    }));
   };
 
   const formatVND = (price) => {
     return price.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
   };
-
-  function mergeCampTypes(bookingDetail) {
-    const mergedCampTypes = {};
-
-    bookingDetail.bookingDetailResponseList.forEach(detail => {
-      const campType = detail.campTypeResponse;
-      if (!campType) return;
-
-      const type = campType.type;
-      const price = campType.price;
-
-      const checkInDate = new Date(detail.checkInAt);
-      const checkOutDate = new Date(detail.checkOutAt);
-      const totalDays = Math.max((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24), 1);
-
-      if (!mergedCampTypes[type]) {
-        mergedCampTypes[type] = {
-          ...campType,
-          totalQuantity: 0,
-          totalAmount: 0
-        };
-      }
-
-      mergedCampTypes[type].totalQuantity += 1;
-      const totalQuantity = mergedCampTypes[type].totalQuantity;
-      mergedCampTypes[type].totalAmount = price * totalDays * totalQuantity;
-    });
-    return Object.values(mergedCampTypes);
-  }
 
   //Table Pagination
   const handleChangePage = (event, newPage) => {
@@ -105,6 +104,10 @@ const ReservationCheckout = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+  function formatBookingData(data) {
+    return Object.values(data).flat();
+}
 
   //Call api for checkout reservations
   useEffect(() => {
@@ -116,10 +119,11 @@ const ReservationCheckout = () => {
             'Content-Type': 'application/json'
           },
           params: {
-            hostId: user.id
+            hostId: user.id,
+            status: 'Check_In',
           }
         });
-        setCheckoutReservations(response.data.data.content.filter(reservation => reservation.status === 'Check_In'));
+        setCheckoutReservations(response.data.data.content);
       } catch (error) {
         console.error("Error fetching checkout reservations data:", error);
       } finally {
@@ -133,23 +137,29 @@ const ReservationCheckout = () => {
   //Handle api change status for Check_In status reservation to Completed status
   const handleCheckout = async (id) => {
     try {
-      const formData = new FormData();
-      await axios.put(`${import.meta.env.VITE_API_BOOKING}/${id}?status=checkout`, 
-        {
-          BookingDetailOrderRequest: orders
-        },
+      const orderList = formatBookingData(orders);
+      console.log(orderList);
+      await axios.put(`${import.meta.env.VITE_API_BOOKING}/${id}?status=checkout`,
+          orderList ,
         {
           headers: {
             'Content-Type': 'application/json'
           }
         }
-    );
+      );
+      handleCloseModal();
       setCheckoutReservations(checkoutReservations.filter(reservation => reservation.id !== id));
     } catch (error) {
       console.error("Error checking out reservation:", error);
     }
   }
 
+  const handleCloseModal = () => {
+    setSelectedReservation(null);
+    setOrders([]);
+    setBookingDetailId('');
+    setSelectedCampName('');
+  };
   //Status color
   const statusColor = (status) => {
     switch (status) {
@@ -158,6 +168,16 @@ const ReservationCheckout = () => {
       default:
         return 'text-gray-500';
     }
+  };
+
+  const handleCampTypeClick = (id, name) => {
+    setBookingDetailId(id);
+    setSelectedCampName(name);
+    console.log(bookingDetailId);
+    setOrders((prevOrders) => ({
+      ...prevOrders,
+      [id]: prevOrders[id] || [],
+    }));
   };
 
   return (
@@ -228,14 +248,14 @@ const ReservationCheckout = () => {
             <button
               className="absolute -top-2 -right-2 bg-red-500 text-xl p-1 rounded-full"
               onClick={() => {
-                setSelectedReservation(null);
-                setOrders([]);
+                handleCloseModal();
+                console.log(selectedReservation);
               }}
             >
               ✖
             </button>
             <div className='flex flex-col h-full overflow-hidden'>
-              <div className='flex space-x-4 w-full h-5/6'>
+              <div className='flex-grow min-h-0 flex'>
                 <div className='relative w-1/3 h-full border-r-2 border-gray-200 flex flex-col'>
                   <div className='absolute bg-black bg-opacity-50 text-white text-sm font-bold px-4 py-2 rounded-lg'>
                     {selectedReservation.campSite.name}
@@ -245,21 +265,35 @@ const ReservationCheckout = () => {
                     <div className='p-4 border-b-2 border-gray-200'>
                       <h1 className='text-xl font-semibold mb-2'>Camp type </h1>
                       <div className='px-4'>
-                        {mergeCampTypes(selectedReservation).map((campType, index) => (
-                          <div key={index} className="flex items-center space-x-9">
-                            <div className="flex items-center space-x-4 shadow-xl bg-gray-100 rounded-xl mt-4 relative">
-                              <div className="relative">
-                                <div className="absolute left-1 right-1 bg-black bg-opacity-50 text-white text-center text-xs font-bold rounded-xl p-1">
-                                  {campType.type}
+                        <Swiper
+                          modules={[Navigation]}
+                          spaceBetween={30}
+                          slidesPerView={4}
+                          navigation
+                          preventClicks={true}
+                          preventClicksPropagation={false}
+                          simulateTouch={true}
+                        >
+                          {selectedReservation.bookingDetailResponseList.map((campType, index) => (
+                            <SwiperSlide
+                              key={index}
+                              onClick={() => handleCampTypeClick(campType.bookingDetailId, campType.campResponse.campName)}
+                            >
+                              <div className="flex items-center space-x-4 shadow-xl bg-gray-100 rounded-xl mt-4 relative">
+                                <div className="relative">
+                                  <div className="absolute left-1 right-1 bg-black bg-opacity-50 text-white text-center text-xs font-bold rounded-xl p-1">
+                                    {campType.campResponse.campName}
+                                  </div>
+                                  <img
+                                    src={campType.campTypeResponse.image}
+                                    alt="campType"
+                                    className="w-14 h-14 object-cover rounded-lg"
+                                  />
                                 </div>
-                                <img src={campType.image} alt="campType" className="w-14 h-14 object-cover rounded-lg" />
                               </div>
-                            </div>
-                            <div>
-                              <h2 className="text-md font-bold">x{campType.totalQuantity}</h2>
-                            </div>
-                          </div>
-                        ))}
+                            </SwiperSlide>
+                          ))}
+                        </Swiper>
                       </div>
                     </div>
                     {selectedReservation.bookingSelectionResponseList.length > 0 ? (
@@ -318,56 +352,83 @@ const ReservationCheckout = () => {
                       </div>
                     </div>
                     <div className='mt-4 pb-4'>
-                      <h1 className='text-xl font-semibold mb-2'>Orders</h1>
-                      <div className='mt-4 pb-4 border-b-2 border-gray-200'>
-                        <div className="grid grid-cols-5 gap-2">
-                          <input type="text" placeholder="Name" value={newOrder.name} onChange={(e) => handleOrderChange(e, 'name')} className="border p-2 rounded" />
-                          <input type="number" placeholder="Qty" value={newOrder.quantity} onChange={(e) => handleOrderChange(e, 'quantity')} className="border p-2 rounded" />
-                          <input type="number" placeholder="Price" value={newOrder.price} onChange={(e) => handleOrderChange(e, 'price')} className="border p-2 rounded" />
-                          <input type="text" placeholder="Note" value={newOrder.note} onChange={(e) => handleOrderChange(e, 'note')} className="border p-2 rounded" />
-                          <button onClick={handleAddOrder} className="bg-blue-500 text-white px-4 py-2 rounded">+</button>
-                        </div>
-
-                        {orders.length > 0 && (
-                          <table className="mt-4 w-full border">
+                      <h1 className='text-xl font-semibold mb-2'>Orders - {selectedCampName || "Select a camp"}</h1>
+                      <div className="grid grid-cols-5 gap-2 mb-4">
+                        <input
+                          type="text"
+                          placeholder="Name"
+                          value={newOrder.name}
+                          onChange={(e) => handleOrderChange(e, 'name')}
+                          className={`border p-2 rounded ${!bookingDetailId ? "bg-gray-200 cursor-not-allowed" : ""}`}
+                          disabled={!bookingDetailId}
+                        />
+                        <input
+                          type="number"
+                          placeholder="Qty"
+                          value={newOrder.quantity}
+                          onChange={(e) => handleOrderChange(e, 'quantity')}
+                          className={`border p-2 rounded ${!bookingDetailId ? "bg-gray-200 cursor-not-allowed" : ""}`}
+                          disabled={!bookingDetailId}
+                        />
+                        <input
+                          type="number"
+                          placeholder="Price"
+                          value={newOrder.price}
+                          onChange={(e) => handleOrderChange(e, 'price')}
+                          className={`border p-2 rounded ${!bookingDetailId ? "bg-gray-200 cursor-not-allowed" : ""}`}
+                          disabled={!bookingDetailId}
+                        />
+                        <input
+                          type="text"
+                          placeholder="Note"
+                          value={newOrder.note}
+                          onChange={(e) => handleOrderChange(e, 'note')}
+                          className={`border p-2 rounded ${!bookingDetailId ? "bg-gray-200 cursor-not-allowed" : ""}`}
+                          disabled={!bookingDetailId}
+                        />
+                        <button
+                          onClick={handleAddOrder}
+                          disabled={!bookingDetailId}
+                          className={`px-4 py-2 bg-blue-500 text-white rounded ${!bookingDetailId ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-600"}`}
+                        >
+                          +
+                        </button>
+                      </div>
+                      {bookingDetailId && (
+                        <div className="overflow-x-auto">
+                          <table className="w-full border border-gray-300">
                             <thead>
-                              <tr>
-                                <th className="border p-2">Name</th>
-                                <th className="border p-2">Quantity</th>
-                                <th className="border p-2">Price</th>
-                                <th className="border p-2">Total</th>
-                                <th className="border p-2">Note</th>
-                                <th className="border p-2">Action</th>
+                              <tr className="bg-gray-200">
+                                <th className="py-2 px-4 border">Name</th>
+                                <th className="py-2 px-4 border text-center">Quantity</th>
+                                <th className="py-2 px-4 border text-center">Price</th>
+                                <th className="py-2 px-4 border text-center">Total</th>
+                                <th className="py-2 px-4 border text-left">Notes</th>
+                                <th className="py-2 px-4 border text-center">Actions</th>
                               </tr>
                             </thead>
                             <tbody>
-                              {orders.map((order, index) => (
-                                <tr key={index}>
-                                  <td className="border p-2">{order.name}</td>
-                                  <td className="border p-2">{order.quantity}</td>
-                                  <td className="border p-2">{formatVND(order.price)}</td>
-                                  <td className="border p-2">{formatVND(order.totalAmount)}</td>
-                                  <td className="border p-2">{order.note}</td>
-                                  <td className="border text-center">
-                                    <button
-                                      onClick={() => handleDeleteOrder(index)}
-                                      className="bg-red-500 text-white px-3 py-1 rounded"
-                                    >
-                                      -
-                                    </button>
+                              {(orders[bookingDetailId] || []).map((order, index) => (
+                                <tr key={index} className="border">
+                                  <td className="py-2 px-4 border">{order.name}</td>
+                                  <td className="py-2 px-4 border text-center">{order.quantity}</td>
+                                  <td className="py-2 px-4 border text-center">{formatVND(order.price)}</td>
+                                  <td className="py-2 px-4 border text-center">{formatVND(order.totalAmount)}</td>
+                                  <td className="py-2 px-4 border">{order.note}</td>
+                                  <td className="py-2 px-4 border text-center">
+                                    <button onClick={() => handleDeleteOrder(index)} className="bg-red-500 text-white px-3 py-1 rounded">❌</button>
                                   </td>
                                 </tr>
                               ))}
                             </tbody>
                           </table>
-                        )}
-                      </div>
-
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
-              <div className='h-1/6 p-4 flex justify-between border-t-2 border-gray-200 bg-white sticky bottom-0'>
+              <div className='h-20 p-4 flex justify-between border-t-2 border-gray-200 bg-white sticky bottom-0'>
                 <h1 className='text-2xl font-bold mb-2'>Final price: {formatVND(calculateTotalAmount())}</h1>
                 <button
                   className='bg-green-500 text-white px-4 py-2 rounded-lg'

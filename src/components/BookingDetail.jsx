@@ -103,8 +103,6 @@ const BookingDetail = ({ selectedReservation, setSelectedReservation, refreshRes
   const handleAccept = async (id) => {
     setLoading(true);
     try {
-      const formData = new FormData();
-      formData.append('status', 'accept');
       await axios.put(`${import.meta.env.VITE_API_BOOKING}/${id}?status=accept`);
       setSelectedReservation(null);
       refreshReservations();
@@ -142,7 +140,7 @@ const BookingDetail = ({ selectedReservation, setSelectedReservation, refreshRes
               Accept
             </button>
             <button
-              className='px-4 py-2 bg-gray-300 text-gray-500 rounded-lg'
+              className='px-4 py-2 bg-gray-300 text-gray-500 rounded-lg ml-2'
               disabled
             >
               Decline
@@ -156,7 +154,6 @@ const BookingDetail = ({ selectedReservation, setSelectedReservation, refreshRes
               className='px-4 py-2 bg-green-500 text-white rounded-lg'
               onClick={() => {
                 handleAccept(id);
-                setSelectedReservation(null);
               }}
             >
               Accept
@@ -292,7 +289,9 @@ const BookingDetail = ({ selectedReservation, setSelectedReservation, refreshRes
               </div>
               <div className='mt-4 flex justify-between'>
                 <h1 className='text-xl font-semibold mb-2'>Total amount: {formatVND(selectedReservation.totalAmount)}</h1>
-                {handleButton(selectedReservation.status)}
+                <div>
+                  {handleButton(selectedReservation.status)}
+                </div>
               </div>
             </div>
           </div>

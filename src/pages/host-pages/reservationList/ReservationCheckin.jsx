@@ -32,10 +32,11 @@ const ReservationCheckin = () => {
             'Content-Type': 'application/json'
           },
           params: {
-            hostId: user.id
+            hostId: user.id,
+            status: 'Accepted',
           }
         });
-        setCheckinReservations(response.data.data.content.filter(reservation => reservation.status === 'Accepted'));
+        setCheckinReservations(response.data.data.content);
       } catch (error) {
         console.error("Error fetching checkin reservations data:", error);
       } finally {
@@ -63,7 +64,7 @@ const ReservationCheckin = () => {
         <div className="flex justify-center items-center h-64 w-full">
           <div className="animate-spin rounded-full border-t-4 border-teal-400 border-solid h-16 w-16"></div>
         </div>
-      ) : (
+      ) : ( 
         <>
           {checkinReservations.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-60">
@@ -93,10 +94,10 @@ const ReservationCheckin = () => {
                         console.log(reservation);
                       }}
                     >
-                      <td className='text-left py-4'>{reservation.user.lastname} {reservation.user.firstname}</td>
-                      <td className='text-left py-4'>{reservation.user.phone}</td>
-                      <td className='text-left py-4'>{reservation.user.email}</td>
-                      <td className='text-left py-4'>{reservation.campSite.name}</td>
+                        <td className='text-left py-4'>{reservation.user.lastname} {reservation.user.firstname}</td>
+                        <td className='text-left py-4'>{reservation.user.phone}</td>
+                        <td className='text-left py-4'>{reservation.user.email}</td>
+                        <td className='text-left py-4'>{reservation.campSite.name}</td>
                       <td className={`text-center py-4 font-bold ${statusColor(reservation.status)}`}>{reservation.status}</td>
                       <td>
                         <FontAwesomeIcon icon={faChevronRight} className='opacity-0 group-hover:opacity-100 transition-opacity' />

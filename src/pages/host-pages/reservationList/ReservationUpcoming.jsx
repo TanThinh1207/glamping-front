@@ -30,18 +30,19 @@ const ReservationUpcoming = () => {
   const fetchUpcomingReservations = async () => {
     setLoading(true);
     try {
+      console.log(user.id);
       const response = await axios.get(`${import.meta.env.VITE_API_BOOKING}`, {
         headers: {
           'Content-Type': 'application/json'
         },
         params: {
-          hostId: user.id
+          hostId: user.id,
+          status: 'Deposit',
         }
       });
 
-      setUpcomingReservations(response.data.data.content.filter(
-        (reservation) => reservation.status === 'Pending' || reservation.status === 'Deposit'
-      ));
+      setUpcomingReservations(response.data.data.content);
+      console.log(upcomingReservations);
     } catch (error) {
       console.error('Error fetching upcoming reservations:', error);
     } finally {

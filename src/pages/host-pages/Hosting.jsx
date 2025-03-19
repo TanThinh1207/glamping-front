@@ -174,7 +174,7 @@
             <Swiper
               modules={[Navigation]}
               spaceBetween={30}
-              slidesPerView={4}
+              slidesPerView={3}
               navigation
             >
               {hostInfo.confirmInfo.map((info) => (
