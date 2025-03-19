@@ -19,7 +19,9 @@ export const BookingProvider = ({ children }) => {
             bookingDetails: [],
             userId: user?.id || null,
             campSiteId: null,
-            totalAmount: 0,
+            checkInTime: localStorage.getItem('checkInDate') || '',
+            checkOutTime: localStorage.getItem('checkOutDate') || '',
+            // totalAmount: 0,
             bookingSelectionRequestList: [],
         };
     });
@@ -29,7 +31,9 @@ export const BookingProvider = ({ children }) => {
             bookingDetails: [],
             userId: user?.id || null,
             campSiteId: null,
-            totalAmount: 0,
+            checkInTime: localStorage.getItem('checkInDate') || '',
+            checkOutTime: localStorage.getItem('checkOutDate') || '',
+            // totalAmount: 0,
             bookingSelectionRequestList: [],
         });
     }, [user?.id]);
@@ -42,7 +46,7 @@ export const BookingProvider = ({ children }) => {
             return prev;
         });
     }, []);
-    
+
 
     const updateServices = useCallback((services) => {
         const serviceList = Object.entries(services)
@@ -66,7 +70,9 @@ export const BookingProvider = ({ children }) => {
                     bookingDetails: [],
                     userId: user?.id || null,
                     campSiteId,
-                    totalAmount: 0,
+                    checkInTime: localStorage.getItem('checkInDate') || '',
+                    checkOutTime: localStorage.getItem('checkOutDate') || '',
+                    // totalAmount: 0,
                     bookingSelectionRequestList: [],
                 };
             }
@@ -127,10 +133,9 @@ export const BookingProvider = ({ children }) => {
             checkOutTime: checkOut
         }));
     };
-    
+
 
     useEffect(() => {
-        // only save booking if user is logged in
         if (user?.id) {
             localStorage.setItem("booking", JSON.stringify(booking));
         }

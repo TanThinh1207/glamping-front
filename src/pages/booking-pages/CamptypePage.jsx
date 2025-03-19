@@ -15,6 +15,7 @@ import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import dayjs from 'dayjs';
 
 const CamptypePage = () => {
     const [loading, setLoading] = useState(true);
@@ -44,6 +45,30 @@ const CamptypePage = () => {
         setIsExpanded(!isExpanded);
     };
 
+    // Function to calculate the total price based on check-in/check-out dates and quantity
+    const calculateTotalPrice = (camptype) => {
+        if (!checkIn || !checkOut) return null;
+
+        const checkInDate = dayjs(checkIn);
+        const checkOutDate = dayjs(checkOut);
+        const diffDays = checkOutDate.diff(checkInDate, 'day');
+
+        if (diffDays <= 0) return null;
+
+        let totalPrice = 0;
+        let currentDate = checkInDate;
+
+        // Iterate through each day of the stay
+        for (let i = 0; i < diffDays; i++) {
+            // Check if the current day is a weekend (Saturday or Sunday or Friday)
+            const isWeekend = currentDate.day() === 0 || currentDate.day() === 6 || currentDate.day() === 5;
+            totalPrice += isWeekend ? camptype.weekendRate : camptype.price;
+            currentDate = currentDate.add(1, 'day');
+        }
+
+        // Multiply by the selected quantity
+        return totalPrice * (quantities[camptype.id] || 1);
+    };
 
     const refreshDates = () => {
         const newCheckIn = localStorage.getItem('checkInDate') || '';
@@ -128,7 +153,6 @@ const CamptypePage = () => {
             }
         } else {
             toast.info('Please login to continue');
-
         }
     }
 
@@ -142,6 +166,32 @@ const CamptypePage = () => {
         setModalOpen(false);
         resetBooking();
         proceedWithSelection(pendingSelection);
+    };
+
+    // Calculate nights between check-in and check-out
+    const calculateNights = () => {
+        if (!checkIn || !checkOut) return 0;
+        const checkInDate = dayjs(checkIn);
+        const checkOutDate = dayjs(checkOut);
+        return checkOutDate.diff(checkInDate, 'day');
+    };
+
+    // Check if the date range includes weekends
+    const hasWeekends = () => {
+        if (!checkIn || !checkOut) return false;
+
+        const checkInDate = dayjs(checkIn);
+        const checkOutDate = dayjs(checkOut);
+        let currentDate = checkInDate;
+
+        while (currentDate.isBefore(checkOutDate)) {
+            if (currentDate.day() === 0 || currentDate.day() === 6) {
+                return true;
+            }
+            currentDate = currentDate.add(1, 'day');
+        }
+
+        return false;
     };
 
     if (loading) {
@@ -202,8 +252,6 @@ const CamptypePage = () => {
                         </button>
                     )}
                 </p>
-
-
             </div>
             <p className='text-5xl font-canto'>Select accomodation</p>
             <SearchBar onSearch={refreshDates} />
@@ -278,14 +326,40 @@ const CamptypePage = () => {
                                 <div className='flex flex-col items-center justify-center'>
                                     <p className='font-canto text-2xl'>Best Flexible Rate</p>
                                     <p className='text-gray-500 text-lg pt-3 gap-3'><span className='pr-1'><FontAwesomeIcon icon={faMugHot} /></span>Breakfast included</p>
+                                    {/* Display pricing breakdown */}
+                                    {checkIn && checkOut && (
+                                        <div className="mt-2 text-sm text-gray-600">
+                                            <p>Regular rate: VND{camptype.price.toLocaleString("vi-VN")}/night</p>
+                                            <p>Weekend rate: VND{camptype.weekendRate.toLocaleString("vi-VN")}/night</p>
+                                            <p>Stay duration: {calculateNights()} night(s)</p>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className='bg-white flex items-center gap-6 p-4 rounded-xl border border-purple-100'>
                                     {camptype.availableSlot > 0 ? (
                                         <>
-                                            <p className='tracking-wide text-purple-900'>Price per night: VND{camptype.price.toLocaleString("vi-VN")}</p>
+                                            {calculateTotalPrice(camptype) ? (
+                                                <div className="flex flex-col">
+                                                    <p className='tracking-wide text-purple-900'>
+                                                        Total: VND{calculateTotalPrice(camptype).toLocaleString("vi-VN")}
+                                                    </p>
+                                                    <p className="text-xs text-gray-500">
+                                                        For {calculateNights()} night(s) × {quantities[camptype.id] || 1} {quantities[camptype.id] > 1 ? 'rooms' : 'room'}
+                                                    </p>
+                                                </div>
+                                            ) : (
+                                                <p className='tracking-wide text-purple-900'>
+                                                    Price per night: VND{camptype.price.toLocaleString("vi-VN")}
+                                                    {hasWeekends() && (
+                                                        <span className="block text-xs text-gray-500">
+                                                            Weekend: VND{camptype.weekendRate.toLocaleString("vi-VN")}
+                                                        </span>
+                                                    )}
+                                                </p>
+                                            )}
                                             <button
                                                 className='bg-transparent border border-purple-900 text-purple-900 hover:bg-purple-900 
-                                            hover:text-white rounded-full px-8 py-4 transform transition duration-300'
+                hover:text-white rounded-full px-8 py-4 transform transition duration-300'
                                                 onClick={() => handleCamptypeSelection(camptype)}
                                             >
                                                 <p>Reservation Inquiry</p>

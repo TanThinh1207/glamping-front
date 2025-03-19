@@ -9,7 +9,7 @@ const Sidebar = ({ items }) => {
   const location = useLocation();
 
   const logout = () => {
-    sessionStorage.clear();
+    localStorage.clear();
     setUser(null);
     navigate('/');
   };

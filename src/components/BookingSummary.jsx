@@ -3,7 +3,6 @@ import { useBooking } from "../context/BookingContext";
 import { fetchCampsiteById, fetchCamptypeById, createBooking } from "../service/BookingService";
 import dayjs from "dayjs";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
 
 const BookingSummary = ({ selectedServices = [] }) => {
   const [loading, setLoading] = useState(true);
@@ -19,10 +18,10 @@ const BookingSummary = ({ selectedServices = [] }) => {
 
   const campsiteId = booking.campSiteId;
   const [campsite, setCampsite] = useState({});
-  console.log(campsite)
   const [camptypes, setCamptypes] = useState([]);
   const [nights, setNights] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [capacityLimit, setCapacityLimit] = useState(0);
 
   const handleConfirmBooking = async () => {
     if (!booking.userId) {
@@ -39,16 +38,18 @@ const BookingSummary = ({ selectedServices = [] }) => {
       const responseData = await createBooking(booking);
       const bookingId = responseData.data.id;
       const bookingName = responseData.data.campSite.name;
-      console.log("Booking Response:", responseData);
-      const depositRate = campsite?.depositRate ? parseFloat(campsite.depositRate) : 1;
-      const depositPrice = parseFloat(responseData.data.totalAmount) * parseFloat(depositRate);
+      const depositRate = parseFloat(responseData.data.campSite.depositRate || 1);
+      const totalDeposit = depositRate * totalPrice;
 
+      console.log("Booking Response:", responseData);
+
+      // Send the full total price to payment, not just the deposit
       const paymentResponse = await fetch(`${import.meta.env.VITE_API_PAYMENT}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           bookingId: bookingId,
-          amount: depositPrice,
+          amount: totalDeposit,
           name: bookingName,
           currency: "vnd",
         }),
@@ -58,7 +59,6 @@ const BookingSummary = ({ selectedServices = [] }) => {
 
       if (paymentResponse.ok) {
         window.open(paymentData.sessionUrl, '_blank');
-
       } else {
         throw new Error(paymentData.message || "Payment session creation failed.");
       }
@@ -113,35 +113,57 @@ const BookingSummary = ({ selectedServices = [] }) => {
     }
   }, [campsiteId]);
 
+  // Calculate total capacity limit for extra services
+  useEffect(() => {
+    if (booking?.bookingDetails?.length > 0 && camptypes.length > 0) {
+      let totalCapacity = 0;
+      booking.bookingDetails.forEach((item) => {
+        const campType = camptypes.find((type) => type.id === item.campTypeId);
+        if (campType) {
+          totalCapacity += campType.capacity * item.quantity;
+        }
+      });
+      setCapacityLimit(totalCapacity);
+    }
+  }, [booking, camptypes]);
+
+  // Calculate total price including weekend rates
   useEffect(() => {
     try {
       let total = 0;
 
-      if (booking?.bookingDetails?.length > 0 && camptypes.length > 0) {
+      if (booking?.bookingDetails?.length > 0 && camptypes.length > 0 && checkInDate && checkOutDate) {
         booking.bookingDetails.forEach((item) => {
           const campType = camptypes.find((type) => type.id === item.campTypeId);
           if (campType) {
-            total += campType.price * item.quantity * nights;
+            // Calculate price day by day considering weekend rates
+            let subtotal = 0;
+            let currentDate = checkInDate.clone();
+
+            while (currentDate.isBefore(checkOutDate)) {
+              // Check if the current day is a weekend (Friday, Saturday, or Sunday)
+              const isWeekend = currentDate.day() === 5 || currentDate.day() === 6 || currentDate.day() === 0;
+              subtotal += isWeekend ? campType.weekendRate : campType.price;
+              currentDate = currentDate.add(1, 'day');
+            }
+
+            total += subtotal * item.quantity;
           }
         });
       }
 
+      // Add extra services
       selectedServices.forEach((service) => {
         total += parseFloat(service.price) * parseFloat(service.quantity);
       });
 
-      
-
-      const depositRate = campsite?.depositRate ? parseFloat(campsite.depositRate) : 1;
-      console.log(total * depositRate)
-      setTotalPrice(total * depositRate);
-      updateTotalAmount(total * depositRate);
+      setTotalPrice(total);
+      updateTotalAmount(total);
     } catch (error) {
       console.error("Error calculating total price:", error);
       setError("Error calculating total price.");
     }
-
-  }, [booking, camptypes, nights, selectedServices, campsite]);
+  }, [booking, camptypes, checkInDate, checkOutDate, selectedServices, updateTotalAmount]);
 
   if (loading) {
     return (
@@ -174,6 +196,19 @@ const BookingSummary = ({ selectedServices = [] }) => {
           <h3 className="text-xl font-semibold">Selected Accommodations</h3>
           {booking.bookingDetails.map((item, index) => {
             const campType = camptypes.find((type) => type.id === item.campTypeId);
+
+            // Calculate camptype price with weekend rates
+            let camptypeTotal = 0;
+            if (campType && checkInDate && checkOutDate) {
+              let currentDate = checkInDate.clone();
+              while (currentDate.isBefore(checkOutDate)) {
+                const isWeekend = currentDate.day() === 5 || currentDate.day() === 6 || currentDate.day() === 0;
+                camptypeTotal += isWeekend ? campType.weekendRate : campType.price;
+                currentDate = currentDate.add(1, 'day');
+              }
+              camptypeTotal *= item.quantity;
+            }
+
             return (
               <div key={index} className="mt-2 text-xl">
                 <p>
@@ -183,6 +218,9 @@ const BookingSummary = ({ selectedServices = [] }) => {
                 <p>
                   <span className="font-semibold">Quantity:</span> {item.quantity}
                 </p>
+                <p>
+                  <span className="font-semibold">Total:</span> VND {camptypeTotal.toLocaleString("vi-VN")}
+                </p>
               </div>
             );
           })}
@@ -190,11 +228,18 @@ const BookingSummary = ({ selectedServices = [] }) => {
       ) : (
         <p className="text-gray-600">No accommodations selected.</p>
       )}
-      <p className="text-xl font-semibold">Extra Services</p>
-      <div className="text-xl">
-        {selectedServices.length > 0 ? selectedServices.map(service => (
-          <p key={service.id}>{service.name} x{service.quantity}</p>
-        )) : <p>No extra services selected.</p>}
+
+      <div className="mb-3">
+        <p className="text-xl font-semibold">Extra Services</p>
+        <p className="text-sm text-gray-600">Maximum capacity: {capacityLimit} people</p>
+        <div className="text-xl">
+          {selectedServices.length > 0 ? selectedServices.map(service => (
+            <div key={service.id} className="flex justify-between">
+              <p>{service.name} x{service.quantity}</p>
+              <p>VND {(service.price * service.quantity).toLocaleString("vi-VN")}</p>
+            </div>
+          )) : <p>No extra services selected.</p>}
+        </div>
       </div>
 
       <div className="border-t border-gray-300 pt-3">
@@ -204,9 +249,8 @@ const BookingSummary = ({ selectedServices = [] }) => {
 
       <div className="pt-3">
         <p className="text-lg">
-          You have to deposit {(parseFloat(campsite.depositRate) * parseFloat(totalPrice)).toLocaleString("vi-VN")} VND
+          Required deposit: VND {(parseFloat(campsite.depositRate || 1) * parseFloat(totalPrice)).toLocaleString("vi-VN")}
         </p>
-
       </div>
 
       <button className="bg-black w-full text-white text-lg border-black border uppercase my-5 p-4 transform duration-300 ease-in-out hover:text-black hover:bg-transparent hover:border hover:border-black mr-2"
