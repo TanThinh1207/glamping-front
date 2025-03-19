@@ -9,6 +9,7 @@ export const UserProvider = ({ children }) => {
     });
 
     const login = (userData) => {
+        localStorage.clear();
         setUser(userData);
         localStorage.setItem("user", JSON.stringify(userData));
     };

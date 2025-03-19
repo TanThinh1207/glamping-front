@@ -31,8 +31,8 @@ const LoginPage = () => {
       console.log("Login Response:", data);
 
       if (response.ok) {
-        localStorage.setItem("accessToken", data.data.accessToken);
         login(data.data.user)
+        localStorage.setItem("accessToken", data.data.accessToken);
         toast.success("Login successful!");
       } else {
         toast.error("Login error code: " + data.statusCode)
