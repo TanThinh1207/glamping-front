@@ -78,7 +78,6 @@ const CampType = () => {
         capacity: numberOfGuests,
         price: campTypePrice,
         weekendRate: campTypeWeekendRate,
-        updatedAt: new Date().toISOString(),
         quantity: campTypeQuantity,
         status: true,
         facilities: selectedFacilities,
