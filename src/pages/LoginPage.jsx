@@ -21,7 +21,7 @@ const LoginPage = () => {
       const user = result.user;
       const idToken = await user.getIdToken();
 
-      const response = await fetch("http://localhost:8080/api/v1/auth/verify", {
+      const response = await fetch(`${import.meta.env.VITE_API_LOGIN}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idToken }),
