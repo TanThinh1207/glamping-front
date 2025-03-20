@@ -4,9 +4,11 @@ import { auth, provider } from "../config/firebaseConfig";
 import { toast } from "sonner";
 import { useUser } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
+import { useBooking } from "../context/BookingContext";
 
 const LoginPage = () => {
   const { user, login } = useUser();
+  const { resetBooking, booking } = useBooking();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,7 +33,10 @@ const LoginPage = () => {
       console.log("Login Response:", data);
 
       if (response.ok) {
-        login(data.data.user)
+        login(data.data.user);
+        booking.userId = data.data.user.id;
+        console.log("Booking:", booking);
+        localStorage.setItem("booking", JSON.stringify(booking));
         localStorage.setItem("accessToken", data.data.accessToken);
         toast.success("Login successful!");
       } else {

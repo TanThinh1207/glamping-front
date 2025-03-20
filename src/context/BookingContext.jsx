@@ -15,6 +15,7 @@ export const BookingProvider = ({ children }) => {
                 return parsed;
             }
         }
+        console.log('user', user);
         return {
             bookingDetails: [],
             userId: user?.id || null,
