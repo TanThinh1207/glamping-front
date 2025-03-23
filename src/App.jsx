@@ -1,4 +1,5 @@
 import "./index.css";
+import { Navigate } from "react-router-dom";
 import { createBrowserRouter, RouterProvider, redirect } from 'react-router-dom'
 import { BookingProvider } from './context/BookingContext';
 import { UserProvider } from './context/UserContext';
@@ -29,6 +30,8 @@ import Hosting from './pages/host-pages/Hosting';
 import Calendar from './pages/host-pages/Calendar';
 import Listings from './pages/host-pages/Listings';
 import Reservations from './pages/host-pages/Reservations';
+import DetailCampsite from './pages/host-pages/DetailCampsite';
+import Earnings from "./pages/host-pages/Earnings";
 
 // Reservation Subpages
 import ReservationUpcoming from './pages/host-pages/reservationList/ReservationUpcoming';
@@ -37,6 +40,16 @@ import ReservationCanceled from './pages/host-pages/reservationList/ReservationC
 import ReservationAll from './pages/host-pages/reservationList/ReservationAll';
 import ReservationCheckin from './pages/host-pages/reservationList/ReservationCheckin';
 import ReservationCheckout from './pages/host-pages/reservationList/ReservationCheckout';
+
+// Campsite Editor
+import EditPhoto from './pages/host-pages/editCampsite/EditPhoto';
+import EditTitle from './pages/host-pages/editCampsite/EditTitle';
+import EditDescription from './pages/host-pages/editCampsite/EditDescription';
+import EditPlaceType from './pages/host-pages/editCampsite/EditPlaceType';
+import EditAmenities from './pages/host-pages/editCampsite/EditAmenities';
+import EditLocation from './pages/host-pages/editCampsite/EditLocation';
+import EditService from './pages/host-pages/editCampsite/EditService';
+import EditCampType from './pages/host-pages/editCampsite/EditCampType';
 
 function App() {
   const router = createBrowserRouter([
@@ -72,6 +85,7 @@ function App() {
         { path: "", element: <Hosting /> },
         { path: "calendar", element: <Calendar /> },
         { path: "listings", element: <Listings /> },
+        { path: "earnings", element: <Earnings /> },
         {
           path: "reservations",
           element: <Reservations />,
@@ -86,7 +100,21 @@ function App() {
           ]
         },
         { path: "create-campsite/:step", element: <CreateCampsiteStepPage /> },
-
+        {
+          path: "listings/editor/:id/details",
+          element: <DetailCampsite />,
+          children: [
+            { index: true, element: <Navigate to="photo" replace /> },
+            { path: "photo", element: <EditPhoto /> },
+            { path: "title", element: <EditTitle /> },
+            { path: "description", element: <EditDescription /> },
+            { path: "place-type", element: <EditPlaceType /> },
+            { path: "amenities", element: <EditAmenities /> },
+            { path: "location", element: <EditLocation /> },
+            { path: "service", element: <EditService /> },
+            { path: "camp-type", element: <EditCampType /> },
+          ]
+        },
       ]
     },
     {

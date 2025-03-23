@@ -20,6 +20,7 @@ const getMenuItems = (path) => {
                 { name: "Calendar", link: "/hosting/calendar" },
                 { name: "Listings", link: "/hosting/listings" },
                 { name: "Reservations", link: "/hosting/reservations" },
+                { name: "Earnings", link: "/hosting/earnings" },
             ];
         default:
             return [
@@ -131,7 +132,7 @@ const NavigationBar = () => {
     const menuItems = getMenuItems(location.pathname);
     return (
         <div
-            className={`fixed w-full z-10 py-3 transition-colors duration-500 ${isScrolled || !isHomePage ? "bg-white" : "bg-transparent"
+            className={`fixed w-full z-30 py-3 transition-colors duration-500 ${isScrolled || !isHomePage ? "bg-white" : "bg-transparent"
                 }`}
         >
             <div className="flex items-center px-3 pt-3">

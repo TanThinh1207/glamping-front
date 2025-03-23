@@ -129,12 +129,6 @@ const CreateCampsiteFooter = () => {
               </button>
             )}
             {step === "camp-type" ? (
-              // <button
-              //   className="bg-gradient-to-r from-green-500 to-green-600 text-white px-5 py-3 rounded-md text-xl font-semibold mx-4"
-              //   onClick={handleFinish}
-              // >
-              //   Finish
-              // </button>
               <button
                 className="bg-purple-900 text-white hover:bg-transparent border border-purple-900 hover:text-purple-900 px-5 py-3 rounded-md text-xl font-semibold mx-4 flex items-center justify-center transform transition duration-300"
                 onClick={handleFinish}

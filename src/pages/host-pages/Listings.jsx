@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import image from '../../assets/ex1.jpg';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
@@ -101,7 +100,7 @@ const Listings = () => {
                                     <tr
                                         key={listing.id}
                                         className="cursor-pointer hover:bg-gray-100 group"
-                                        onClick={() => navigate(`/hosting/editor/${listing.id}`)}
+                                        onClick={() => navigate(`/hosting/listings/editor/${listing.id}/details`)}
                                     >
                                         <td className="p-4 flex items-center gap-3">
                                             <img src={listing.imageList[0]?.path} alt={listing.name} className="w-12 h-12 rounded-md object-cover" />

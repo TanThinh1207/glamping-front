@@ -181,17 +181,6 @@ const BookingDetail = ({ selectedReservation, setSelectedReservation, refreshRes
             </button>
           </>
         );
-      case 'Check_In':
-        return (
-          <>
-            <button
-              className='bg-green-500 text-white px-4 py-2 rounded-lg'
-              onClick={() => handleCheckout(selectedReservation.id)}
-            >
-              Check out
-            </button>
-          </>
-        );
     }
   }
   return (

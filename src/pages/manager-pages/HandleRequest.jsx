@@ -1,12 +1,15 @@
 import axios from 'axios'
 import React, { useEffect, useState, useRef } from 'react'
 import { TablePagination } from '@mui/material'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faChevronRight } from '@fortawesome/free-solid-svg-icons'
 
 const HandleRequest = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [id, setId] = useState(null);
     const [message, setMessage] = useState('');
-
+    const [campsite, setCampsite] = useState(null);
+    const googleMapUrl = `https://www.google.com/maps?q=${campsite?.latitude},${campsite?.longitude}&hl=es;z=14&output=embed`;
     //Handle Click outside of pop-up
     const modalRef = useRef(null);
 
@@ -126,7 +129,16 @@ const HandleRequest = () => {
         setIsOpen(false);
         setId(null);
         setMessage('');
-    }
+        setCampsite(null);
+    };
+
+    const handleCloseModal = () => {
+        setCampsite(null);
+    };
+
+    useEffect(() => {
+        console.log(campsite);
+    }, [campsite]);
     return (
         <div className='w-full h-screen bg-white px-20 py-4'>
             <div>
@@ -138,45 +150,100 @@ const HandleRequest = () => {
                         <div className="animate-spin rounded-full border-t-4 border-teal-400 border-solid h-16 w-16"></div>
                     </div>
                 ) : (
-                    <table className='w-full'>
-                        <thead>
-                            <tr className='border-b-2 border-gray-300'>
-                                <th className='text-left py-4'>Campsite</th>
-                                <th className='text-left py-4'>Location</th>
-                                <th className='text-center py-4'>Status</th>
-                                <th className='text-center py-4'>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {createCampsiteRequests.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((request) => (
-                                <tr key={request.id} className='border-b border-gray-300'>
-                                    <td className="p-4 flex items-center gap-5">
-                                        <img src={request.imageList[0]?.path} alt={request.name} className="w-12 h-12 rounded-md object-cover" />
-                                        {request.name}
-                                    </td>
-                                    <td className='py-4'>{request.city}</td>
-                                    <td className={`py-4 text-center ${statusColor(request.status)}`}>{request.status}</td>
-                                    <td className='py-4 text-center space-x-4'>
-                                        <button
-                                            className='bg-green-500 text-white rounded-md px-4 py-2'
-                                            onClick={() => handleApprove(request.id)}
-                                        >
+                    <>
+                        <table className='w-full'>
+                            <thead>
+                                <tr className='border-b-2 border-gray-300'>
+                                    <th className='text-left py-4'>Campsite</th>
+                                    <th className='text-left py-4'>Location</th>
+                                    <th className='text-center py-4'>Status</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {createCampsiteRequests.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((request) => (
+                                    <tr
+                                        key={request.id}
+                                        className="cursor-pointer hover:bg-gray-100 group"
+                                        onClick={() => setCampsite(request)}
+                                    >
+                                        <td className="p-4 flex items-center gap-5">
+                                            <img src={request.imageList[0]?.path} alt={request.name} className="w-12 h-12 rounded-md object-cover" />
+                                            {request.name}
+                                        </td>
+                                        <td className='py-4'>{request.city}</td>
+                                        <td className={`py-4 font-bold text-center ${statusColor(request.status)}`}>{request.status}</td>
+                                        <td>
+                                            <FontAwesomeIcon icon={faChevronRight} className='opacity-0 group-hover:opacity-100 transition-opacity' />
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        <TablePagination
+                            component="div"
+                            count={createCampsiteRequests.length}
+                            page={page}
+                            onPageChange={handleChangePage}
+                            rowsPerPage={rowsPerPage}
+                            onRowsPerPageChange={handleChangeRowsPerPage}
+                            rowsPerPageOptions={[5, 10, 25]}
+                            className='p-4'
+                        />
+                    </>
+                )}
+                {campsite && (
+                    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
+                        <div ref={modalRef} className='bg-white shadow-md w-3/5 h-4/5 relative rounded-xl flex flex-col'>
+                            <button
+                                className="absolute -top-2 -right-2 bg-red-500 text-xl p-1 rounded-full"
+                                onClick={handleCloseModal}
+                            >
+                                ✖
+                            </button>
+                            <div className='flex w-full h-full'>
+                                <div className='relative w-1/2 h-full overflow-y-auto'>
+                                    <div className='absolute bg-black bg-opacity-50 text-white text-sm font-bold px-4 py-2 rounded-lg'>
+                                        {campsite.name}
+                                    </div>
+                                    <img src={campsite.imageList[0].path} alt='campsite' className='w-auto h-full object-cover rounded-l-xl' />
+                                </div>
+                                <div className='w-1/2 h-full flex flex-col'>
+                                    <div className='flex-1 overflow-y-auto p-4'>
+                                        <h1 className='text-xl font-semibold'>Description</h1>
+                                        <p className='text-gray-500'>{campsite.description}</p>
+
+                                        <h1 className='text-xl font-semibold mt-2'>Location</h1>
+                                        <iframe width="100%" height="200" className='rounded-lg my-2' src={googleMapUrl} allowFullScreen />
+                                        <h1 className='font-semibold text-gray-500'>{campsite.address}, {campsite.city}</h1>
+
+                                        <h1 className='text-xl font-semibold mt-2'>Place type</h1>
+                                        <p className='text-gray-500'>{campsite.campSitePlaceTypeList.map((placeType) => placeType.name).join(", ")}</p>
+
+                                        <h1 className='text-xl font-semibold mt-2'>Amenities</h1>
+                                        <p className='text-gray-500'>{campsite.campSiteUtilityList.map((utility) => utility.name).join(", ")}</p>
+
+                                        <h1 className='text-xl font-semibold mt-2'>Camp Type</h1>
+                                        <h1 className='text-gray-500'>{campsite.campSiteCampTypeList?.map((type) => type.type).join(", ")}</h1>
+
+                                        <h1 className='text-xl font-semibold mt-2'>Service</h1>
+                                        <h1 className='text-gray-500 mb-2'>{campsite.campSiteSelectionsList?.map((service) => service.name).join(", ")}</h1>
+                                    </div>
+
+                                    {/* Fixed Bottom Buttons */}
+                                    <div className='p-2 flex justify-end space-x-4 bg-white sticky bottom-0 border-t'>
+                                        <button className='bg-green-500 text-white rounded-md px-4 py-2' onClick={() => handleApprove(campsite.id)}>
                                             Approve
                                         </button>
-                                        <button
-                                            className='bg-red-500 text-white rounded-md px-4 py-2 '
-                                            onClick={() => {
-                                                setIsOpen(true);
-                                                setId(request.id);
-                                            }}
-                                        >
+                                        <button className='bg-red-500 text-white rounded-md px-4 py-2' onClick={() => { setIsOpen(true); setId(campsite.id); }}>
                                             Reject
                                         </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 )}
             </div>
             {isOpen && (
@@ -205,19 +272,6 @@ const HandleRequest = () => {
                         </div>
                     </div>
                 </div>
-            )}
-
-            {!loading && (
-                <TablePagination
-                    component="div"
-                    count={createCampsiteRequests.length}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    rowsPerPage={rowsPerPage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                    rowsPerPageOptions={[5, 10, 25]}
-                    className='p-4'
-                />
             )}
         </div>
     )
