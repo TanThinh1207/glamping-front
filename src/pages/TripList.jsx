@@ -46,7 +46,6 @@ const TripList = () => {
 
             const data = await response.json();
             setServices(data.data.content);
-            console.log(data.data.content);
 
         } catch (error) {
             setError(error.message);
@@ -270,7 +269,11 @@ const TripList = () => {
                         <div className="max-w-4xl mx-auto">
                             <h2 className="font-canto text-3xl mb-6">My Booking</h2>
 
-                            {bookedList && bookedList.length > 0 ? (
+                            {loading ? (
+                                <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-80 z-50">
+                                    <div className="animate-spin rounded-full border-t-4 border-teal-400 border-solid h-16 w-16"></div>
+                                </div>
+                            ) : bookedList && bookedList.length > 0 ? (
                                 bookedList.map((booking, index) => (
                                     <OrderCard key={index} booking={booking} />
                                 ))
