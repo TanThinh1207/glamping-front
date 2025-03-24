@@ -28,6 +28,7 @@
     "@mui/material": "^6.4.7",
     "@mui/x-date-pickers": "^7.27.1",
     "@rollup/plugin-terser": "^0.4.4",
+    "@stomp/stompjs": "^7.1.0",
     "axios": "^1.7.9",
     "chart.js": "^4.4.7",
     "chartjs": "^0.3.24",
@@ -44,6 +45,7 @@
     "react-leaflet": "^4.2.1",
     "react-router-dom": "^7.1.1",
     "recharts": "^2.15.1",
+    "sockjs-client": "^1.6.1",
     "sonner": "^1.7.1",
     "svgo": "^3.3.2",
     "swiper": "^11.2.5"

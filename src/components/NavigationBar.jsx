@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faUser, faTimes, faCartShopping } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faUser, faTimes, faCartShopping, faComment } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import "../css/NavigationBar.css";
 import logo from "../assets/word-logo.png";
@@ -79,7 +79,7 @@ const NavigationBar = () => {
     // }, [booking]);
 
     const miniItems = [
-        { name: "Glamping", link: "/glamping" },
+        { name: "Campsite", link: "/campsite" },
         { name: "About", link: "/about" },
         { name: "Become a Host", link: "/hosting" },
         { name: "My Account", link: isLoggedIn ? "/account" : "/login" },
@@ -118,6 +118,12 @@ const NavigationBar = () => {
                             className="font-canto uppercase text-xs hidden xl:inline-block">
                             <FontAwesomeIcon className="cursor-pointer hover:scale-110 transition-transform duration-200" icon={faUser} />
                             <span className="pl-1">My Account</span>
+                        </Link>
+                        <Link
+                            to="/messages"
+                            className="font-canto uppercase text-xs hidden xl:inline-block">
+                            <FontAwesomeIcon className="cursor-pointer hover:scale-110 transition-transform duration-200" icon={faComment} />
+                            <span className="pl-1">Messages</span>
                         </Link>
                         <Link to="/trip" className="relative font-canto uppercase text-xs hidden xl:inline-block">
                             <FontAwesomeIcon className="cursor-pointer hover:scale-110 transition-transform duration-200 pr-1" icon={faCartShopping} />

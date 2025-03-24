@@ -9,7 +9,6 @@ import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
 import Modal from '../../components/Modal'
 import { useUser } from '../../context/UserContext'
-import ex1 from '../../assets/thumb.jpg'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
@@ -256,10 +255,23 @@ const CamptypePage = () => {
             <p className='text-5xl font-canto'>Select accomodation</p>
             <SearchBar onSearch={refreshDates} />
             <div className="mb-16 relative">
-                <h2 className="font-canto text-3xl mb-8 pb-4 border-b border-gray-200">
-                    Campsite Amenities
-                </h2>
-
+                <div className='flex justify-between items-center pb-2'>
+                    <h2 className="font-canto text-3xl">
+                        Campsite Amenities
+                    </h2>
+                    <button
+                        className='bg-transparent border border-purple-900 text-purple-900 hover:bg-purple-900 
+                        hover:text-white px-8 py-3 transform transition duration-300 font-canto text-lg'
+                        onClick={() => navigate('/messages', { 
+                            state: { 
+                              recipientId: campsite?.user.id
+                            } 
+                          })}
+                    >
+                        <p>Contact Property</p>
+                    </button>
+                </div>
+                <hr />
                 <div className="flex overflow-x-auto scrollbar-hide space-x-6 px-4">
                     {campsite?.campSiteUtilityList.map((utility, index) => (
                         <div

@@ -50,6 +50,7 @@ import EditAmenities from './pages/host-pages/editCampsite/EditAmenities';
 import EditLocation from './pages/host-pages/editCampsite/EditLocation';
 import EditService from './pages/host-pages/editCampsite/EditService';
 import EditCampType from './pages/host-pages/editCampsite/EditCampType';
+import Messages from "./pages/Messages";
 
 function App() {
   const router = createBrowserRouter([
@@ -76,6 +77,7 @@ function App() {
         { path: "account", element: <Account /> },
         { path: "trip", element: <TripList /> },
         { path: "complete-booking", element: <CompleteBookingPage /> },
+        { path: "messages", element: <Messages /> }
       ]
     },
     {

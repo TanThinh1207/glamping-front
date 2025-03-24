@@ -29,3 +29,12 @@ export const fetchUserData = async (id) => {
         throw new Error(error.response?.data?.message || error.message);
     }
 };
+
+export const fetchUserList = async () => {
+    try {
+        const response = await axios.get(import.meta.env.VITE_API_GET_USERS);
+        return response.data.data.content;
+    } catch (error) {
+        throw new Error(error.response?.data?.message || error.message);
+    }
+}

@@ -32,7 +32,7 @@ const Earnings = () => {
         console.log('Start Date:', startDate.toISOString().split('T')[0]);
         console.log('End Date:', endDate.toISOString().split('T')[0]);
 
-        const response = await axios.get(`${import.meta.env.VITE_API_REVENUE}/${user.id}`, {
+        const response = await axios.get(`${import.meta.env.VITE_API_REVENUE}/26`, {
           params: {
             startDate: startDate.toISOString().split('T')[0],
             endDate: endDate.toISOString().split('T')[0],
