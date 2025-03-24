@@ -2,36 +2,42 @@ import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import axios from "axios";
 
-export let stompClient = null;
 const SERVER_URL = "http://localhost:8080/ws";
+let activeClient = null;
 
-export const connect = (onConnected) => {
-  const socket = new SockJS(SERVER_URL);
-  stompClient = new Client({
-    webSocketFactory: () => socket,
-    reconnectDelay: 5000,
-    onConnect: () => {
-      onConnected();
-    },
-    onStompError: (frame) => {
-      console.error("WebSocket Error:", frame.headers["message"]);
-    },
+export const connect = () => {
+  return new Promise((resolve, reject) => {
+    if (activeClient?.connected) {
+      resolve(activeClient);
+      return;
+    }
+    const socket = new SockJS(SERVER_URL);
+    const client = new Client({
+      webSocketFactory: () => socket,
+      reconnectDelay: 5000,
+      onConnect: () => {
+        activeClient = client;
+        resolve(client);
+      },
+      onStompError: (frame) => reject(frame),
+    });
+
+    client.activate();
   });
-  stompClient.activate();
-  return stompClient;
 };
 
 export const subscribeToPrivateMessages = (userId, callback) => {
-  if (stompClient && stompClient.connected) {
-    return stompClient.subscribe(`/topic/private.${userId}`, (message) => {
+  if (activeClient?.connected) {
+    return activeClient.subscribe(`/topic/private.${userId}`, (message) => {
       callback(JSON.parse(message.body));
     });
   }
+  return null;
 };
 
 export const sendMessageToUser = (senderId, content, recipientId) => {
-  if (stompClient && stompClient.connected) {
-    stompClient.publish({
+  if (activeClient?.connected) {
+    activeClient.publish({
       destination: "/app/sendToUser",
       body: JSON.stringify({ senderId, content, recipientId }),
     });
@@ -41,18 +47,21 @@ export const sendMessageToUser = (senderId, content, recipientId) => {
 };
 
 export const getRecipientsByUserId = async (userId) => {
-    try {
-        const response = await axios.get(`${import.meta.env.VITE_API_CHAT}/recipients`, {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            params: {
-                userId: userId,
-            }
-        })
-        console.log(response.data);
-        return response.data;
-    } catch (error) {
-        throw new Error(error.response?.data?.message || error.message);
-    }
-}
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_CHAT}/recipients`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        params: {
+          userId: userId,
+        },
+      }
+    );
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || error.message);
+  }
+};

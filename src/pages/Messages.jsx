@@ -84,28 +84,33 @@ function Messages() {
 
   // WebSocket connection and message subscription
   useEffect(() => {
-    const setupWebSocket = () => {
-      connect();
+    let subscription;
+    let isMounted = true;
+
+    const setupWebSocket = async () => {
+      const client = await connect();
+      if (!isMounted) return;
+      setStompClient(client);
+      setIsConnected(true);
 
       if (userId && recipientId) {
-        subscribeToPrivateMessages(userId, (message) => {
+        subscription = subscribeToPrivateMessages(userId, (message) => {
           setMessages((prev) => {
-            const exists = prev.some((msg) => msg.timestamp === message.timestamp);
-            const updatedMessages = exists
-              ? prev
-              : [...prev, message].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-
-            // Scroll to bottom after new message
-            setTimeout(scrollToBottom, 100);
-
-            return updatedMessages;
+            const exists = prev.some((msg) => msg.id === message.id); // Use unique ID
+            return exists ? prev : [...prev, message];
           });
         });
       }
     };
 
     setupWebSocket();
-  }, [userId, recipientId, scrollToBottom]);
+
+    // Cleanup
+    return () => {
+      isMounted = false;
+      subscription?.unsubscribe(); // Unsubscribe on unmount/recipient change
+    };
+  }, [userId, recipientId]); // Re-run on recipient change
 
   const fetchChatHistory = useCallback(async () => {
     if (!userId || !recipientId) return;
@@ -137,17 +142,19 @@ function Messages() {
 
   // Send message handler
   const handleSendMessage = () => {
-    if (!input.trim()) return;
+    if (!input.trim() || !stompClient?.connected) return;
 
-    sendMessageToUser(userId, input, recipientId);
     const newMessage = {
       senderId: userId,
       content: input,
+      recipientId,
       timestamp: new Date().toISOString()
     };
 
-    setMessages((prev) => [...prev, newMessage]);
+    setMessages(prev => [...prev, newMessage]);
     setInput("");
+
+    sendMessageToUser(userId, input, recipientId);
 
     // Scroll to bottom after sending
     setTimeout(scrollToBottom, 100);
