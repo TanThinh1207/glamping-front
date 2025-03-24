@@ -1,5 +1,8 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
 import { useUser } from './UserContext';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+
 
 const CampsiteContext = createContext();
 export const CampsiteProvider = ({ children }) => {
@@ -182,6 +185,29 @@ export const CampsiteProvider = ({ children }) => {
     setCampTypes([]);
   };
 
+  // call api by id
+  const { id } = useParams();
+  const [campsite, setCampsite] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  const fetchCampsiteDetails = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_GET_CAMPSITES}`, {
+        params: { id: id }
+      });
+      setCampsite(response.data.data.content[0]);
+    } catch (error) {
+      console.error('Error fetching campsite data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (id) fetchCampsiteDetails();
+  }, [id]);
+
   return (
     <CampsiteContext.Provider value={{
       campsiteData, updateCampsiteData,
@@ -193,6 +219,7 @@ export const CampsiteProvider = ({ children }) => {
       services, addService, updateService, removeService,
       campTypes, addCampType, updateCampType, removeCampType,
       resetCampsiteData,
+      campsite, fetchCampsiteDetails, loading
     }}>
       {children}
     </CampsiteContext.Provider>

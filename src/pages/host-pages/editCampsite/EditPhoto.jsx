@@ -49,7 +49,7 @@ const EditPhoto = () => {
 
     for (const file of files) {
       const imageUrl = URL.createObjectURL(file);
-      newImages.push({ path: imageUrl});
+      newImages.push({ path: imageUrl });
     }
 
     setImages(newImages);
@@ -58,14 +58,12 @@ const EditPhoto = () => {
 
   // Save changes 
   const saveChanges = () => {
-
     try {
       axios.patch(`${import.meta.env.VITE_API_GET_CAMPSITES}/${id}`, { imageList: images });
       setModified(false);
     } catch (error) {
       console.error('Error saving changes:', error);
     }
-
   };
 
   useEffect(() => {
@@ -73,7 +71,7 @@ const EditPhoto = () => {
   }, [images]);
   return (
     <div>
-      <div className='h-screen px-44 pb-20'>
+      <div className='min-h-screen px-44 pb-20 relative'>
         <div className='flex justify-between items-center'>
           <div>
             <h1 className='text-3xl font-semibold'>Campsite photos</h1>
@@ -118,9 +116,11 @@ const EditPhoto = () => {
 
       </div>
       {modified && (
-        <div className='fixed bottom-0 right-2 w-full bg-white border-t-2 p-4 flex justify-end'>
-          <button className='bg-purple-900 text-white hover:bg-transparent border border-purple-900 hover:text-purple-900 transform transition duration-300 px-6 py-2 rounded-lg' onClick={saveChanges}>
-            Save Changes
+        <div className='fixed bottom-0 left-0 w-full bg-white border-t-2 p-4 flex justify-end'>
+          <button className='bg-purple-900 text-white hover:bg-transparent border border-purple-900 hover:text-purple-900 transform transition duration-300 px-6 py-2 rounded-lg'
+            onClick={saveChanges}
+          >
+            Save
           </button>
         </div>
       )}

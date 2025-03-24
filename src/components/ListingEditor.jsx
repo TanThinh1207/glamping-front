@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import axios from 'axios';
+import { useCampsite } from '../context/CampsiteContext';
 
 const ListingEditor = () => {
     const navigate = useNavigate()
     const { id } = useParams();
-    const [loading, setLoading] = useState(true);
-    const [campsite, setCampsite] = useState({});
+    const { campsite, loading } = useCampsite();
     const [activeSection, setActiveSection] = useState("photo");
     const googleMapUrl = `https://www.google.com/maps?q=${campsite.latitude},${campsite.longitude}&hl=es;z=14&output=embed`;
 
@@ -15,32 +15,11 @@ const ListingEditor = () => {
         setActiveSection(section); // Update active state
         navigate(`/hosting/listings/editor/${id}/details/${section}`);
     };
-    // Call api campsite by id
-    useEffect(() => {
-        const fetchCampsiteDetails = async () => {
-            setLoading(true);
-            try {
-                console.log('Fetching campsite with ID:', id);
-                const response = await axios.get(`${import.meta.env.VITE_API_GET_CAMPSITES}`, {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    params: { id: id }
-                });
-                setCampsite(response.data.data.content[0]);
-            } catch (error) {
-                console.error('Error fetching campsite data:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (id) fetchCampsiteDetails();
-    }, [id]);
 
     useEffect(() => {
         console.log(campsite);
     }, [campsite]);
+    
     return (
         <div className='flex flex-col h-screen'>
             <div className='flex items-center'>

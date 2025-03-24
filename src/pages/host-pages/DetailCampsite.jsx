@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import ListingEditor from '../../components/ListingEditor'
-import { useParams, useNavigate, Outlet, useLocation} from 'react-router-dom'
+import { useParams, useNavigate, Outlet, useLocation } from 'react-router-dom'
+import { CampsiteProvider } from '../../context/CampsiteContext'
+
 const DetailCampsite = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -11,16 +13,18 @@ const DetailCampsite = () => {
             navigate(`/hosting/listings/editor/${id}/details/photo`, { replace: true });
         }
     }, [id, location.pathname, navigate]);
-    
+
     return (
-        <div className='w-full h-screen bg-white mt-10 flex overflow-hidden'>
-            <div className='w-1/4 ml-20 h-full overflow-auto'>
-                <ListingEditor />
+        <CampsiteProvider>
+            <div className='w-full min-h-screen bg-white mt-10 flex'>
+                <div className='w-1/4 ml-20 min-h-screen overflow-y-auto'>
+                    <ListingEditor />
+                </div>
+                <div className='w-3/4 min-h-screen overflow-y-auto'>
+                    <Outlet />
+                </div>
             </div>
-            <div className='w-3/4 h-full overflow-auto'>
-                <Outlet/>
-            </div>
-        </div>
+        </CampsiteProvider>
     )
 }
 
