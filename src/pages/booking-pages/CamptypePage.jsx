@@ -4,7 +4,7 @@ import SearchBar from '../../components/SearchBar'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMugHot } from '@fortawesome/free-solid-svg-icons'
 import { useBooking } from '../../context/BookingContext'
-import { fetchCampsiteById, fetchCamptypeById, fetchCamptypeByIdWithDate } from '../../service/BookingService'
+import { fetchCampsiteById, fetchCamptypeById, fetchCamptypeByIdWithDate, fetchRatingByCampsiteId } from '../../service/BookingService'
 import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
 import Modal from '../../components/Modal'
@@ -41,6 +41,8 @@ const CamptypePage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [pageSize, setPageSize] = useState(10);
+
+    const [ratings, setRatings] = useState({ averageRating: 0, ratingResponseList: [] });
 
     const googleMapUrl = `https://www.google.com/maps?q=${campsite.latitude},${campsite.longitude}&hl=es;z=14&output=embed`;
 
@@ -80,6 +82,22 @@ const CamptypePage = () => {
         setCheckOut(newCheckOut);
         setCurrentPage(0);
     };
+
+    useEffect(() => {
+        const fetchRatings = async () => {
+            try {
+                const ratingsData = await fetchRatingByCampsiteId(campsiteId, 0, 100);
+                console.log(ratingsData)
+                setRatings(ratingsData);
+            } catch (error) {
+                console.error("Error fetching ratings:", error);
+            }
+        };
+
+        if (campsiteId) {
+            fetchRatings();
+        }
+    }, [campsiteId]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -398,7 +416,7 @@ const CamptypePage = () => {
                                             )}
                                             <button
                                                 className='bg-transparent border border-purple-900 text-purple-900 hover:bg-purple-900 
-hover:text-white rounded-full px-8 py-4 transform transition duration-300 font-canto text-xl'
+                                                hover:text-white rounded-full px-8 py-4 transform transition duration-300 font-canto text-xl'
                                                 onClick={() => handleCamptypeSelection(camptype)}
                                             >
                                                 <p>Reservation Inquiry</p>
@@ -441,6 +459,48 @@ hover:text-white rounded-full px-8 py-4 transform transition duration-300 font-c
                 </>)
             }
 
+            <div className="mb-10">
+                <p className='text-3xl font-canto mb-6'>Guest Reviews</p>
+                <div className="flex overflow-x-auto scrollbar-hide gap-6 pb-4">
+                    {/* Average Rating Card */}
+                    <div className="flex-shrink-0 bg-white rounded-lg p-6 shadow-md min-w-[300px]">
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="text-3xl font-bold text-purple-900">{ratings.averageRating}</span>
+                            <div className="flex text-yellow-400">
+                                {[...Array(5)].map((_, i) => (
+                                    <span key={i}>
+                                        {i < Math.floor(ratings.averageRating) ? '★' : '☆'}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                        <p className="text-gray-600">Average Rating</p>
+                    </div>
+
+                    {/* Individual Reviews */}
+                    {ratings.ratingResponseList?.map((review, index) => (
+                        <div key={index} className="flex-shrink-0 bg-white rounded-lg p-6 shadow-md min-w-[300px]">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                    <span className="text-gray-600">{review.userName?.[0]?.toUpperCase() || 'U'}</span>
+                                </div>
+                                <div>
+                                    <p className="font-semibold">{review.userName || 'Anonymous'}</p>
+                                    <div className="flex text-yellow-400">
+                                        {[...Array(5)].map((_, i) => (
+                                            <span key={i}>{i < review.rating ? '★' : '☆'}</span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                            <p className="text-gray-600 mb-2">{review.comment}</p>
+                            <p className="text-sm text-gray-400">
+                                {dayjs(review.uploadTime).format('MMM D, YYYY')}
+                            </p>
+                        </div>
+                    ))}
+                </div>
+            </div>
 
             <p className='text-3xl font-canto my-6'>Map View</p>
             <iframe

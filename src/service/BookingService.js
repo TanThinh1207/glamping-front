@@ -157,3 +157,21 @@ export const fetchCampsiteCityList = async () => {
     throw new Error(error.message);
   }
 };
+
+export const fetchRatingByCampsiteId = async (campsiteId, page = 0, size = 100) => {
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_RATING}/${campsiteId}`,
+      {
+        params: {
+          sortBy: 'rating',
+          page: page,
+          size: size,
+        },
+      }
+    );
+    return response.data.data.content;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}

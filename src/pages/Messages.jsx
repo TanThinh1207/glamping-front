@@ -25,7 +25,9 @@ function Messages() {
   const [searchTerm, setSearchTerm] = useState("");
   const location = useLocation();
   const [stompClient, setStompClient] = useState(null);
-  const [isConnected, setIsConnected] = useState(false);
+
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
 
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
@@ -263,130 +265,137 @@ function Messages() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-79px)] bg-gray-100">
-      {/* Sidebar */}
-      <div className="w-96 bg-white border-r border-gray-200 flex flex-col">
-        {/* Search Bar */}
-        <div className="p-4 border-b border-gray-200">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search chats"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <Search className="absolute left-3 top-3 text-gray-400" size={20} />
+    <>
+      <div className="flex h-[calc(100vh-79px)] bg-gray-100 flex-col md:flex-row">
+        {/* Sidebar */}
+        <div className={`absolute md:relative w-80 bg-white border-r border-gray-200 flex flex-col transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out`}>
+          {/* Search Bar */}
+          <div className="p-4 border-b border-gray-200">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search chats"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <Search className="absolute left-3 top-3 text-gray-400" size={20} />
+            </div>
+          </div>
+
+          {/* Chat History List */}
+          <div className="flex-1 overflow-y-auto">
+            {filteredUsers.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <MessageCircle className="mx-auto mb-4" size={48} />
+                <p>No chat history found</p>
+              </div>
+            ) : (
+              filteredUsers.map((chatUser) => (
+                <button
+                  key={chatUser.id}
+                  onClick={() => {
+                    setRecipientId(chatUser.id);
+                    setTimeout(scrollToBottom, 100);
+                    setIsSidebarOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-between p-4 hover:bg-gray-100 transition-colors cursor-pointer
+                  ${recipientId === chatUser.id ? 'bg-blue-50' : ''}`}
+                >
+                  <div className="flex items-center space-x-4">
+                    <UserCircle2 className="text-gray-400" size={40} />
+                    <div className="text-left">
+                      <p className="font-medium">{chatUser.firstname}</p>
+                      <p className="text-sm text-gray-500">{chatUser.email}</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="text-gray-400" size={20} />
+                </button>
+              ))
+            )}
           </div>
         </div>
 
-        {/* Chat History List */}
-        <div className="flex-1 overflow-y-auto">
-          {filteredUsers.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <MessageCircle className="mx-auto mb-4" size={48} />
-              <p>No chat history found</p>
+        {/* Chat Area */}
+        <div className="flex-1 flex flex-col w-full">
+          {/* Chat Header */}
+          {recipientId ? (
+            <div className="bg-white border-b border-gray-200 p-4 flex items-center">
+              <UserCircle2 className="mr-4 text-gray-400" size={40} />
+              <div>
+                <button
+                  onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                  className="absolute top-11 left-4 md:hidden bg-blue-500 text-white p-2 rounded-full z-50"
+                >
+                  <ChevronRight className={`transform ${isSidebarOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                <h2 className="text-lg font-semibold">
+                  {chatHistoryList.find(u => u.id === recipientId)?.firstname || "Chat"}
+                </h2>
+              </div>
             </div>
           ) : (
-            filteredUsers.map((chatUser) => (
-              <button
-                key={chatUser.id}
-                onClick={() => {
-                  setRecipientId(chatUser.id);
-                  setTimeout(scrollToBottom, 100);
-                }}
-                className={`w-full flex items-center justify-between p-4 hover:bg-gray-100 transition-colors cursor-pointer
-                  ${recipientId === chatUser.id ? 'bg-blue-50' : ''}`}
-              >
-                <div className="flex items-center space-x-4">
-                  <UserCircle2 className="text-gray-400" size={40} />
-                  <div className="text-left">
-                    <p className="font-medium">{chatUser.firstname}</p>
-                    <p className="text-sm text-gray-500">{chatUser.email}</p>
+            <div className="flex items-center justify-center h-full text-gray-500">
+              <MessageCircle className="mr-2" size={32} />
+              Select a chat to start messaging
+            </div>
+          )}
+
+          {/* Messages Container */}
+          <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-gray-50">
+            {messages.map((msg, index) => {
+              const isSender = msg.senderId === userId;
+              return (
+                <div
+                  key={index}
+                  className={`flex ${isSender ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`
+                    max-w-md p-3 rounded-2xl shadow-sm 
+                    ${isSender
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-white text-gray-800 border border-gray-200'}
+                  `}
+                  >
+                    <p className="text-sm">{msg.content}</p>
+                    <div className={`text-xs mt-1 ${isSender ? 'text-blue-100' : 'text-gray-500'}`}>
+                      {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
                   </div>
                 </div>
-                <ChevronRight className="text-gray-400" size={20} />
-              </button>
-            ))
+              );
+            })}
+            {/* Invisible div to enable scrolling to bottom */}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Message Input */}
+          {recipientId && (
+            <div className="bg-white border-t border-gray-200 p-4">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                  placeholder="Type a message..."
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-auto"
+                />
+                <button
+                  onClick={handleSendMessage}
+                  disabled={!input.trim()}
+                  className="bg-blue-500 text-white p-2 rounded-full disabled:opacity-50 hover:bg-blue-600 transition-colors"
+                >
+                  <Send size={20} />
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </div>
-
-      {/* Chat Area */}
-      <div className="flex-1 flex flex-col">
-        {/* Chat Header */}
-        {recipientId ? (
-          <div className="bg-white border-b border-gray-200 p-4 flex items-center">
-            <UserCircle2 className="mr-4 text-gray-400" size={40} />
-            <div>
-              <h2 className="text-lg font-semibold">
-                {chatHistoryList.find(u => u.id === recipientId)?.firstname || "Chat"}
-              </h2>
-            </div>
-          </div>
-        ) : (
-          <div className="flex items-center justify-center h-full text-gray-500">
-            <MessageCircle className="mr-2" size={32} />
-            Select a chat to start messaging
-          </div>
-        )}
-
-        {/* Messages Container */}
-        <div
-          ref={messagesContainerRef}
-          className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50"
-        >
-          {messages.map((msg, index) => {
-            const isSender = msg.senderId === userId;
-            return (
-              <div
-                key={index}
-                className={`flex ${isSender ? 'justify-end' : 'justify-start'}`}
-              >
-                <div
-                  className={`
-                    max-w-md p-3 rounded-2xl shadow-sm 
-                    ${isSender
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-white text-gray-800 border border-gray-200'}
-                  `}
-                >
-                  <p className="text-sm">{msg.content}</p>
-                  <div className={`text-xs mt-1 ${isSender ? 'text-blue-100' : 'text-gray-500'}`}>
-                    {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-          {/* Invisible div to enable scrolling to bottom */}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Message Input */}
-        {recipientId && (
-          <div className="bg-white border-t border-gray-200 p-4">
-            <div className="flex items-center space-x-2">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                placeholder="Type a message..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <button
-                onClick={handleSendMessage}
-                disabled={!input.trim()}
-                className="bg-blue-500 text-white p-2 rounded-full disabled:opacity-50 hover:bg-blue-600 transition-colors"
-              >
-                <Send size={20} />
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+    </>
   );
 }
 
