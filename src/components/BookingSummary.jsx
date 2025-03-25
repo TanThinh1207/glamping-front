@@ -22,6 +22,8 @@ const BookingSummary = ({ selectedServices = [] }) => {
   const [nights, setNights] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
   const [capacityLimit, setCapacityLimit] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(100);
 
   const handleConfirmBooking = async () => {
     if (!booking.userId) {
@@ -93,14 +95,14 @@ const BookingSummary = ({ selectedServices = [] }) => {
       try {
         setLoading(true);
         const campsiteData = await fetchCampsiteById(campsiteId);
-        const camptypesData = await fetchCamptypeById(campsiteId);
-
+        const camptypesData = await fetchCamptypeById(campsiteId, 0, 100);
         if (!campsiteData || campsiteData.length === 0) {
           throw new Error("Campsite data not found.");
         }
+        
 
         setCampsite(campsiteData[0] || {});
-        setCamptypes(camptypesData || []);
+        setCamptypes(camptypesData.content || []);
       } catch (error) {
         console.error("Error fetching data:", error);
         setError(error.message);
