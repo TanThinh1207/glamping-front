@@ -11,26 +11,42 @@ const CampsitePage = () => {
     const [campsites, setCampsites] = useState([]);
     const location = useLocation();
     const selectedCity = location.state?.selectedCity || '';
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
 
     useEffect(() => {
         const fetchCampsites = async () => {
             setLoading(true);
             try {
-                const response = await fetchAllCampsites();
-                const filteredCampsites = selectedCity
-                    ? response.filter(campsite => campsite.city.toLowerCase() === selectedCity.toLowerCase())
-                    : response;
+                const response = await fetchAllCampsites(currentPage, pageSize);
+                let filteredCampsites = response.content;
+
+                if (selectedCity) {
+                    filteredCampsites = response.content.filter(campsite =>
+                        campsite.city.toLowerCase() === selectedCity.toLowerCase()
+                    );
+                }
+
                 setCampsites(filteredCampsites);
-                console.log(response);
+                setTotalPages(response.totalPages);
             } catch (error) {
                 setError(error.message);
-            }
-            finally {
+            } finally {
                 setLoading(false);
             }
         }
         fetchCampsites();
-    }, [selectedCity]);
+    }, [currentPage, pageSize, selectedCity]);
+
+    const handlePreviousPage = () => {
+        setCurrentPage(prev => Math.max(0, prev - 1));
+    };
+
+    const handleNextPage = () => {
+        setCurrentPage(prev => Math.min(totalPages - 1, prev + 1));
+    };
+
 
     if (loading) {
         return (
@@ -47,7 +63,32 @@ const CampsitePage = () => {
             <DestinationSearch />
             <hr className='my-10' />
             {campsites.length > 0 ? (
-                campsites.map((campsite) => <CampsiteCard key={campsite.id} campsite={campsite} />)
+                <>
+                    {campsites.map((campsite) => (
+                        <CampsiteCard key={campsite.id} campsite={campsite} />
+                    ))}
+                    <div className="flex justify-center gap-4 my-8">
+                        <button
+                            onClick={handlePreviousPage}
+                            disabled={currentPage === 0}
+                            className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300"
+                        >
+                            Previous
+                        </button>
+
+                        <span className="px-4 py-2">
+                            Page {currentPage + 1} of {totalPages}
+                        </span>
+
+                        <button
+                            onClick={handleNextPage}
+                            disabled={currentPage >= totalPages - 1}
+                            className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300"
+                        >
+                            Next
+                        </button>
+                    </div>
+                </>
             ) : (
                 <p>No campsites found.</p>
             )}

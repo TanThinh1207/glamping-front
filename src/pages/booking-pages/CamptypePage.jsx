@@ -38,6 +38,10 @@ const CamptypePage = () => {
     const [isExpanded, setIsExpanded] = useState(false);
     const maxDescriptionLength = 250;
 
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
+
     const googleMapUrl = `https://www.google.com/maps?q=${campsite.latitude},${campsite.longitude}&hl=es;z=14&output=embed`;
 
     const toggleDescription = () => {
@@ -74,6 +78,7 @@ const CamptypePage = () => {
         const newCheckOut = localStorage.getItem('checkOutDate') || '';
         setCheckIn(newCheckIn);
         setCheckOut(newCheckOut);
+        setCurrentPage(0);
     };
 
     useEffect(() => {
@@ -95,15 +100,22 @@ const CamptypePage = () => {
                 };
 
                 let camptypesData = [];
+                let response;
 
                 if (checkIn && checkOut) {
-                    camptypesData = await fetchCamptypeByIdWithDate(params);
+                    response = await fetchCamptypeByIdWithDate({
+                        campSiteId: campsiteId,
+                        checkIn,
+                        checkOut,
+                        page: currentPage,
+                        size: pageSize
+                    });
                 } else {
-                    camptypesData = await fetchCamptypeById(campsiteId);
+                    response = await fetchCamptypeById(campsiteId, currentPage, pageSize);
                 }
-                if (!Array.isArray(camptypesData)) {
-                    camptypesData = [];
-                }
+
+                camptypesData = response.content || [];
+                setTotalPages(response.totalPages);
 
                 setCamptypes(camptypesData);
                 console.log(camptypesData)
@@ -123,7 +135,7 @@ const CamptypePage = () => {
         };
 
         fetchData();
-    }, [campsiteId, checkIn, checkOut]);
+    }, [campsiteId, checkIn, checkOut, currentPage, pageSize]);
 
     const handleQuantityChange = (id, value, availableSlot) => {
         if (availableSlot) {
@@ -398,12 +410,38 @@ hover:text-white rounded-full px-8 py-4 transform transition duration-300 font-c
                                         </>
                                     )}
                                 </div>
+
                             </div>
                             <hr className='mt-6' />
                         </div>
                     ))}
+                    {camptypes.length > 0 && (
+                        <div className="flex justify-center gap-4 my-8">
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+                                disabled={currentPage === 0}
+                                className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300"
+                            >
+                                Previous
+                            </button>
+
+                            <span className="px-4 py-2">
+                                Page {currentPage + 1} of {totalPages}
+                            </span>
+
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
+                                disabled={currentPage >= totalPages - 1}
+                                className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300"
+                            >
+                                Next
+                            </button>
+                        </div>
+                    )}
                 </>)
             }
+
+
             <p className='text-3xl font-canto my-6'>Map View</p>
             <iframe
                 width="100%"
@@ -423,7 +461,7 @@ hover:text-white rounded-full px-8 py-4 transform transition duration-300 font-c
                             Cancel
                         </button>
                         <button
-                            className="px-4 py-2 bg-red-600 text-white rounded"
+                            className="px-4 py-2 bg-purple-900 text-white rounded"
                             onClick={handleConfirmNewSelection}
                         >
                             Yes, Proceed
