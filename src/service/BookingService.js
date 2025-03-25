@@ -27,10 +27,10 @@ export const fetchCamptypeById = async (campSiteId, page = 0, size = 10) => {
       throw new Error(`Failed to fetch campsite: ${response.statusText}`);
     const data = await response.json();
     return {
-        content: data.data.content,
-        totalPages: data.data.totalPages,
-        currentPage: data.data.number
-      };
+      content: data.data.content,
+      totalPages: data.data.totalPages,
+      currentPage: data.data.number,
+    };
   } catch (error) {
     throw new Error(error.message);
   }
@@ -39,7 +39,9 @@ export const fetchCamptypeById = async (campSiteId, page = 0, size = 10) => {
 export const fetchCamptypeByIdWithDate = async ({
   campSiteId,
   checkIn,
-  checkOut, page = 0, size = 10
+  checkOut,
+  page = 0,
+  size = 10,
 }) => {
   try {
     const formattedCheckIn = new Date(checkIn).toISOString().slice(0, 19);
@@ -59,10 +61,10 @@ export const fetchCamptypeByIdWithDate = async ({
 
     const data = await response.json();
     return {
-        content: data.data.content,
-        totalPages: data.data.totalPages,
-        currentPage: data.data.number
-      };
+      content: data.data.content,
+      totalPages: data.data.totalPages,
+      currentPage: data.data.number,
+    };
   } catch (error) {
     throw new Error(error.message);
   }

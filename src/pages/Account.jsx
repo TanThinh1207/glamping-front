@@ -11,7 +11,7 @@ import thumb from '../assets/terrace.jpg';
 import { updateUserData, fetchUserData } from '../service/UserService';
 
 const Account = () => {
-    const [loading , setLoading] = useState(true);
+    const [loading, setLoading] = useState(true);
     const { user, logout } = useUser();
     const navigate = useNavigate();
 
@@ -48,15 +48,15 @@ const Account = () => {
             setLoading(true);
             try {
                 const newUser = await fetchUserData(user.id);
-            setUserData({
-                firstName: newUser.firstname ?? defaultText,
-                lastName: newUser.lastname ?? defaultText,
-                phone: newUser.phone ?? defaultText,
-                email: newUser.email ?? defaultText,
-                address: newUser.address ?? defaultText,
-                dob: newUser.birthday ?? defaultText
-            });
-            } catch(error) {
+                setUserData({
+                    firstName: newUser.firstname ?? defaultText,
+                    lastName: newUser.lastname ?? defaultText,
+                    phone: newUser.phone ?? defaultText,
+                    email: newUser.email ?? defaultText,
+                    address: newUser.address ?? defaultText,
+                    dob: newUser.birthday ?? defaultText
+                });
+            } catch (error) {
                 toast.error(`Failed to fetch user data: ${error.message}`);
             } finally {
                 setLoading(false);
@@ -74,7 +74,7 @@ const Account = () => {
                 phone: userData.phone,
                 address: userData.address,
                 dob: userData.dob,
-              };
+            };
             console.log(backendData)
             await updateUserData(user.id, backendData);
             const updatedUser = await fetchUserData(user.id);
@@ -90,7 +90,7 @@ const Account = () => {
             });
             console.log(userData)
             console.log("userData")
-    
+
             toast.success("User data updated successfully!");
         } catch (error) {
             toast.error(`Failed to update user data: ${error.message}`);

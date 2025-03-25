@@ -7,13 +7,15 @@ import feature5 from "../assets/feature5.jpg";
 import feature6 from "../assets/feature6.jpg";
 import feature7 from "../assets/feature7.jpg";
 import DestinationSearch from "../components/DestinationSearch";
+import { Link } from "react-router-dom";
 
 const HomePage = () => {
   return (
     <div>
 
       <div className="thumb flex relative justify-center w-full">
-        <img src={thumb} className="w-full h-auto" alt="Thumbnail" />
+        {/* <img src={thumb} className="w-full h-auto" alt="Thumbnail" /> */}
+        <video src="https://media.sixsenses.com/B60H3R33/at/7m98ph5t799nmk5rfj9fxktk/Six_Senses_Con_Dao_Video_Mobile_Teaser.mp4" autoPlay loop muted className="w-full h-screen object-cover"></video>
       </div>
       <div className="flex justify-center ">
         <div className="mx-auto">
@@ -99,9 +101,11 @@ const HomePage = () => {
               <p className="text-gray-600 text-sm leading-relaxed mb-6">
                 Stretching from steaming Amazonian jungles to the penguin playgrounds near Antarctica, South America represents incredible opportunities for eco-adventures, cultural learning, and otherwise exploring a unique part of the earth. Whether your desire is to chase down a blue-footed booby on the Galapagos Islands, walk where the Inca did on Machu Picchu, or explore the vast wonders of the Andes, glamping provides some excellent basecamps. From unmatched luxury in a posh Patagonian lodge, to astronomy-focused lodgings in Chile, from eco-luxury in Ecuador to the beautiful beaches of Brazil, glamping puts you in touch with this intriguing continent in ways no other type of travel ever could.
               </p>
-              <button className="bg-transparent uppercase text-black border border-black w-1/2 py-2 px-6 text-sm hover:bg-blue-400 hover:text-white hover:border-white transition duration-200">
-                View Destination
-              </button>
+              <Link to="/campsite">
+                <button className="bg-transparent uppercase text-black border border-black w-1/2 py-2 px-6 text-sm hover:bg-blue-400 hover:text-white hover:border-white transition duration-200">
+                  View Destination
+                </button>
+              </Link>
             </div>
           </div>
         </div>

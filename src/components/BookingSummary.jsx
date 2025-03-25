@@ -99,7 +99,6 @@ const BookingSummary = ({ selectedServices = [] }) => {
         if (!campsiteData || campsiteData.length === 0) {
           throw new Error("Campsite data not found.");
         }
-        console.log(camptypesData.content)
 
         setCampsite(campsiteData[0] || {});
         setCamptypes(camptypesData.content || []);
