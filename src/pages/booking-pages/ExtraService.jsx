@@ -41,7 +41,8 @@ const ExtraService = () => {
     useEffect(() => {
         const fetchCamptypes = async () => {
             try {
-                const camptypesData = await fetchCamptypeById(campSiteId);
+                const camptypesResponse = await fetchCamptypeById(campSiteId, 0, 100);
+                const camptypesData = camptypesResponse.content;
                 setCamptypes(camptypesData || []);
 
                 if (booking?.bookingDetails?.length > 0 && camptypesData?.length > 0) {
