@@ -82,35 +82,90 @@ function Messages() {
   }, [recipientId]);
 
 
-  // WebSocket connection and message subscription
+  // WebSocket management
   useEffect(() => {
-    let subscription;
     let isMounted = true;
+    let clientInstance;
 
     const setupWebSocket = async () => {
-      const client = await connect();
-      if (!isMounted) return;
-      setStompClient(client);
-      setIsConnected(true);
+      try {
+        const client = await connect();
+        if (!isMounted) return;
 
-      if (userId && recipientId) {
-        subscription = subscribeToPrivateMessages(userId, (message) => {
-          setMessages((prev) => {
-            const exists = prev.some((msg) => msg.id === message.id); // Use unique ID
-            return exists ? prev : [...prev, message];
-          });
-        });
+        setStompClient(client);
+        clientInstance = client;
+      } catch (error) {
+        console.error("Connection error:", error);
       }
     };
 
     setupWebSocket();
 
-    // Cleanup
     return () => {
       isMounted = false;
-      subscription?.unsubscribe(); // Unsubscribe on unmount/recipient change
+      if (clientInstance) {
+        clientInstance.deactivate();
+      }
     };
-  }, [userId, recipientId]); // Re-run on recipient change
+  }, [userId]);
+
+  useEffect(() => {
+    if (!stompClient || !stompClient.connected || !userId || !recipientId) return;
+
+    const subscription = stompClient.subscribe(`/topic/private.${userId}`, (message) => {
+      const newMessage = JSON.parse(message.body);
+      console.log('Received message:', newMessage);
+
+      // Check if the message is part of the current chat
+      const isCurrentChatMessage =
+        (newMessage.senderId === recipientId && newMessage.recipientId === userId) ||
+        (newMessage.senderId === userId && newMessage.recipientId === recipientId);
+
+      if (isCurrentChatMessage) {
+        setMessages(prev => {
+          const exists = prev.some(msg => msg.id === newMessage.id);
+          if (!exists) {
+            return [...prev, newMessage];
+          }
+          return prev;
+        });
+        scrollToBottom();
+      }
+      fetchChatHistory();
+    });
+
+    return () => subscription.unsubscribe();
+  }, [stompClient, userId, recipientId, scrollToBottom]);
+
+
+  // Send message
+  const handleSendMessage = () => {
+    if (!input.trim() || !stompClient?.connected) return;
+  
+    // Optimistic update with a temporary ID
+    const tempMessage = {
+      tempId: Date.now(),
+      content: input,
+      senderId: userId,
+      recipientId,
+      timestamp: new Date().toISOString(),
+    };
+  
+    setMessages(prev => [...prev, tempMessage]);
+    setInput("");
+  
+    // Send via WebSocket
+    stompClient.publish({
+      destination: "/app/sendToUser",
+      body: JSON.stringify({
+        senderId: userId,
+        recipientId,
+        content: input,
+      }),
+    });
+  
+    scrollToBottom();
+  };
 
   const fetchChatHistory = useCallback(async () => {
     if (!userId || !recipientId) return;
@@ -125,9 +180,8 @@ function Messages() {
 
       const data = await response.json();
       const sortedMessages = data.content.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-      setMessages(sortedMessages);
 
-      // Scroll to bottom after fetching history
+      setMessages(sortedMessages);
       setTimeout(scrollToBottom, 100);
     } catch (error) {
       console.error("Chat history error:", error);
@@ -137,28 +191,31 @@ function Messages() {
   }, [userId, recipientId, scrollToBottom]);
 
   useEffect(() => {
-    fetchChatHistory();
-  }, [fetchChatHistory]);
+    if (recipientId) {
+      fetchChatHistory();
+    }
+  }, [fetchChatHistory, recipientId]);
+
 
   // Send message handler
-  const handleSendMessage = () => {
-    if (!input.trim() || !stompClient?.connected) return;
+  // const handleSendMessage = () => {
+  //   if (!input.trim() || !stompClient?.connected) return;
 
-    const newMessage = {
-      senderId: userId,
-      content: input,
-      recipientId,
-      timestamp: new Date().toISOString()
-    };
+  //   const newMessage = {
+  //     senderId: userId,
+  //     content: input,
+  //     recipientId,
+  //     timestamp: new Date().toISOString()
+  //   };
 
-    setMessages(prev => [...prev, newMessage]);
-    setInput("");
+  //   setMessages(prev => [...prev, newMessage]);
+  //   setInput("");
 
-    sendMessageToUser(userId, input, recipientId);
+  //   sendMessageToUser(userId, input, recipientId);
 
-    // Scroll to bottom after sending
-    setTimeout(scrollToBottom, 100);
-  };
+  //   // Scroll to bottom after sending
+  //   setTimeout(scrollToBottom, 100);
+  // };
 
   const filteredUsers = chatHistoryList.filter(user =>
     user.firstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -233,7 +290,6 @@ function Messages() {
               <h2 className="text-lg font-semibold">
                 {chatHistoryList.find(u => u.id === recipientId)?.firstname || "Chat"}
               </h2>
-              <p className="text-sm text-gray-500">Online</p>
             </div>
           </div>
         ) : (

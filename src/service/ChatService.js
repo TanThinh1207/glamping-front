@@ -7,21 +7,14 @@ let activeClient = null;
 
 export const connect = () => {
   return new Promise((resolve, reject) => {
-    if (activeClient?.connected) {
-      resolve(activeClient);
-      return;
-    }
     const socket = new SockJS(SERVER_URL);
     const client = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000,
-      onConnect: () => {
-        activeClient = client;
-        resolve(client);
-      },
+      onConnect: () => resolve(client),
       onStompError: (frame) => reject(frame),
+      onWebSocketError: (error) => reject(error),
     });
-
     client.activate();
   });
 };
