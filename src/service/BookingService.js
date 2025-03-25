@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export const fetchCampsiteById = async (campSiteId) => {
     try {
         const url = new URL(`${import.meta.env.VITE_API_GET_CAMPSITES}`);
@@ -91,6 +93,7 @@ export const fetchBookingByUserId = async (userId) => {
     try {
         const url = new URL(`${import.meta.env.VITE_API_BOOKING}`);
         url.searchParams.append('userId', userId);
+        url.searchParams.append('direction', 'desc');
         const response = await fetch(url.toString());
         if (!response.ok) throw new Error(`Failed to fetch booking: ${response.statusText}`);
 
@@ -98,6 +101,22 @@ export const fetchBookingByUserId = async (userId) => {
         console.log(data)
         return data.data.content;
     } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
+export const fetchCampsiteCityList = async () => {
+    try {
+        const response = await axios.get(`${import.meta.env.VITE_API_GET_CAMPSITES}`, {
+            params: {
+                fields: 'id,city',
+                sortBy: 'name',
+                direction: 'asc',
+            },
+        });
+        console.log(response.data.data.content);
+        return response.data.data.content;
+    } catch(error) {
         throw new Error(error.message);
     }
 }

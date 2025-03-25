@@ -106,6 +106,7 @@ const CamptypePage = () => {
                 }
 
                 setCamptypes(camptypesData);
+                console.log(camptypesData)
 
                 const initialQuantities = {};
                 camptypesData.forEach(camptype => {
@@ -253,7 +254,11 @@ const CamptypePage = () => {
                 </p>
             </div>
             <p className='text-5xl font-canto'>Select accomodation</p>
-            <SearchBar onSearch={refreshDates} />
+            <div className='w-full flex justify-center items-center'>
+                <div className='w-1/2'>
+                    <SearchBar onSearch={refreshDates} />
+                </div>
+            </div>
             <div className="mb-16 relative">
                 <div className='flex justify-between items-center pb-2'>
                     <h2 className="font-canto text-3xl">
@@ -262,11 +267,14 @@ const CamptypePage = () => {
                     <button
                         className='bg-transparent border border-purple-900 text-purple-900 hover:bg-purple-900 
                         hover:text-white px-8 py-3 transform transition duration-300 font-canto text-lg'
-                        onClick={() => navigate('/messages', { 
-                            state: { 
-                              recipientId: campsite?.user.id
-                            } 
-                          })}
+                        onClick={() => navigate('/messages', {
+                            state: {
+                                newChat: true,
+                                recipientId: campsite?.user.id,
+                                recipientName: campsite?.user.firstname,
+                                recipientEmail: campsite?.user.email
+                            }
+                        })}
                     >
                         <p>Contact Property</p>
                     </button>

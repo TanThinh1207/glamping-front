@@ -6,7 +6,7 @@ import {
   MessageCircle,
   Search
 } from "lucide-react";
-import { connect, sendMessageToUser, subscribeToPrivateMessages, getRecipientsByUserId } from "../service/ChatService";
+import { connect, getRecipientsByUserId } from "../service/ChatService";
 import { useUser } from "../context/UserContext";
 import { fetchUserList, fetchUserData } from "../service/UserService";
 import { useLocation } from "react-router-dom";
@@ -44,17 +44,38 @@ function Messages() {
     const initializeChat = async () => {
       try {
         setLoading(true);
-        const [users, chatHistory] = await Promise.all([
-          fetchUserList(),
-          getRecipientsByUserId(userId)
-        ]);
+        const usersList = await fetchUserList();
+        const chatHistory = await getRecipientsByUserId(userId).catch(() => []);
 
-        setUserList(users);
-        setChatHistoryList(chatHistory);
+        // Handle new chat creation
+        if (location.state?.newChat) {
+          const newRecipient = {
+            id: location.state.recipientId,
+            firstname: location.state.recipientName,
+            email: location.state.recipientEmail
+          };
 
-        if (location.state?.recipientId) {
-          setRecipientId(location.state.recipientId);
+          // Check if recipient exists in any list
+          const exists = [
+            ...(chatHistory || []),
+            ...(usersList || [])
+          ].some(u => u.id === newRecipient.id);
+
+          if (!exists) {
+            setChatHistoryList(prev => [...prev, newRecipient]);
+          }
+          setRecipientId(newRecipient.id);
         }
+
+        // Merge lists safely
+        setUserList(usersList || []);
+        setChatHistoryList(prev => {
+          const merged = [...prev, ...(chatHistory || [])];
+          return merged.filter((v, i, a) =>
+            a.findIndex(t => t.id === v.id) === i
+          );
+        });
+
       } catch (error) {
         toast.error("Failed to initialize chat");
         console.error("Initialization error:", error);
@@ -116,7 +137,6 @@ function Messages() {
       const newMessage = JSON.parse(message.body);
       console.log('Received message:', newMessage);
 
-      // Check if the message is part of the current chat
       const isCurrentChatMessage =
         (newMessage.senderId === recipientId && newMessage.recipientId === userId) ||
         (newMessage.senderId === userId && newMessage.recipientId === recipientId);
@@ -141,7 +161,19 @@ function Messages() {
   // Send message
   const handleSendMessage = () => {
     if (!input.trim() || !stompClient?.connected) return;
-  
+
+    const recipientExists = chatHistoryList.some(u => u.id === recipientId);
+
+    if (!recipientExists) {
+      const newRecipient = userList.find(u => u.id === recipientId) || {
+        id: recipientId,
+        firstname: recipientData.firstname,
+        email: recipientData.email
+      };
+
+      setChatHistoryList(prev => [...prev, newRecipient]);
+    }
+
     // Optimistic update with a temporary ID
     const tempMessage = {
       tempId: Date.now(),
@@ -150,10 +182,10 @@ function Messages() {
       recipientId,
       timestamp: new Date().toISOString(),
     };
-  
+
     setMessages(prev => [...prev, tempMessage]);
     setInput("");
-  
+
     // Send via WebSocket
     stompClient.publish({
       destination: "/app/sendToUser",
@@ -163,7 +195,7 @@ function Messages() {
         content: input,
       }),
     });
-  
+
     scrollToBottom();
   };
 

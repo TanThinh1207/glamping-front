@@ -6,7 +6,7 @@ import feature4 from "../assets/feature4.jpg";
 import feature5 from "../assets/feature5.jpg";
 import feature6 from "../assets/feature6.jpg";
 import feature7 from "../assets/feature7.jpg";
-import SearchBar from "../components/SearchBar";
+import DestinationSearch from "../components/DestinationSearch";
 
 const HomePage = () => {
   return (
@@ -17,7 +17,7 @@ const HomePage = () => {
       </div>
       <div className="flex justify-center ">
         <div className="mx-auto">
-          <SearchBar hideDestination={true}/>
+          <DestinationSearch />
         </div>
       </div>
       <div className="featured px-4">

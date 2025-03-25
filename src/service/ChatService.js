@@ -44,17 +44,17 @@ export const getRecipientsByUserId = async (userId) => {
     const response = await axios.get(
       `${import.meta.env.VITE_API_CHAT}/recipients`,
       {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        params: {
-          userId: userId,
-        },
+        headers: { "Content-Type": "application/json" },
+        params: { userId },
+        validateStatus: (status) => status === 200 || status === 404
       }
     );
-    console.log(response.data);
-    return response.data;
+    
+    // Handle empty response for 404
+    return response.status === 200 ? response.data : [];
+    
   } catch (error) {
-    throw new Error(error.response?.data?.message || error.message);
+    console.error('Error fetching recipients:', error);
+    return [];
   }
 };

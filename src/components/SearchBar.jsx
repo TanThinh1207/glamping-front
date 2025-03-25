@@ -153,18 +153,13 @@ const SearchBar = ({ onSearch, hideDestination = false }) => {
       onSearch();
       return;
     }
-
-    // Always navigate to /campsite, regardless of destination selection
     navigate("/campsite");
   };
 
-  // Update findCampsiteByCity to find matching campsite when a destination is selected
   const findCampsiteByCity = (cityName) => {
     if (!cityName || !campsites.length) return null;
     return campsites.find(campsite => campsite.city === cityName);
   };
-
-  // Handle destination selection
   useEffect(() => {
     if (destination && campsites.length) {
       const matchingCampsite = findCampsiteByCity(destination.name);
@@ -322,21 +317,7 @@ const SearchBar = ({ onSearch, hideDestination = false }) => {
     <div className="pb-6 pt-10 w-full flex justify-center">
       <div className={`border border-black flex flex-col md:flex-row ${isCampsiteRoute ? "w-3/4" : "w-full"} gap-4 md:shadow-md md:rounded-xl py-4 px-2 md:mx-auto 
                       justify-center items-center`}>
-        {/* Only show destination dropdown if hideDestination is false and not on campsite route */}
-        {!hideDestination && !isCampsiteRoute && (
-          <Dropdown
-            items={campsiteCities}
-            selected={destination}
-            onSelect={setDestination}
-          />
-        )}
-
         <div className="flex flex-col md:flex-row w-full md:w-auto items-center gap-4">
-          {/* Only show the divider if destination dropdown is shown */}
-          {!hideDestination && !isCampsiteRoute && (
-            <div className="border-l border-gray-400 h-6 hidden md:block"></div>
-          )}
-
           <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 w-full">
             <button
               onClick={() => setIsCheckInOpen(true)}
@@ -387,7 +368,7 @@ const SearchBar = ({ onSearch, hideDestination = false }) => {
         </Modal>
 
         <div className="border-l border-gray-400 h-6 hidden md:block"></div>
-        <div
+        {/* <div
           className="flex items-center gap-x-4 p-4 rounded-md cursor-pointer"
           onClick={() => setIsGuestModalOpen(true)}
         >
@@ -418,9 +399,9 @@ const SearchBar = ({ onSearch, hideDestination = false }) => {
               </button>
             </div>
           </div>
-        </Modal>
+        </Modal> */}
 
-        <div className="border-l border-gray-400 h-6 hidden md:block"></div>
+        {/* <div className="border-l border-gray-400 h-6 hidden md:block"></div> */}
         <button
           onClick={handleSearch}
           className="bg-black text-white text-sm rounded-3xl border-black border uppercase px-6 py-3 transform 
