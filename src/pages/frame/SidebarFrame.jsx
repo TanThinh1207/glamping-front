@@ -17,6 +17,7 @@ const SidebarFrame = () => {
   const managerSidebarItems = [
     { title: 'Dashboard', path: '/manager/dashboard', icon: faChartPie },
     { title: 'Request', path: '/manager/request', icon: faBuilding },
+    { title: 'Campsites', path: '/manager/campsites', icon: faMountainSun },
   ];
 
   const sidebarItems = location.pathname.startsWith('/manager') ? managerSidebarItems : adminSidebarItems;

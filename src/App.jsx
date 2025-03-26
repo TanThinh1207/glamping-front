@@ -23,6 +23,7 @@ import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/manager-pages/Dashboard';
 import HandleRequest from './pages/manager-pages/HandleRequest';
 import CompleteBookingPage from './pages/CompleteBookingPage';
+import AllCampsites from "./pages/manager-pages/AllCampsites";
 
 // Host
 import { CampsiteProvider } from './context/CampsiteContext';
@@ -137,6 +138,7 @@ function App() {
       children: [
         { path: "dashboard", element: <Dashboard /> },
         { path: "request", element: <HandleRequest /> },
+        { path: "campsites", element: <AllCampsites /> },
       ]
     }
   ])

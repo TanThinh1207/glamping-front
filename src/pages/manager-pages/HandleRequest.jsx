@@ -148,7 +148,7 @@ const HandleRequest = () => {
         console.log(campsite);
     }, [campsite]);
     return (
-        <div className='w-full h-screen bg-white px-20 py-4'>
+        <div className='w-full h-screen px-20 py-4'>
             <div>
                 <h1 className='text-4xl font-semibold py-8'>Request</h1>
             </div>
@@ -172,7 +172,7 @@ const HandleRequest = () => {
                                 {createCampsiteRequests.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((request) => (
                                     <tr
                                         key={request.id}
-                                        className="cursor-pointer hover:bg-gray-100 group"
+                                        className="cursor-pointer hover:bg-gray-200 group"
                                         onClick={() => setCampsite(request)}
                                     >
                                         <td className="p-4 flex items-center gap-5">
@@ -277,7 +277,6 @@ const HandleRequest = () => {
                             </div>
                         </div>
                     </div>
-
                 )}
             </div>
             {isOpen && (
