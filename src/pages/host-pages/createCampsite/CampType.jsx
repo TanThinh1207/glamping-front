@@ -107,6 +107,8 @@ const CampType = () => {
     setCampTypeWeekendRate('');
     setSelectedFacilities([]);
   };
+ 
+  const isFormValid = campTypeName.trim() && campTypePrice && selectedFacilities.length > 0 && campTypeImage && campTypeQuantity && campTypeWeekendRate && numberOfGuests;
 
   return (
     <div className='w-full bg-white py-24 px-96'>
@@ -237,8 +239,9 @@ const CampType = () => {
             </div>
             <div className='text-right'>
               <button
-                className='bg-black text-white px-4 py-2 rounded-xl'
+                className={`px-4 py-2 rounded-xl ${isFormValid ? 'bg-black text-white' : 'bg-gray-300 text-gray-600 cursor-not-allowed'}`}
                 onClick={handleAddCampType}
+                disabled={!isFormValid}
               >
                 Add Camp Type
               </button>

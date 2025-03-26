@@ -44,9 +44,9 @@ const EditCampType = () => {
 
   useEffect(() => {
     console.log("Updated camptype ", campsite.campSiteCampTypeList);
-      if(campsite.campSiteCampTypeList) {
-        setCampTypes(campsite.campSiteCampTypeList);
-      }
+    if (campsite.campSiteCampTypeList) {
+      setCampTypes(campsite.campSiteCampTypeList);
+    }
     console.log(id);
   }, [campsite]);
 
@@ -138,8 +138,8 @@ const EditCampType = () => {
       console.log('Selected facilities:', selectedFacilities);
       const { type, capacity, price, quantity, weekendRate } = updateCampType;
       const filteredFacilities = selectedFacilities.map((facility) => facility.id);
-      const filteredCampType = { type, capacity, price, quantity, weekendRate};
-      await axios.put(`${import.meta.env.VITE_API_GET_CAMPTYPES}/${updateCampType.id}` , JSON.stringify(filteredCampType), {
+      const filteredCampType = { type, capacity, price, quantity, weekendRate };
+      await axios.put(`${import.meta.env.VITE_API_GET_CAMPTYPES}/${updateCampType.id}`, JSON.stringify(filteredCampType), {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -155,6 +155,19 @@ const EditCampType = () => {
       console.error('Error updating camp type:', error);
     }
   }
+
+  const isFormValid = () => {
+    return (
+      newCampType.type.trim() !== "" &&
+      newCampType.capacity.trim() !== "" &&
+      newCampType.quantity.trim() !== "" &&
+      newCampType.price.trim() !== "" &&
+      newCampType.weekendRate.trim() !== "" &&
+      selectedFacilities.length > 0 &&
+      newImage !== ""
+    );
+  };
+
   return (
     <div className='min-h-screen px-44 pb-20 relative'>
       <div className='flex justify-between items-center'>
@@ -286,8 +299,10 @@ const EditCampType = () => {
             </div>
             <div className='text-right'>
               <button
-                className='bg-black text-white px-4 py-2 rounded-xl'
+                className={`px-4 py-2 rounded-xl ${isFormValid() ? "bg-black text-white" : "bg-gray-300 text-gray-600 cursor-not-allowed"
+                  }`}
                 onClick={handleAddCampType}
+                disabled={!isFormValid()}
               >
                 Add Camp Type
               </button>
@@ -366,31 +381,31 @@ const EditCampType = () => {
                 <div className='mb-4'>
                   <h1 className='text-2xl font-semibold mb-2'>Facilities</h1>
                   <div className='flex gap-4 flex-wrap'>
-                      {facilities?.map((facility) => (
-                        <div
-                          key={facility.id}
-                          className={`rounded-2xl p-2 cursor-pointer transition ${selectedFacilities.some((item) => item.id === facility.id)
-                              ? "bg-gradient-to-r from-green-500 to-green-600 text-white border-green-500 border"
-                              : "border-gray-300 border"
-                            }`}
-                          onClick={() => toggleFacility(facility)}
-                        >
-                          {facility.name}
-                        </div>
-                      ))}
-                    </div>
+                    {facilities?.map((facility) => (
+                      <div
+                        key={facility.id}
+                        className={`rounded-2xl p-2 cursor-pointer transition ${selectedFacilities.some((item) => item.id === facility.id)
+                          ? "bg-gradient-to-r from-green-500 to-green-600 text-white border-green-500 border"
+                          : "border-gray-300 border"
+                          }`}
+                        onClick={() => toggleFacility(facility)}
+                      >
+                        {facility.name}
+                      </div>
+                    ))}
                   </div>
-                  <div className='text-right p-4'>
-                    <button className='bg-black text-white px-4 py-2 rounded-xl' onClick={handleUpdateCampType} >Update</button>
-                    <button className='bg-red-500 text-white px-4 py-2 rounded-xl ml-4' onClick={handleCloseUpdateCampType}>Cancel</button>
-                  </div>
+                </div>
+                <div className='text-right p-4'>
+                  <button className='bg-black text-white px-4 py-2 rounded-xl' onClick={handleUpdateCampType} >Update</button>
+                  <button className='bg-red-500 text-white px-4 py-2 rounded-xl ml-4' onClick={handleCloseUpdateCampType}>Cancel</button>
                 </div>
               </div>
             </div>
           </div>
-      )}
         </div>
-      )
-      }
+      )}
+    </div>
+  )
+}
 
-      export default EditCampType
+export default EditCampType

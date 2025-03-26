@@ -13,26 +13,19 @@ const formatVND = (amount) => {
 
 const Earnings = () => {
   const [view, setView] = useState("daily");
-
-  // Get the first and last day of the current month
   const today = new Date();
   const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
   const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-
   const [startDate, setStartDate] = useState(firstDayOfMonth);
   const [endDate, setEndDate] = useState(lastDayOfMonth);
   const { user } = useUser();
   const [filteredData, setFilteredData] = useState([]);
+  const [recentRevenue, setRecentRevenue] = useState(0);
 
-  // Call API for earnings data
   useEffect(() => {
     const fetchEarningsData = async () => {
       try {
-        console.log('Fetching earnings data for user:', user.id);
-        console.log('Start Date:', startDate.toISOString().split('T')[0]);
-        console.log('End Date:', endDate.toISOString().split('T')[0]);
-
-        const response = await axios.get(`${import.meta.env.VITE_API_REVENUE}/26`, {
+        const response = await axios.get(`${import.meta.env.VITE_API_REVENUE}/${user.id}`, {
           params: {
             startDate: startDate.toISOString().split('T')[0],
             endDate: endDate.toISOString().split('T')[0],
@@ -40,7 +33,9 @@ const Earnings = () => {
           }
         });
 
-        const profitList = response.data.data.profitList || [];
+        const { recentRevenue, profitList } = response.data.data;
+        setRecentRevenue(recentRevenue);
+        
         const formattedData = profitList.map((item) => ({
           date: item.date,
           earnings: item.totalRevenue,
@@ -55,15 +50,19 @@ const Earnings = () => {
     fetchEarningsData();
   }, [startDate, endDate, user, view]);
 
+  const totalEarnings = filteredData.reduce((sum, item) => sum + item.earnings, 0);
+  const percentageChange = recentRevenue !== 0 ? ((totalEarnings - recentRevenue) / recentRevenue) * 100 : 0;
+
   return (
     <div className="p-11">
-      {/* Earnings Title */}
       <h1 className="text-3xl font-bold">You've made</h1>
-      <h2 className="text-4xl font-bold text-gray-500">
-        {formatVND(filteredData.reduce((sum, item) => sum + item.earnings, 0))}
+      <h2 className="text-4xl font-bold text-gray-500 flex items-center">
+        {formatVND(totalEarnings)}
+        <span className={`ml-2 text-lg ${percentageChange >= 0 ? "text-green-500" : "text-red-500"}`}>
+          ({percentageChange.toFixed(2)}%)
+        </span>
       </h2>
 
-      {/* Date Range Picker */}
       <div className="flex space-x-4 items-center mt-4">
         <div>
           <label className="block text-sm font-medium text-gray-700">Start Date</label>
@@ -90,7 +89,6 @@ const Earnings = () => {
         </div>
       </div>
 
-      {/* Toggle Buttons */}
       <div className="flex justify-center mt-4 space-x-2">
         <button
           className={`px-4 py-1 rounded-full text-sm font-medium transition ${view === "daily" ? "bg-black text-white" : "bg-gray-100 text-black"}`}
@@ -106,7 +104,6 @@ const Earnings = () => {
         </button>
       </div>
 
-      {/* Earnings Chart */}
       <div className="mt-10 h-96 w-full px-4">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={filteredData}>
@@ -114,12 +111,7 @@ const Earnings = () => {
               height={90}
               dataKey="date"
               tick={{ angle: -25, textAnchor: "end" }}
-              tickFormatter={(date) => {
-                if (view === "monthly") {
-                  return format(parseISO(date), "MMMM"); // Full month name
-                }
-                return format(parseISO(date), "MM-dd"); // Example: "03-15" for daily view
-              }}
+              tickFormatter={(date) => view === "monthly" ? format(parseISO(date), "MMMM") : format(parseISO(date), "MM-dd")}
             />
             <YAxis width={100} tickFormatter={(value) => formatVND(value)} />
             <Tooltip formatter={(value) => formatVND(value)} />

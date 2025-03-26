@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Chart as ChartJS,
-  ArcElement,
   LineElement,
   BarElement,
   PointElement,
@@ -11,10 +10,10 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { Pie, Line, Bar } from "react-chartjs-2";
+import { Line, Bar } from "react-chartjs-2";
+import axios from "axios";
 
 ChartJS.register(
-  ArcElement,
   LineElement,
   BarElement,
   PointElement,
@@ -26,99 +25,111 @@ ChartJS.register(
 );
 
 const Dashboard = () => {
-  const pieData = {
-    labels: ["5 ★", "4 ★", "3 ★", "2 ★", "1 ★"],
-    datasets: [
-      {
-        data: [1259, 374, 159, 55, 29],
-        backgroundColor: [
-          "#4CAF50",
-          "#2196F3",
-          "#FFC107",
-          "#FF5722",
-          "#9C27B0",
-        ],
-      },
-    ],
-  };
+  const today = new Date();
+  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
+    .toISOString()
+    .split("T")[0];
+  const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+    .toISOString()
+    .split("T")[0];
 
-  const lineData = {
-    labels: Array.from({ length: 12 }, (_, i) => i + 1),
-    datasets: [
-      {
-        label: "Bookings",
-        data: [
-          5000, 7000, 6080, 7800, 7590, 7500, 8200, 6500, 6780, 7000, 8000,
-          8590,
-        ],
-        borderColor: "#FF5733",
-        fill: false,
-        tension: 0.4,
-      },
-    ],
-  };
+  const [startDate, setStartDate] = useState(firstDayOfMonth);
+  const [endDate, setEndDate] = useState(lastDayOfMonth);
+  const [frequency, setFrequency] = useState("daily");
+  const [data, setData] = useState({ profitList: [] });
 
-  const revenueData = {
-    labels: [
-      "01/01/2024",
-      "01/02/2024",
-      "01/03/2024",
-      "01/04/2024",
-      "01/05/2024",
-      "01/06/2024",
-      "01/07/2024",
-      "01/08/2024",
-      "01/09/2024",
-      "01/10/2024",
-      "01/11/2024",
-      "01/12/2024",
-    ],
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_REVENUE}/system`, {
+          params: {
+            startDate,
+            endDate,
+            interval: frequency,
+          },
+      });
+        setData(response.data.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
+  }, [startDate, endDate, frequency]);
+
+  const filteredData = data.profitList;
+  const labels = filteredData.map((entry) => entry.date);
+  const revenueData = filteredData.map((entry) => entry.totalRevenue);
+  const profitData = filteredData.map((entry) => entry.totalProfit);
+
+  const revenueChart = {
+    labels,
     datasets: [
       {
         label: "Revenue",
-        data: [
-          6500, 7200, 6400, 8200, 7600, 8400, 7900, 8700, 9100, 8600, 9500,
-          10220,
-        ],
+        data: revenueData,
         borderColor: "#48AAAD",
-        backgroundColor: "#48AAAD",
+        backgroundColor: "rgba(72, 170, 173, 0.2)",
         borderWidth: 2,
         pointBackgroundColor: "#48AAAD",
-        pointBorderColor: "#fff",
         tension: 0.3,
       },
     ],
   };
 
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
+  const profitChart = {
+    labels,
+    datasets: [
+      {
+        label: "Profit",
+        data: profitData,
+        backgroundColor: "#4CAF50",
+      },
+    ],
   };
 
   return (
-    <div className="flex p-5">
-      <div className="w-11/12">
-        <h1 className="text-2xl font-semibold mb-8">Dashboard</h1>
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-10 mb-10">
-          <div className="bg-white shadow-md p-5">
-            <h2 className="text-xl font-semibold mb-4">Customers' review</h2>
-            <div className="h-80">
-              <Pie data={pieData} options={chartOptions} />
-            </div>
-          </div>
-          <div className="bg-white shadow-md p-5">
-            <h2 className="text-xl font-semibold mb-4">Number of booking</h2>
-            <div className="h-80">
-              <Line data={lineData} options={chartOptions} />
-            </div>
-          </div>
-        </div>
-        <div className="bg-white shadow-md p-5 mb-10">
-          <h2 className="text-xl font-semibold mb-4">Revenue</h2>
+    <div className="p-5">
+      <h1 className="text-2xl font-semibold mb-4">Dashboard</h1>
+      <div className="flex gap-4 mb-6">
+        <input
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          className="p-2 border rounded"
+        />
+        <input
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          className="p-2 border rounded"
+        />
+        <select
+          value={frequency}
+          onChange={(e) => setFrequency(e.target.value)}
+          className="p-2 border rounded"
+        >
+          <option value="daily">Daily</option>
+          <option value="monthly">Monthly</option>
+        </select>
+      </div>
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div className="bg-white shadow-md p-5">
+          <h2 className="text-xl font-semibold mb-4">Revenue Over Time</h2>
           <div className="h-80">
-            <Line data={revenueData} options={chartOptions} />
+            <Line data={revenueChart} options={{ responsive: true }} />
           </div>
         </div>
+        <div className="bg-white shadow-md p-5">
+          <h2 className="text-xl font-semibold mb-4">Profit Overview</h2>
+          <div className="h-80">
+            <Bar data={profitChart} options={{ responsive: true }} />
+          </div>
+        </div>
+      </div>
+      <div className="mt-6 p-5 bg-white shadow-md">
+        <h2 className="text-xl font-semibold mb-2">Summary</h2>
+        <p>Total Revenue: {revenueData.reduce((a, b) => a + b, 0).toLocaleString()} VND</p>
+        <p>Total Profit: {profitData.reduce((a, b) => a + b, 0).toLocaleString()} VND</p>
       </div>
     </div>
   );

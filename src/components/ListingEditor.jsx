@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import axios from 'axios';
 import { useCampsite } from '../context/CampsiteContext';
 
 const ListingEditor = () => {
@@ -12,14 +11,14 @@ const ListingEditor = () => {
     const googleMapUrl = `https://www.google.com/maps?q=${campsite.latitude},${campsite.longitude}&hl=es;z=14&output=embed`;
 
     const handleClick = (section) => {
-        setActiveSection(section); // Update active state
+        setActiveSection(section);
         navigate(`/hosting/listings/editor/${id}/details/${section}`);
     };
 
     useEffect(() => {
         console.log(campsite);
     }, [campsite]);
-    
+
     return (
         <div className='flex flex-col h-screen'>
             <div className='flex items-center'>
@@ -39,25 +38,33 @@ const ListingEditor = () => {
                 >
                     <div className='mb-4'>
                         <h1 className="text-xl">Photo</h1>
-                        <h2 className="text-xl font-semibold text-gray-400">{campsite.imageList?.length} photo</h2>
+                        {loading ? (
+                            <div className="flex justify-center items-center h-16 w-full">
+                                <div className="animate-spin rounded-full border-t-4 border-teal-400 border-solid h-8 w-8"></div>
+                            </div>
+                        ) : (
+                            <h2 className="text-xl font-semibold text-gray-400">{campsite.imageList?.length} photo</h2>
+                        )}
                     </div>
-                    <div className="relative w-40 h-40 mx-auto rounded-2xl">
-                        <img
-                            src={campsite.imageList?.[0]?.path}
-                            alt="Campsite"
-                            className="absolute inset-0 w-full h-full object-cover rounded-2xl z-20 shadow-xl"
-                        />
-                        <img
-                            src={campsite.imageList?.[1]?.path}
-                            alt="Campsite"
-                            className="absolute top-6 right-1/2 -translate-x-5 -rotate-2 w-32 h-32 object-cover rounded-2xl z-10 shadow-xl"
-                        />
-                        <img
-                            src={campsite.imageList?.[2]?.path}
-                            alt="Campsite"
-                            className="absolute top-6 left-1/2 translate-x-5 rotate-2 w-32 h-32 object-cover rounded-2xl z-0 shadow-xl"
-                        />
-                    </div>
+                    {!loading && (
+                        <div className="relative w-40 h-40 mx-auto rounded-2xl">
+                            <img
+                                src={campsite.imageList?.[0]?.path}
+                                alt="Campsite"
+                                className="absolute inset-0 w-full h-full object-cover rounded-2xl z-20 shadow-xl"
+                            />
+                            <img
+                                src={campsite.imageList?.[1]?.path}
+                                alt="Campsite"
+                                className="absolute top-6 right-1/2 -translate-x-5 -rotate-2 w-32 h-32 object-cover rounded-2xl z-10 shadow-xl"
+                            />
+                            <img
+                                src={campsite.imageList?.[2]?.path}
+                                alt="Campsite"
+                                className="absolute top-6 left-1/2 translate-x-5 rotate-2 w-32 h-32 object-cover rounded-2xl z-0 shadow-xl"
+                            />
+                        </div>
+                    )}
                 </div>
                 <div
                     className={`rounded-lg p-4 shadow-md cursor-pointer hover:bg-gray-100 
@@ -65,7 +72,13 @@ const ListingEditor = () => {
                     onClick={() => handleClick("title")}
                 >
                     <h1 className='text-xl'>Title</h1>
-                    <h1 className='text-xl font-semibold text-gray-400'>{campsite.name}</h1>
+                    {loading ? (
+                        <div className="flex justify-center items-center h-16 w-full">
+                            <div className="animate-spin rounded-full border-t-4 border-teal-400 border-solid h-8 w-8"></div>
+                        </div>
+                    ) : (
+                        <h1 className='text-xl font-semibold text-gray-400'>{campsite.name}</h1>
+                    )}
                 </div>
                 <div
                     className={`rounded-lg p-4 shadow-md cursor-pointer hover:bg-gray-100 
@@ -73,7 +86,13 @@ const ListingEditor = () => {
                     onClick={() => handleClick("description")}
                 >
                     <h1 className='text-xl'>Description</h1>
-                    <h1 className='text-xl font-semibold text-gray-400'>{campsite.description}</h1>
+                    {loading ? (
+                        <div className="flex justify-center items-center h-16 w-full">
+                            <div className="animate-spin rounded-full border-t-4 border-teal-400 border-solid h-8 w-8"></div>
+                        </div>
+                    ) : (
+                        <h1 className='text-xl font-semibold text-gray-400'>{campsite.description}</h1>
+                    )}
                 </div>
                 <div
                     className={`rounded-lg p-4 shadow-md cursor-pointer hover:bg-gray-100 
@@ -81,7 +100,13 @@ const ListingEditor = () => {
                     onClick={() => handleClick("place-type")}
                 >
                     <h1 className='text-xl'>Place type</h1>
-                    <h1 className='text-xl font-semibold text-gray-400'>{campsite.campSitePlaceTypeList?.map((placeType) => placeType.name).join(", ")}</h1>
+                    {loading ? (
+                        <div className="flex justify-center items-center h-16 w-full">
+                            <div className="animate-spin rounded-full border-t-4 border-teal-400 border-solid h-8 w-8"></div>
+                        </div>
+                    ) : (
+                        <h1 className='text-xl font-semibold text-gray-400'>{campsite.campSitePlaceTypeList?.map((placeType) => placeType.name).join(", ")}</h1>
+                    )}
                 </div>
                 <div
                     className={`rounded-lg p-4 shadow-md cursor-pointer hover:bg-gray-100 
@@ -89,7 +114,13 @@ const ListingEditor = () => {
                     onClick={() => handleClick("amenities")}
                 >
                     <h1 className='text-xl'>Amenities</h1>
-                    <h1 className='text-xl font-semibold text-gray-400'>{campsite.campSiteUtilityList?.map((utility) => utility.name).join(", ")}</h1>
+                    {loading ? (
+                       <div className="flex justify-center items-center h-16 w-full">
+                            <div className="animate-spin rounded-full border-t-4 border-teal-400 border-solid h-8 w-8"></div>
+                        </div>
+                    ) : (
+                        <h1 className='text-xl font-semibold text-gray-400'>{campsite.campSiteUtilityList?.map((utility) => utility.name).join(", ")}</h1>
+                    )}
                 </div>
                 <div
                     className={`rounded-lg p-4 shadow-md cursor-pointer hover:bg-gray-100 
@@ -97,14 +128,22 @@ const ListingEditor = () => {
                     onClick={() => handleClick("location")}
                 >
                     <h1 className='text-xl'>Location</h1>
-                    <iframe
-                        width="100%"
-                        height="300"
-                        className='rounded-lg my-2'
-                        src={googleMapUrl}
-                        allowFullScreen
-                    />
-                    <h1 className='text-xl font-semibold text-gray-400'>{campsite.address}, {campsite.city}</h1>
+                    {loading ? (
+                        <div className="flex justify-center items-center h-64 w-full">
+                            <div className="animate-spin rounded-full border-t-4 border-teal-400 border-solid h-16 w-16"></div>
+                        </div>
+                    ) : (
+                        <>
+                            <iframe
+                                width="100%"
+                                height="300"
+                                className='rounded-lg my-2'
+                                src={googleMapUrl}
+                                allowFullScreen
+                            />
+                            <h1 className='text-xl font-semibold text-gray-400'>{campsite.address}, {campsite.city}</h1>
+                        </>
+                    )}
                 </div>
                 <div
                     className={`rounded-lg p-4 shadow-md cursor-pointer hover:bg-gray-100 
@@ -112,7 +151,13 @@ const ListingEditor = () => {
                     onClick={() => handleClick("service")}
                 >
                     <h1 className='text-xl'>Service</h1>
-                    <h1 className='text-xl font-semibold text-gray-400'>{campsite.campSiteSelectionsList?.map((service) => service.name).join(", ")}</h1>
+                    {loading ? (
+                        <div className="flex justify-center items-center h-16 w-full">
+                            <div className="animate-spin rounded-full border-t-4 border-teal-400 border-solid h-8 w-8"></div>
+                        </div>
+                    ) : (
+                        <h1 className='text-xl font-semibold text-gray-400'>{campsite.campSiteSelectionsList?.map((service) => service.name).join(", ")}</h1>
+                    )}
                 </div>
                 <div
                     className={`rounded-lg p-4 shadow-md cursor-pointer hover:bg-gray-100 
@@ -120,7 +165,13 @@ const ListingEditor = () => {
                     onClick={() => handleClick("camp-type")}
                 >
                     <h1 className='text-xl'>Camp Type</h1>
-                    <h1 className='text-xl font-semibold text-gray-400'>{campsite.campSiteCampTypeList?.map((type) => type.type).join(", ")}</h1>
+                    {loading ? (
+                        <div className="flex justify-center items-center h-16 w-full">
+                            <div className="animate-spin rounded-full border-t-4 border-teal-400 border-solid h-8 w-8"></div>
+                        </div>
+                    ) : (
+                        <h1 className='text-xl font-semibold text-gray-400'>{campsite.campSiteCampTypeList?.map((type) => type.type).join(", ")}</h1>
+                    )}
                 </div>
             </div>
         </div>

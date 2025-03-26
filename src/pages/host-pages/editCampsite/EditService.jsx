@@ -89,22 +89,31 @@ const EditService = () => {
 
   const handleUpdateService = async () => {
     try {
-        const { id, name, description, price } = updateService;
-        const numericPrice = Number(price);
-        const filteredService = { id, name, description, price: numericPrice };
+      const { id, name, description, price } = updateService;
+      const numericPrice = Number(price);
+      const filteredService = { id, name, description, price: numericPrice };
 
-        console.log('Updating service:', JSON.stringify(filteredService));
-        await axios.put(`${import.meta.env.VITE_API_GET_SERVICES}`, JSON.stringify(filteredService), {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-        fetchCampsiteDetails();
-        handleCloseUpdateService();
+      console.log('Updating service:', JSON.stringify(filteredService));
+      await axios.put(`${import.meta.env.VITE_API_GET_SERVICES}`, JSON.stringify(filteredService), {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      fetchCampsiteDetails();
+      handleCloseUpdateService();
     } catch (error) {
-        console.error('Error updating service:', error);
+      console.error('Error updating service:', error);
     }
-};
+  };
+
+  const isFormValid = () => {
+    return (
+      newService.name.trim() !== "" &&
+      newService.description.trim() !== "" &&
+      newService.price.trim() !== "" &&
+      newImage
+    )
+  };
   return (
     <div className='h-screen px-44 pb-20 relative'>
       <div className='flex justify-between items-center'>
@@ -196,7 +205,14 @@ const EditService = () => {
               </div>
             </div>
             <div className='text-right'>
-              <button className='bg-black text-white px-4 py-2 rounded-xl' onClick={handleAddNewService} >Add service</button>
+              <button
+                className={`px-4 py-2 rounded-xl ${isFormValid() ? "bg-black text-white" : "bg-gray-300 text-gray-600 cursor-not-allowed"
+                  }`}
+                onClick={handleAddNewService}
+                disabled={!isFormValid()}
+              >
+                Add service
+              </button>
               <button className='bg-red-500 text-white px-4 py-2 rounded-xl ml-4' onClick={handleCloseAddService}>Cancel</button>
             </div>
           </div>
@@ -205,44 +221,44 @@ const EditService = () => {
       {updateService && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
           <div ref={modalRef} className='bg-white shadow-lg w-3/5 h-4/5 relative rounded-xl'>
-          <div className='flex w-full h-full'>
-            <div className='relative w-1/2 h-full'>
-              <img src={updateService.image} alt='campsite' className='w-auto h-full object-cover rounded-l-xl ' />
-            </div>
-            <div className='w-1/2 p-6 flex flex-col overflow-y-auto'>
-              <div className='mb-4'>
-                <h1 className='text-2xl font-semibold mb-2'>Service Name</h1>
-                <input
-                  className='w-full h-10 border-2 rounded-xl border-gray-200 p-2'
-                  placeholder='Enter your service name'
-                  value={updateService.name}
-                  onChange={(e) => setUpdateService({ ...updateService, name: e.target.value })}
-                />
+            <div className='flex w-full h-full'>
+              <div className='relative w-1/2 h-full'>
+                <img src={updateService.image} alt='campsite' className='w-auto h-full object-cover rounded-l-xl ' />
               </div>
-              <div className='mb-4'>
-                <h1 className='text-2xl font-semibold mb-2'>Service Description</h1>
-                <textarea
-                  className='w-full h-32 border-2 rounded-xl border-gray-200 p-2'
-                  placeholder='Enter your service description'
-                  value={updateService.description}
-                  onChange={(e) => setUpdateService({ ...updateService, description: e.target.value })}
-                />
+              <div className='w-1/2 p-6 flex flex-col overflow-y-auto'>
+                <div className='mb-4'>
+                  <h1 className='text-2xl font-semibold mb-2'>Service Name</h1>
+                  <input
+                    className='w-full h-10 border-2 rounded-xl border-gray-200 p-2'
+                    placeholder='Enter your service name'
+                    value={updateService.name}
+                    onChange={(e) => setUpdateService({ ...updateService, name: e.target.value })}
+                  />
+                </div>
+                <div className='mb-4'>
+                  <h1 className='text-2xl font-semibold mb-2'>Service Description</h1>
+                  <textarea
+                    className='w-full h-32 border-2 rounded-xl border-gray-200 p-2'
+                    placeholder='Enter your service description'
+                    value={updateService.description}
+                    onChange={(e) => setUpdateService({ ...updateService, description: e.target.value })}
+                  />
+                </div>
+                <div className='mb-4'>
+                  <h1 className='text-2xl font-semibold mb-2'>Service Price</h1>
+                  <input
+                    className='w-full h-10 border-2 rounded-xl border-gray-200 p-2'
+                    placeholder='Enter your service price'
+                    type='number'
+                    value={updateService.price}
+                    onChange={(e) => setUpdateService({ ...updateService, price: e.target.value })}
+                  />
+                </div>
+                <div className='text-right p-4'>
+                  <button className='bg-black text-white px-4 py-2 rounded-xl' onClick={handleUpdateService} >Update service</button>
+                  <button className='bg-red-500 text-white px-4 py-2 rounded-xl ml-4' onClick={handleCloseUpdateService}>Cancel</button>
+                </div>
               </div>
-              <div className='mb-4'>
-                <h1 className='text-2xl font-semibold mb-2'>Service Price</h1>
-                <input
-                  className='w-full h-10 border-2 rounded-xl border-gray-200 p-2'
-                  placeholder='Enter your service price'
-                  type='number'
-                  value={updateService.price}
-                  onChange={(e) => setUpdateService({ ...updateService, price: e.target.value })}
-                />
-              </div>
-              <div className='text-right p-4'>
-                <button className='bg-black text-white px-4 py-2 rounded-xl' onClick={handleUpdateService} >Update service</button>
-                <button className='bg-red-500 text-white px-4 py-2 rounded-xl ml-4' onClick={handleCloseUpdateService}>Cancel</button>
-              </div>
-            </div>
             </div>
           </div>
         </div>

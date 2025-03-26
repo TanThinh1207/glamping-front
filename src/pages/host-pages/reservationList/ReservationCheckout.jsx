@@ -246,7 +246,7 @@ const ReservationCheckout = () => {
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
           <div ref={modalRef} className='bg-white shadow-md  w-3/5 h-4/5 relative rounded-xl'>
             <button
-              className="absolute -top-2 -right-2 bg-red-500 text-xl p-1 rounded-full"
+              className="absolute -top-0 -right-0 text-xl p-1 text-purple-900"
               onClick={() => {
                 handleCloseModal();
                 console.log(selectedReservation);
@@ -268,7 +268,7 @@ const ReservationCheckout = () => {
                         <Swiper
                           modules={[Navigation]}
                           spaceBetween={30}
-                          slidesPerView={4}
+                          slidesPerView={2}
                           navigation
                           preventClicks={true}
                           preventClicksPropagation={false}
@@ -287,7 +287,7 @@ const ReservationCheckout = () => {
                                   <img
                                     src={campType.campTypeResponse.image}
                                     alt="campType"
-                                    className="w-14 h-14 object-cover rounded-lg"
+                                    className="w-24 h-24 object-cover rounded-lg"
                                   />
                                 </div>
                               </div>

@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import Modal from '../components/Modal';
 import thumb from '../assets/terrace.jpg';
 import { updateUserData, fetchUserData } from '../service/UserService';
+import { useLocation } from 'react-router-dom';
 
 const Account = () => {
     const [loading, setLoading] = useState(true);
@@ -37,6 +38,23 @@ const Account = () => {
     ];
 
     const modalFields = fields.filter(field => field.key !== 'email');
+    const location = useLocation();
+
+    useEffect(() => {
+        console.log("Current URL:", location.search);
+        const params = new URLSearchParams(location.search);
+        const status = params.get("status");
+        console.log("Params:", params.toString());
+        console.log("Status:", status);
+        console.log("Restricted:", localStorage.getItem("restricted"));
+        if (status === "fail") {
+            localStorage.setItem("restricted", "true");
+            toast.error("Connect payment failed!");
+        } else if (status === "success") {
+            localStorage.setItem("restricted", "false");
+            toast.success("Connect payment success!");
+        }
+    }, [location]);
 
     useEffect(() => {
         if (!user) {

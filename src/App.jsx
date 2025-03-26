@@ -32,6 +32,7 @@ import Listings from './pages/host-pages/Listings';
 import Reservations from './pages/host-pages/Reservations';
 import DetailCampsite from './pages/host-pages/DetailCampsite';
 import Earnings from "./pages/host-pages/Earnings";
+import Ratings from "./pages/host-pages/Ratings";
 
 // Reservation Subpages
 import ReservationUpcoming from './pages/host-pages/reservationList/ReservationUpcoming';
@@ -88,6 +89,7 @@ function App() {
         { path: "calendar", element: <Calendar /> },
         { path: "listings", element: <Listings /> },
         { path: "earnings", element: <Earnings /> },
+        { path: "ratings", element: <Ratings /> },
         {
           path: "reservations",
           element: <Reservations />,
