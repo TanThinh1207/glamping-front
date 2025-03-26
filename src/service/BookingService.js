@@ -129,8 +129,8 @@ export const fetchAllCampsites = async (page = 0, size = 10) => {
 
 export const createBooking = async (bookingData) => {
   try {
-    console.log(accessToken);
-    const response = await axios.get(`${import.meta.env.VITE_API_BOOKING}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_BOOKING}`, {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,

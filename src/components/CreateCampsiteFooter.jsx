@@ -25,6 +25,7 @@ const CreateCampsiteFooter = () => {
   const prevStep = currentStepIndex > 0 ? pageSteps[currentStepIndex - 1] : null;
   const nextStep = currentStepIndex < pageSteps.length - 1 ? pageSteps[currentStepIndex + 1] : null;
   const { user } = useUser();
+  const accessToken = localStorage.getItem('accessToken');
   const handleUploadImage = async (ids, images, type) => {
     const validImages = images.filter((_, index) => ids[index] !== undefined);
     const validIds = ids.filter(id => id !== undefined);
@@ -39,7 +40,9 @@ const CreateCampsiteFooter = () => {
         `${import.meta.env.VITE_API_IMAGE}`,
         formData,
         {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: { "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${accessToken}`
+           },
         }
       );
     }
@@ -59,6 +62,7 @@ const CreateCampsiteFooter = () => {
       const response = await axios.post(url, campsiteData, {
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
         },
       });
       const campsiteId = response.data.data.id;
@@ -75,7 +79,9 @@ const CreateCampsiteFooter = () => {
           `${import.meta.env.VITE_API_CAMPSITE_IMAGE}`,
           formData,
           {
-            headers: { "Content-Type": "multipart/form-data" },
+            headers: { "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${accessToken}`
+             },
           }
         );
       }

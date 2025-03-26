@@ -17,6 +17,7 @@ const ManageUtility = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const pageSize = 10;
+  const accessToken = localStorage.getItem("accessToken");
 
   const filteredUtilities = utilities
     .filter((p) => p.name && p.name.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -42,7 +43,11 @@ const ManageUtility = () => {
         const formData = new FormData();
         formData.append('id', selectedUtility.id);
         formData.append('name', selectedUtility.name);
-        const response = await axios.put(url, formData);
+        const response = await axios.put(url, formData, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        });
         const returnedData = response.data.data;
 
         if (returnedData.id === selectedUtility.id) {
@@ -58,7 +63,11 @@ const ManageUtility = () => {
         const url = `${import.meta.env.VITE_API_UTILITIES_ENDPOINT}`;
         const formData = new FormData();
         formData.append('name', selectedUtility.name);
-        const response = await axios.post(url, formData);
+        const response = await axios.post(url, formData, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        });
         const newUtility = response.data.data;
 
         setUtilities(prev => [...prev, newUtility]);
@@ -74,7 +83,11 @@ const ManageUtility = () => {
       const confirmDelete = window.confirm("Are you sure you want to delete this utility?");
       if (!confirmDelete) return;
 
-      await axios.delete(`${import.meta.env.VITE_API_UTILITIES_BY_ID_ENDPOINT}${utilityId}`);
+      await axios.delete(`${import.meta.env.VITE_API_UTILITIES_BY_ID_ENDPOINT}${utilityId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      });
       await fetchUtilities();
       toast.success("Utility deleted successfully");
     } catch (error) {
@@ -96,7 +109,11 @@ const ManageUtility = () => {
     setIsLoading(true);
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_UTILITIES_ENDPOINT}?page=${currentPage}&size=${pageSize}`
+        `${import.meta.env.VITE_API_UTILITIES_ENDPOINT}?page=${currentPage}&size=${pageSize}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      }
       );
       const responseData = response.data.data;
       setUtilities(responseData.content);

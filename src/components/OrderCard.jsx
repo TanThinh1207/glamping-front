@@ -11,6 +11,8 @@ const OrderCard = ({ booking }) => {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  
+  const accessToken = localStorage.getItem('accessToken');
 
   // Calculate nights between check-in and check-out
   const nights = differenceInDays(new Date(booking.checkOut), new Date(booking.checkIn));
@@ -59,6 +61,7 @@ const OrderCard = ({ booking }) => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 

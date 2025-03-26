@@ -176,7 +176,12 @@ const HandleRequest = () => {
                                         onClick={() => setCampsite(request)}
                                     >
                                         <td className="p-4 flex items-center gap-5">
-                                            <img src={request.imageList[0]?.path} alt={request.name} className="w-12 h-12 rounded-md object-cover" />
+                                            <img
+                                                src={request.imageList?.length ? request.imageList[0]?.path : ''}
+                                                alt={request.name}
+                                                className="w-12 h-12 rounded-md object-cover"
+                                            />
+
                                             {request.name}
                                         </td>
                                         <td className='py-4'>{request.city}</td>

@@ -10,6 +10,8 @@ const ManagePlaceType = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const pageSize = 10;
+  
+  const accessToken = localStorage.getItem("accessToken");
 
   const filteredPlacetypes = placeTypes
     .filter((p) => p.name && p.name.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -42,7 +44,7 @@ const ManagePlaceType = () => {
           url: url,
           data: object,
           headers: {
-            'Content-Type': 'application/json'
+            Authorization: `Bearer ${accessToken}`
           }
         })
         const returnedData = response.data.data;
@@ -62,7 +64,7 @@ const ManagePlaceType = () => {
           method: 'POST',
           url: `${url}?name=${encodeURIComponent(selectedPlaceType.name)}`,
           headers: {
-            'Content-Type': 'application/json'
+            Authorization: `Bearer ${accessToken}`
           }
         })
         const newPlaceType = response.data.data;
@@ -82,7 +84,11 @@ const ManagePlaceType = () => {
       if (!confirmDelete) return;
 
       const url = `${import.meta.env.VITE_API_PLACETYPE_BY_ID_ENDPOINT}${placeTypeId}`;
-      await axios.delete(url);
+      await axios.delete(url, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      });
 
       const response = await axios.get(`${import.meta.env.VITE_API_PLACETYPES_ENDPOINT}`);
       setPlaceTypes(response.data.data.content);
@@ -106,7 +112,7 @@ const ManagePlaceType = () => {
       const response = await axios.get(
         `${import.meta.env.VITE_API_PLACETYPES_ENDPOINT}?page=${currentPage}&size=${pageSize}`, {
         headers: {
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${accessToken}`
         }
       });
       setPlaceTypes(response.data.data.content);

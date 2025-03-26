@@ -9,6 +9,7 @@ const ReservationAll = () => {
   const { user } = useUser();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const accessToken = localStorage.getItem('accessToken');
 
   //Table Pagination
   const handleChangePage = (event, newPage) => {
@@ -26,7 +27,8 @@ const ReservationAll = () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_BOOKING}`, {
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`
           },
           params: {
             hostId: user.id,

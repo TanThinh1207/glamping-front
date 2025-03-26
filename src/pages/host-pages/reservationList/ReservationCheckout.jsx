@@ -30,6 +30,7 @@ const ReservationCheckout = () => {
       note: ''
     }
   );
+  const accessToken = localStorage.getItem('accessToken');
 
   // Function to calculate total amount
   const calculateTotalAmount = () => {
@@ -116,7 +117,8 @@ const ReservationCheckout = () => {
         setLoading(true);
         const response = await axios.get(`${import.meta.env.VITE_API_BOOKING}`, {
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`
           },
           params: {
             hostId: user.id,
@@ -143,7 +145,8 @@ const ReservationCheckout = () => {
           orderList ,
         {
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`
           }
         }
       );

@@ -14,6 +14,7 @@ const Hosting = () => {
   const [reservationsByStatus, setReservationsByStatus] = useState({});
   const navigate = useNavigate();
   const [restrictedAcount, setRestrictedAccount] = useState(user.restricted);
+  const accessToken = localStorage.getItem('accessToken');
 
   useEffect(() => {
     const fetchReservations = async () => {
@@ -21,7 +22,9 @@ const Hosting = () => {
       try {
         console.log('user', user);
         const response = await axios.get(`${import.meta.env.VITE_API_BOOKING}`, {
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`  
+           },
           params: { hostId: user.id, size: 50 }
         });
         setAllReservations(response.data.data.content);
@@ -58,6 +61,9 @@ const Hosting = () => {
   const handleConnectPayment = async () => {
     try {
       const respone = await axios.get(`${import.meta.env.VITE_API_PAYMENT_CONNECT}`, {
+        headers: { 'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`
+        },
         params: { hostId: user.id }
       });
       console.log('response', respone.data.redirectUrl);

@@ -69,7 +69,7 @@ const BookingSummary = ({ selectedServices = [] }) => {
       console.log("Payment Response:", paymentData);
 
       if (paymentResponse.ok) {
-        window.open(paymentData.sessionUrl, '_blank');
+        window.location.href = paymentData.sessionUrl;
       } else {
         throw new Error(paymentData.message || "Payment session creation failed.");
       }

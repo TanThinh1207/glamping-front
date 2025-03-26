@@ -10,13 +10,15 @@ const ReservationCompleted = () => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const accessToken = localStorage.getItem('accessToken');
   // Call api for completed reservations
   const fetchCompletedReservations = async () => {
     setLoading(true);
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_BOOKING}`, {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`
         },
         params: {
           hostId: user.id,

@@ -12,6 +12,7 @@ const ManageAccount = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const pageSize = 10;
+    const accessToken = localStorage.getItem("accessToken");
 
     const filteredUsers = users
         .filter((p) => p.firstname && p.firstname.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -43,7 +44,12 @@ const ManageAccount = () => {
                     dob: selectedUser.birthday,
                     status: selectedUser.status,
                 }
-                const response = await axios.put(url, object);
+                const response = await axios.put(url, object , {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                });
                 const returnedData = response.data.data;
 
                 if (returnedData.id === selectedUser.id) {
@@ -69,7 +75,11 @@ const ManageAccount = () => {
             if (!confirmDelete) return;
 
             const url = `${import.meta.env.VITE_API_DELETE_USERS}${userId}`;
-            await axios.delete(url);
+            await axios.delete(url, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            });
 
             const response = await axios.get(`${import.meta.env.VITE_API_GET_USERS}`);
             setUsers(response.data.data.content);
@@ -92,7 +102,7 @@ const ManageAccount = () => {
         try {
             const response = await axios.get(`${import.meta.env.VITE_API_GET_USERS}?page=${currentPage}&size=${pageSize}`, {
                 headers: {
-                    'Content-Type': 'application/json'
+                    Authorization: `Bearer ${accessToken}`,
                 },
             });
             setUsers(response.data.data.content);

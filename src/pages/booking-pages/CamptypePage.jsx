@@ -310,19 +310,19 @@ const CamptypePage = () => {
                     </button>
                 </div>
                 <hr />
-                <div className="flex overflow-x-auto scrollbar-hide space-x-6 px-4">
+                <div className="flex overflow-x-auto scrollbar-hide space-x-6 px-4 justify-items-center">
                     {campsite?.campSiteUtilityList.map((utility, index) => (
                         <div
                             key={index}
                             className="flex-shrink-0 w-64"
                         >
-                            <div className="group relative p-6 h-full">
+                            <div className="group relative p-6 h-full items-center">
                                 <div className="flex flex-col items-center h-full">
                                     <div className="flex items-center justify-center">
                                         <img
                                             src={utility.imagePath}
                                             alt={utility.name}
-                                            className="w-30 h-30 object-contain"
+                                            className="w-20 h-20 object-contain"
                                         />
                                     </div>
                                     <h3 className="text-center font-canto text-xl">

@@ -29,9 +29,9 @@ const SidebarFrame = () => {
   ];
 
   let sidebarItems = [];
-  if (user.role === "admin" && location.pathname.startsWith("/admin")) {
+  if (user.role === "ROLE_ADMIN" && location.pathname.startsWith("/admin")) {
     sidebarItems = adminSidebarItems;
-  } else if (user.role === "manager" && location.pathname.startsWith("/manager")) {
+  } else if (user.role === "ROLE_MANAGER" && location.pathname.startsWith("/manager")) {
     sidebarItems = managerSidebarItems;
   } else {
     return <Navigate to="/" replace />;

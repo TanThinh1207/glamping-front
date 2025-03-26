@@ -11,12 +11,6 @@ const LoginPage = () => {
   const { resetBooking, booking } = useBooking();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (user) {
-      navigate("/account");
-    }
-  }, [user, navigate]);
-
   const handleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, provider);
@@ -33,20 +27,32 @@ const LoginPage = () => {
       console.log("Login Response:", data);
 
       if (response.ok) {
-        login(data.data.user);
-        booking.userId = data.data.user.id;
-        console.log("Booking:", booking);
+        const userData = data.data.user;
+        login(userData);
+
+        booking.userId = userData.id;
         localStorage.setItem("booking", JSON.stringify(booking));
         localStorage.setItem("accessToken", data.data.accessToken);
+
         toast.success("Login successful!");
+
+        if (userData.role === "ROLE_ADMIN") {
+          navigate("/admin/place-type");
+        } else if (userData.role === "ROLE_MANAGER") {
+          navigate("/manager/dashboard");
+        } else {
+          navigate("/account");
+        }
+
       } else {
-        toast.error("Login error code: " + data.statusCode)
+        toast.error("Login error code: " + data.statusCode);
         throw new Error(data.message || "Authentication failed!");
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
   };
+
 
   return (
     <div className="min-h-screen flex justify-center">

@@ -3,16 +3,12 @@ import Logo from '../assets/word-logo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNavigate, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { useUser } from '../context/UserContext';
 
 const Sidebar = ({ items }) => {
   const navigate = useNavigate();
   const location = useLocation();
-
-  const logout = () => {
-    localStorage.clear();
-    setUser(null);
-    navigate('/');
-  };
+  const { logout } = useUser();
 
   const isActive = (path) => location.pathname === path;
 
@@ -38,6 +34,7 @@ const Sidebar = ({ items }) => {
       <div className="flex justify-start w-full">
         <button
           className="w-full py-2 font-montserrat font-bold italic bg-transparent border-2 border-black text-black hover:bg-black hover:text-white border-solid hover:scale-95 transform transition-all duration-300 ease-in-out"
+          onClick={logout}
         >
           LOG OUT
         </button>

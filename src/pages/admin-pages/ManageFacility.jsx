@@ -18,6 +18,7 @@ const ManageFacility = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const pageSize = 10;
+  const accessToken = localStorage.getItem("accessToken");
 
   const filteredFacilities = facilities
     .filter(p =>
@@ -45,7 +46,12 @@ const ManageFacility = () => {
         formData.append('id', selectedFacility.id);
         formData.append('name', selectedFacility.name);
         formData.append('description', selectedFacility.description);
-        const response = await axios.put(url, formData);
+        console.log(selectedFacility);
+        const response = await axios.put(url, formData, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          },
+        });
         console.log(response);
         const returnedData = response.data.data;
 
@@ -63,7 +69,11 @@ const ManageFacility = () => {
         const formData = new FormData();
         formData.append('name', selectedFacility.name);
         formData.append('description', selectedFacility.description);
-        const response = await axios.post(url, formData);
+        const response = await axios.post(url, formData, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          },
+        });
         const newFacility = response.data.data;
         console.log(newFacility);
         setFacilities((prev) => [...prev, newFacility]);
@@ -81,7 +91,12 @@ const ManageFacility = () => {
       const confirmDelete = window.confirm("Are you sure you want to delete this facility?");
       if (!confirmDelete) return;
 
-      await axios.delete(`${import.meta.env.VITE_API_FACILITIES_BY_ID_ENDPOINT}${facilityId}`);
+      await axios.delete(`${import.meta.env.VITE_API_FACILITIES_BY_ID_ENDPOINT}${facilityId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        },
+      }
+      );
 
       await fetchFacilities();
       toast.success("Facility deleted successfully");
@@ -104,8 +119,11 @@ const ManageFacility = () => {
     setIsLoading(true);
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_FACILITIES_ENDPOINT}?page=${currentPage}&size=${pageSize}`
-      );
+        `${import.meta.env.VITE_API_FACILITIES_ENDPOINT}?page=${currentPage}&size=${pageSize}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      });
 
       const responseData = response.data.data;
       setFacilities(responseData.content);

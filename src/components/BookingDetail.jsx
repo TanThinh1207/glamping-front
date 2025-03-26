@@ -85,7 +85,8 @@ const BookingDetail = ({ selectedReservation, setSelectedReservation, refreshRes
       const formData = new FormData();
       formData.append('bookingId', id);
       formData.append('message', reason);
-      await axios.post(`${import.meta.env.VITE_API_PAYMENT_REFUND}`, formData, {
+      await fetch(`${import.meta.env.VITE_API_PAYMENT_REFUND}`, formData, {
+        method: 'POST',
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${accessToken}`,
@@ -105,7 +106,8 @@ const BookingDetail = ({ selectedReservation, setSelectedReservation, refreshRes
   const handleAccept = async (id) => {
     setLoading(true);
     try {
-      await axios.put(`${import.meta.env.VITE_API_BOOKING}/${id}?status=accept`, {
+      await fetch(`${import.meta.env.VITE_API_BOOKING}/${id}?status=accept`, {
+        method: 'PUT',
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -123,8 +125,10 @@ const BookingDetail = ({ selectedReservation, setSelectedReservation, refreshRes
   const handleCheckin = async (id) => {
     setLoading(true);
     try {
-      await axios.put(`${import.meta.env.VITE_API_BOOKING}/${id}?status=checkin`, {
+      await fetch(`${import.meta.env.VITE_API_BOOKING}/${id}?status=checkin`, {
+        method: 'PUT',
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
       });

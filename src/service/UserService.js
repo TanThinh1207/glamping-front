@@ -1,8 +1,15 @@
 import axios from "axios";
 
+let accessToken = localStorage.getItem("accessToken");
+
 export const updateUserData = async (id, userData) => {
     try {
-        const response = await axios.put(`${import.meta.env.VITE_API_USER_ID}${id}`, userData);
+        const response = await axios.put(`${import.meta.env.VITE_API_USER_ID}${id}`, userData, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${accessToken}`,
+            },
+        });
         if (!response.statusCode === 200) {
             throw new Error(`Failed to update user data: ${response.statusText}`);
         }

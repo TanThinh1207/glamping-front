@@ -126,7 +126,7 @@ function App() {
     },
     {
       path: "/admin",
-      element: <ProtectedRoute allowedRoles={["admin"]} />,
+      element: <ProtectedRoute allowedRoles={["ROLE_ADMIN"]} />,
       children: [
         {
           path: "",
@@ -142,7 +142,7 @@ function App() {
     },
     {
       path: "/manager",
-      element: <ProtectedRoute allowedRoles={["manager"]} />,
+      element: <ProtectedRoute allowedRoles={["ROLE_MANAGER"]} />,
       children: [
         {
           path: "",
