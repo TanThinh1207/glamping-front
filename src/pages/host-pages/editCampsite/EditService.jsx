@@ -60,7 +60,7 @@ const EditService = () => {
   const handleAddNewService = async () => {
     try {
       console.log('Adding new service:', JSON.stringify(newService));
-      const response = await axios.post(`${import.meta.env.VITE_API_SELECTIONS}`, JSON.stringify(newService), {
+      const response = await axios.post(`${import.meta.env.VITE_API_GET_SERVICES}`, JSON.stringify(newService), {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -94,7 +94,7 @@ const EditService = () => {
         const filteredService = { id, name, description, price: numericPrice };
 
         console.log('Updating service:', JSON.stringify(filteredService));
-        await axios.put(`${import.meta.env.VITE_API_SELECTIONS}`, JSON.stringify(filteredService), {
+        await axios.put(`${import.meta.env.VITE_API_GET_SERVICES}`, JSON.stringify(filteredService), {
             headers: {
                 'Content-Type': 'application/json',
             },
