@@ -23,6 +23,7 @@ import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/manager-pages/Dashboard';
 import HandleRequest from './pages/manager-pages/HandleRequest';
 import CompleteBookingPage from './pages/CompleteBookingPage';
+import ProtectedRoute from "./auth/ProtectedRoute";
 
 // Host
 import { CampsiteProvider } from './context/CampsiteContext';
@@ -51,13 +52,14 @@ import EditLocation from './pages/host-pages/editCampsite/EditLocation';
 import EditService from './pages/host-pages/editCampsite/EditService';
 import EditCampType from './pages/host-pages/editCampsite/EditCampType';
 import Messages from "./pages/Messages";
+import NotFound from "./pages/NotFound";
 
 function App() {
   const router = createBrowserRouter([
     {
       path: "/",
       element: <CustomerFrame />,
-      errorElement: <h1>Oops! This page doesn't exist.</h1>,
+      errorElement: <NotFound />,
       children: [
         { path: "", element: <HomePage /> },
         {
@@ -121,20 +123,32 @@ function App() {
     },
     {
       path: "/admin",
-      element: <AdminFrame />,
+      element: <ProtectedRoute allowedRoles={["admin"]} />,
       children: [
-        { path: "place-type", element: <ManagePlaceType /> },
-        { path: "account", element: <ManageAccount /> },
-        { path: "utility", element: <ManageUtility /> },
-        { path: "facility", element: <ManageFacility /> },
+        {
+          path: "",
+          element: <AdminFrame />,
+          children: [
+            { path: "place-type", element: <ManagePlaceType /> },
+            { path: "account", element: <ManageAccount /> },
+            { path: "utility", element: <ManageUtility /> },
+            { path: "facility", element: <ManageFacility /> },
+          ]
+        }
       ]
     },
     {
       path: "/manager",
-      element: <AdminFrame />,
+      element: <ProtectedRoute allowedRoles={["manager"]} />,
       children: [
-        { path: "dashboard", element: <Dashboard /> },
-        { path: "request", element: <HandleRequest /> },
+        {
+          path: "",
+          element: <AdminFrame />,
+          children: [
+            { path: "dashboard", element: <Dashboard /> },
+            { path: "request", element: <HandleRequest /> },
+          ]
+        }
       ]
     }
   ])

@@ -3,6 +3,7 @@ import { Client } from "@stomp/stompjs";
 import axios from "axios";
 
 let activeClient = null;
+const getAccessToken = () => localStorage.getItem("accessToken");
 
 export const connect = () => {
   return new Promise((resolve, reject) => {
@@ -10,7 +11,13 @@ export const connect = () => {
     const client = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000,
-      onConnect: () => resolve(client),
+      connectHeaders: {
+        Authorization: `Bearer ${getAccessToken()}`, // Attach token to WebSocket
+      },
+      onConnect: () => {
+        activeClient = client;
+        resolve(client);
+      },
       onStompError: (frame) => reject(frame),
       onWebSocketError: (error) => reject(error),
     });
@@ -32,6 +39,9 @@ export const sendMessageToUser = (senderId, content, recipientId) => {
     activeClient.publish({
       destination: "/app/sendToUser",
       body: JSON.stringify({ senderId, content, recipientId }),
+      headers: {
+        Authorization: `Bearer ${getAccessToken()}`, // Attach token to messages
+      },
     });
   } else {
     console.error("WebSocket is not connected.");
@@ -43,16 +53,18 @@ export const getRecipientsByUserId = async (userId) => {
     const response = await axios.get(
       `${import.meta.env.VITE_API_CHAT}/recipients`,
       {
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getAccessToken()}`, // Attach token to API requests
+        },
         params: { userId },
-        validateStatus: (status) => status === 200 || status === 404
+        validateStatus: (status) => status === 200 || status === 404,
       }
     );
-    
+
     return response.status === 200 ? response.data : [];
-    
   } catch (error) {
-    console.error('Error fetching recipients:', error);
+    console.error("Error fetching recipients:", error);
     return [];
   }
 };

@@ -11,6 +11,7 @@ const BookingDetail = ({ selectedReservation, setSelectedReservation, refreshRes
   const [totalRefund, setTotalRefund] = useState(selectedReservation?.totalAmount);
   const modalRef = useRef(null);
   const [reason, setReason] = useState('');
+  const accessToken = localStorage.getItem('accessToken');
 
   // Format VND for price
   const formatVND = (price) => {
@@ -86,7 +87,8 @@ const BookingDetail = ({ selectedReservation, setSelectedReservation, refreshRes
       formData.append('message', reason);
       await axios.post(`${import.meta.env.VITE_API_PAYMENT_REFUND}`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${accessToken}`,
         },
       });
       handleClosePopUp();
@@ -103,7 +105,11 @@ const BookingDetail = ({ selectedReservation, setSelectedReservation, refreshRes
   const handleAccept = async (id) => {
     setLoading(true);
     try {
-      await axios.put(`${import.meta.env.VITE_API_BOOKING}/${id}?status=accept`);
+      await axios.put(`${import.meta.env.VITE_API_BOOKING}/${id}?status=accept`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       setSelectedReservation(null);
       refreshReservations();
     } catch (error) {
@@ -117,7 +123,11 @@ const BookingDetail = ({ selectedReservation, setSelectedReservation, refreshRes
   const handleCheckin = async (id) => {
     setLoading(true);
     try {
-      await axios.put(`${import.meta.env.VITE_API_BOOKING}/${id}?status=checkin`);
+      await axios.put(`${import.meta.env.VITE_API_BOOKING}/${id}?status=checkin`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       setSelectedReservation(null);
       refreshReservations();
     } catch (error) {

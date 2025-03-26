@@ -84,7 +84,7 @@ const TripList = () => {
                 if (!booking.campSiteId) return;
 
                 const camptypesData = await fetchCamptypeById(booking.campSiteId);
-                setCamptypes(camptypesData || []);
+                setCamptypes(camptypesData.content || []);
 
                 if (booking?.bookingDetails?.length > 0 && camptypesData?.length > 0) {
                     let totalCapacity = 0;

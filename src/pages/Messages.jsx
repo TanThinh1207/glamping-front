@@ -271,7 +271,7 @@ function Messages() {
 
   return (
     <>
-      <div className="flex h-[calc(100vh-79px)] bg-gray-100 flex-col md:flex-row">
+      <div className="flex h-[calc(100vh-70px)] bg-gray-100 flex-col md:flex-row">
         {/* Sidebar */}
         <div className={`absolute md:relative w-80 bg-white border-r border-gray-200 flex flex-col transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out`}>
           {/* Search Bar */}

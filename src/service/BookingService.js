@@ -1,12 +1,22 @@
 import axios from "axios";
 
+const accessToken = localStorage.getItem("accessToken");
+
 export const fetchCampsiteById = async (campSiteId) => {
   try {
     const url = new URL(`${import.meta.env.VITE_API_GET_CAMPSITES}`);
     url.searchParams.append("id", campSiteId);
-    const response = await fetch(url.toString());
-    if (!response.ok)
+
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
       throw new Error(`Failed to fetch campsite: ${response.statusText}`);
+    }
 
     const data = await response.json();
     return data.data.content;
@@ -21,10 +31,18 @@ export const fetchCamptypeById = async (campSiteId, page = 0, size = 10) => {
     url.searchParams.append("campSiteId", campSiteId);
     url.searchParams.append("page", page);
     url.searchParams.append("size", size);
-    const response = await fetch(url.toString());
 
-    if (!response.ok)
-      throw new Error(`Failed to fetch campsite: ${response.statusText}`);
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch camptype: ${response.statusText}`);
+    }
+
     const data = await response.json();
     return {
       content: data.data.content,
@@ -54,10 +72,16 @@ export const fetchCamptypeByIdWithDate = async ({
     url.searchParams.append("page", page);
     url.searchParams.append("size", size);
 
-    const response = await fetch(url.toString());
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-    if (!response.ok)
-      throw new Error(`Failed to fetch campsite: ${response.statusText}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch camptype: ${response.statusText}`);
+    }
 
     const data = await response.json();
     return {
@@ -88,8 +112,9 @@ export const fetchAllCampsites = async (page = 0, size = 10) => {
       }
     );
 
-    if (!response.ok)
+    if (!response.ok) {
       throw new Error(`Failed to fetch campsites: ${response.statusText}`);
+    }
 
     const data = await response.json();
     return {
@@ -104,18 +129,20 @@ export const fetchAllCampsites = async (page = 0, size = 10) => {
 
 export const createBooking = async (bookingData) => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_BOOKING}`, {
-      method: "POST",
+    console.log(accessToken);
+    const response = await axios.get(`${import.meta.env.VITE_API_BOOKING}`, {
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify(bookingData),
     });
+
     if (!response.ok) {
       throw new Error(`Booking failed: ${response.statusText}`);
     }
+
     const responseData = await response.json();
-    console.log(bookingData);
     return responseData;
   } catch (error) {
     throw new Error(error.message);
@@ -127,12 +154,20 @@ export const fetchBookingByUserId = async (userId) => {
     const url = new URL(`${import.meta.env.VITE_API_BOOKING}`);
     url.searchParams.append("userId", userId);
     url.searchParams.append("direction", "desc");
-    const response = await fetch(url.toString());
-    if (!response.ok)
+
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
       throw new Error(`Failed to fetch booking: ${response.statusText}`);
+    }
 
     const data = await response.json();
-    console.log(data);
     return data.data.content;
   } catch (error) {
     throw new Error(error.message);
@@ -151,27 +186,32 @@ export const fetchCampsiteCityList = async () => {
         },
       }
     );
-    console.log(response.data.data.content);
+
     return response.data.data.content;
   } catch (error) {
     throw new Error(error.message);
   }
 };
 
-export const fetchRatingByCampsiteId = async (campsiteId, page = 0, size = 100) => {
+export const fetchRatingByCampsiteId = async (
+  campsiteId,
+  page = 0,
+  size = 100
+) => {
   try {
     const response = await axios.get(
       `${import.meta.env.VITE_API_RATING}/${campsiteId}`,
       {
         params: {
-          sortBy: 'rating',
+          sortBy: "rating",
           page: page,
           size: size,
         },
       }
     );
+
     return response.data.data.content;
   } catch (error) {
     throw new Error(error.message);
   }
-}
+};
