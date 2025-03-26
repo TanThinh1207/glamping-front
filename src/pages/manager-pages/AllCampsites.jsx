@@ -114,7 +114,7 @@ const AllCampsites = () => {
                 <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
                     <div ref={modalRef} className='bg-white shadow-md w-3/5 h-4/5 relative rounded-xl flex flex-col'>
                         <button
-                            className="absolute -top-2 -right-2 bg-red-500 text-xl p-1 rounded-full"
+                            className="absolute top-1 right-1 text-xl p-2"
                             onClick={handleCloseModal}
                         >
                             ✖
@@ -127,7 +127,7 @@ const AllCampsites = () => {
                                 <img src={selectedCampsite.imageList[0].path} alt='campsite' className='w-auto h-full object-cover rounded-l-xl' />
                             </div>
                             <div className='w-1/2 h-full flex flex-col'>
-                                <div className='flex-1 overflow-y-auto p-4'>
+                                <div className='flex-1 overflow-y-auto p-4 mt-5'>
                                     <h1 className='text-xl font-semibold'>Description</h1>
                                     <p className='text-gray-500'>{selectedCampsite.description}</p>
 
