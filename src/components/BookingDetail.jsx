@@ -301,8 +301,9 @@ const BookingDetail = ({ selectedReservation, setSelectedReservation, refreshRes
                 </div>
                 <div className='text-right mt-4'>
                   <button
-                    className='px-4 py-2 bg-green-500 text-white rounded-lg '
+                    className={`px-4 py-2 rounded-lg ${reason.trim() ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
                     onClick={() => handleDeny(id, reason)}
+                    disabled={!reason.trim()}
                   >
                     Refund
                   </button>

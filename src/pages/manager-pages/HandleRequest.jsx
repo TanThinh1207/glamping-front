@@ -291,8 +291,9 @@ const HandleRequest = () => {
                         />
                         <div className='text-right mt-4'>
                             <button
-                                className='bg-red-500 text-white rounded-md px-4 py-2'
+                                className={`px-4 py-2 rounded-lg ${message.trim() ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
                                 onClick={() => handleReject(id)}
+                                disabled={!message.trim()}
                             >
                                 Reject
                             </button>
