@@ -375,7 +375,7 @@ const CamptypePage = () => {
                             <div className='price-container rounded-md bg-blue-50 mx-8 flex justify-between p-8'>
                                 <div className='flex flex-col items-start justify-center'>
                                     <p className='font-canto text-2xl'>Best Flexible Rate</p>
-                                    <p className='text-gray-500 text-lg pt-3 gap-3 w-full font-canto'><span className='pr-1'><FontAwesomeIcon icon={faMugHot} /></span>Breakfast included</p>
+                                    
                                     {/* Display pricing breakdown */}
                                     {checkIn && checkOut && (
                                         <div className="mt-2 text-lg font-canto text-gray-600 w-full">

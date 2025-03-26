@@ -152,8 +152,8 @@ function Messages() {
           return prev;
         });
         scrollToBottom();
+        fetchChatHistory();
       }
-      fetchChatHistory();
     });
 
     return () => subscription.unsubscribe();
@@ -213,7 +213,12 @@ function Messages() {
       if (!response.ok) throw new Error("Failed to fetch messages");
 
       const data = await response.json();
-      const sortedMessages = data.content.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+      const sortedMessages = data.content
+        .map(msg => ({
+          ...msg,
+          timestamp: new Date(new Date(msg.timestamp).getTime() + 7 * 60 * 60 * 1000).toISOString()
+        }))
+        .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
       setMessages(sortedMessages);
       setTimeout(scrollToBottom, 100);
@@ -361,7 +366,10 @@ function Messages() {
                   >
                     <p className="text-sm">{msg.content}</p>
                     <div className={`text-xs mt-1 ${isSender ? 'text-blue-100' : 'text-gray-500'}`}>
-                      {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {
+                        new Date(new Date(msg.timestamp).getTime())
+                          .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                      }
                     </div>
                   </div>
                 </div>

@@ -2,7 +2,6 @@ import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import axios from "axios";
 
-const SERVER_URL = "http://18.140.180.54:8080/ws";
 let activeClient = null;
 
 export const connect = () => {
@@ -50,7 +49,6 @@ export const getRecipientsByUserId = async (userId) => {
       }
     );
     
-    // Handle empty response for 404
     return response.status === 200 ? response.data : [];
     
   } catch (error) {

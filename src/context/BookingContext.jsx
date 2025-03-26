@@ -104,6 +104,22 @@ export const BookingProvider = ({ children }) => {
         });
     }, []);
 
+    const removeCamptype = useCallback((campTypeId) => {
+        setBooking((prev) => {
+          const updatedDetails = prev.bookingDetails.filter(
+            item => item.campTypeId !== campTypeId
+          );
+          
+          const updatedBooking = { 
+            ...prev, 
+            bookingDetails: updatedDetails 
+          };
+          
+          localStorage.setItem("booking", JSON.stringify(updatedBooking));
+          return updatedBooking;
+        });
+      }, []);
+
     const updateDates = useCallback((index, checkInAt, checkOutAt) => {
         setBooking((prev) => {
             const updatedDetails = [...prev.bookingDetails];
@@ -151,7 +167,8 @@ export const BookingProvider = ({ children }) => {
             updateServices,
             updateCampsite,
             updateCamptype,
-            updateDates
+            updateDates,
+            removeCamptype
         }}>
             {children}
         </BookingContext.Provider>
