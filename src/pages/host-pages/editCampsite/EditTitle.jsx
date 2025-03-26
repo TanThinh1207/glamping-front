@@ -25,7 +25,7 @@ const EditTitle = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-screen relative">
+    <div className="flex flex-col items-center justify-center w-full h-[calc(100vh-79px)] relative">
       <h1 className='text-3xl text-gray-400'>Campsite Title</h1>
       <textarea
         className="w-full text-center text-4xl p-4 font-bold border-none outline-none bg-transparent resize-none focus:ring-0"
@@ -35,7 +35,7 @@ const EditTitle = () => {
         autoFocus
       />
 
-      <div className="fixed bottom-0 left-0 w-full bg-white border-t-2 p-4 flex justify-end">
+      <div className="fixed bottom-0 left-0 w-full bg-white border-t-2 p-4 flex justify-end z-50">
         <button
           onClick={handleSave}
           disabled={title === originalTitle}

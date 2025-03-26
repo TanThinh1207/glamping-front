@@ -17,7 +17,7 @@ const DetailCampsite = () => {
     return (
         <CampsiteProvider>
             <div className='w-full bg-white mt-10 flex'>
-                <div className='w-1/4 ml-20'>
+                <div className='w-1/4 ml-20 overflow-y-auto h-screen'>
                     <ListingEditor />
                 </div>
                 <div className='w-3/4'>

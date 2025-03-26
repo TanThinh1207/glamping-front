@@ -24,7 +24,7 @@ const EditDescription = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-screen relative">
+    <div className="flex flex-col items-center justify-center w-full h-[calc(100vh-79px)] relative">
       <h1 className='text-3xl text-gray-400'>Campsite Description</h1>
       <textarea
         className="w-full h-60 text-4xl font-bold p-4 text-center flex items-center justify-center border-none outline-none bg-transparent resize-none focus:ring-0"
