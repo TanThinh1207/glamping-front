@@ -2,12 +2,12 @@ import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import axios from "axios";
 
-const SERVER_URL = "http://localhost:8080/ws";
+const SERVER_URL = "http://18.140.180.54:8080/ws";
 let activeClient = null;
 
 export const connect = () => {
   return new Promise((resolve, reject) => {
-    const socket = new SockJS(SERVER_URL);
+    const socket = new SockJS(`${import.meta.env.VITE_WEB_SOCKET}`);
     const client = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000,

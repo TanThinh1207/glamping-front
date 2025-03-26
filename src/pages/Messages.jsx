@@ -207,7 +207,7 @@ function Messages() {
     try {
       setLoading(true);
       const response = await fetch(
-        `http://localhost:8080/api/chat/history?senderId=${userId}&recipientId=${recipientId}&page=0&size=100`
+        `${import.meta.env.VITE_API_CHAT}/history?senderId=${userId}&recipientId=${recipientId}&page=0&size=100`
       );
 
       if (!response.ok) throw new Error("Failed to fetch messages");
