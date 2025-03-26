@@ -16,6 +16,8 @@ const BookingSummary = ({ selectedServices = [] }) => {
   const checkInDate = checkInDateStr ? dayjs(checkInDateStr) : null;
   const checkOutDate = checkOutDateStr ? dayjs(checkOutDateStr) : null;
 
+  const accessToken = localStorage.getItem("accessToken");
+
   const campsiteId = booking.campSiteId;
   const [campsite, setCampsite] = useState({});
   const [camptypes, setCamptypes] = useState([]);
@@ -53,7 +55,9 @@ const BookingSummary = ({ selectedServices = [] }) => {
       // Send the full total price to payment, not just the deposit
       const paymentResponse = await fetch(`${import.meta.env.VITE_API_PAYMENT}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`
+         },
         body: JSON.stringify({
           bookingId: bookingId,
           amount: totalDeposit,
