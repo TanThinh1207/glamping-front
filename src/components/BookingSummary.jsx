@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useBooking } from "../context/BookingContext";
-import { fetchCampsiteById, fetchCamptypeById, createBooking } from "../service/BookingService";
+import { fetchCampsiteById, fetchCamptypeById, createBooking, fetchCamptypeByIdWithDate } from "../service/BookingService";
 import dayjs from "dayjs";
 import { toast } from "sonner";
+import Modal from "./Modal";
 
 const BookingSummary = ({ selectedServices = [] }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { booking, resetBooking } = useBooking();
-  const { updateTotalAmount } = useBooking();
+  const { booking, resetBooking, updateTotalAmount, removeCamptype, updateCamptype } = useBooking();
 
   const checkInDateStr = localStorage.getItem("checkInDate");
   const checkOutDateStr = localStorage.getItem("checkOutDate");
@@ -24,6 +24,11 @@ const BookingSummary = ({ selectedServices = [] }) => {
   const [capacityLimit, setCapacityLimit] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(100);
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [quantityModalOpen, setQuantityModalOpen] = useState(false);
+  const [pendingCampTypeId, setPendingCampTypeId] = useState(null);
+  const [pendingQuantity, setPendingQuantity] = useState(1);
 
   const handleConfirmBooking = async () => {
     if (!booking.userId) {
@@ -78,6 +83,35 @@ const BookingSummary = ({ selectedServices = [] }) => {
     }
   };
 
+  const handleQuantityChange = (campTypeId, newQuantity) => {
+    const campType = camptypes.find(type => type.id === campTypeId);
+
+    if (newQuantity < 1) {
+      setPendingCampTypeId(campTypeId);
+      setQuantityModalOpen(true);
+      return;
+    }
+
+    if (campType?.availableSlot && newQuantity > campType.availableSlot) {
+      toast.error(`Only ${campType.availableSlot} available slots remaining`);
+      return;
+    }
+
+    updateCamptype(campTypeId, newQuantity);
+  };
+
+  const handleConfirmRemove = () => {
+    removeCamptype(pendingCampTypeId);
+    setDeleteModalOpen(false);
+    setPendingCampTypeId(null);
+  };
+
+  const handleConfirmZeroQuantity = () => {
+    removeCamptype(pendingCampTypeId);
+    setQuantityModalOpen(false);
+    setPendingCampTypeId(null);
+  };
+
   useEffect(() => {
     try {
       if (checkInDate && checkOutDate) {
@@ -95,20 +129,50 @@ const BookingSummary = ({ selectedServices = [] }) => {
       try {
         setLoading(true);
         const campsiteData = await fetchCampsiteById(campsiteId);
-        const camptypesData = await fetchCamptypeById(campsiteId, 0, 100);
+
+        // Fetch availability data if dates are selected
+        let camptypesData;
+        if (checkInDate && checkOutDate) {
+          const response = await fetchCamptypeByIdWithDate({
+            campSiteId: campsiteId,
+            checkIn: checkInDate.format('YYYY-MM-DD'),
+            checkOut: checkOutDate.format('YYYY-MM-DD'),
+            page: 0,
+            size: 100
+          });
+          camptypesData = response.content || [];
+        } else {
+          const response = await fetchCamptypeById(campsiteId, 0, 100);
+          camptypesData = response.content || [];
+        }
+
         if (!campsiteData || campsiteData.length === 0) {
           throw new Error("Campsite data not found.");
         }
 
+        // Merge existing booking quantities with availability data
+        const updatedCamptypes = camptypesData.map(camptype => {
+          const existingBooking = booking.bookingDetails.find(
+            item => item.campTypeId === camptype.id
+          );
+          return {
+            ...camptype,
+            currentQuantity: existingBooking ? existingBooking.quantity : 0
+          };
+        });
+
         setCampsite(campsiteData[0] || {});
-        setCamptypes(camptypesData.content || []);
+        setCamptypes(updatedCamptypes);
+
       } catch (error) {
         console.error("Error fetching data:", error);
         setError(error.message);
+        toast.error("Failed to load availability data");
       } finally {
         setLoading(false);
       }
     };
+
     if (campsiteId) {
       getDataDetails();
     }
@@ -126,7 +190,7 @@ const BookingSummary = ({ selectedServices = [] }) => {
       });
       setCapacityLimit(totalCapacity);
     }
-  }, [booking, camptypes]);
+  }, [booking, camptypes, removeCamptype]);
 
   // Calculate total price including weekend rates
   useEffect(() => {
@@ -211,17 +275,48 @@ const BookingSummary = ({ selectedServices = [] }) => {
             }
 
             return (
-              <div key={index} className="mt-2 text-xl">
-                <p>
-                  <span className="font-semibold">Camp {index + 1}:</span>{" "}
-                  {campType ? campType.type : "Unknown Camp Type"}
-                </p>
-                <p>
-                  <span className="font-semibold">Quantity:</span> {item.quantity}
-                </p>
-                <p>
-                  <span className="font-semibold">Total:</span> VND {camptypeTotal.toLocaleString("vi-VN")}
-                </p>
+              <div key={index} className="mt-2 text-xl flex relative justify-between">
+                <div>
+                  <p>
+                    <span className="font-semibold">Camp {index + 1}:</span>{" "}
+                    {campType ? campType.type : "Unknown Camp Type"}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Quantity:</span> {item.quantity}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Total:</span> VND {camptypeTotal.toLocaleString("vi-VN")}
+                  </p>
+                </div>
+                <div className="flex flex-col items-end">
+                  <button
+                    onClick={() => {
+                      setPendingCampTypeId(item.campTypeId);
+                      setDeleteModalOpen(true);
+                    }}
+                    className="text-purple-900 hover:text-purple-600"
+                  >
+                    <span className="text-lg">Remove</span>
+                  </button>
+
+                  {/* Quantity controls placed below the remove button */}
+                  <div className="flex items-center gap-2 mt-2">
+                    <button
+                      onClick={() => handleQuantityChange(item.campTypeId, item.quantity - 1)}
+                      className="px-2 py-1 border rounded"
+                    >
+                      -
+                    </button>
+                    <span>{item.quantity}</span>
+                    <button
+                      onClick={() => handleQuantityChange(item.campTypeId, item.quantity + 1)}
+                      className="px-2 py-1 border rounded"
+                      disabled={campType?.availableSlot <= item.quantity}
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
               </div>
             );
           })}
@@ -259,6 +354,58 @@ const BookingSummary = ({ selectedServices = [] }) => {
       >
         CONFIRM BOOKING
       </button>
+      {/* Delete Confirmation Modal */}
+      <Modal isOpen={deleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
+        <div className="p-4">
+          <h3 className="text-xl font-semibold mb-4">Confirm Removal</h3>
+          <p>Are you sure you want to remove this accommodation from your booking?</p>
+          <div className="flex justify-end gap-4 mt-6">
+            <button
+              className="px-4 py-2 border rounded"
+              onClick={() => setDeleteModalOpen(false)}
+            >
+              Cancel
+            </button>
+            <button
+              className="px-4 py-2 bg-red-600 text-white rounded"
+              onClick={handleConfirmRemove}
+            >
+              Remove
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Zero Quantity Confirmation Modal */}
+      <Modal isOpen={quantityModalOpen} onClose={() => setQuantityModalOpen(false)}>
+        <div className="p-4">
+          <h3 className="text-xl font-semibold mb-4">Remove Accommodation</h3>
+          <p>Setting quantity to zero will remove this accommodation from your booking. Do you want to continue?</p>
+          <div className="flex justify-end gap-4 mt-6">
+            <button
+              className="px-4 py-2 border rounded"
+              onClick={() => {
+                setQuantityModalOpen(false);
+                // Reset to previous quantity
+                const campType = booking.bookingDetails.find(
+                  item => item.campTypeId === pendingCampTypeId
+                );
+                if (campType) {
+                  updateCamptype(pendingCampTypeId, campType.quantity);
+                }
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              className="px-4 py-2 bg-purple-900 text-white rounded"
+              onClick={handleConfirmZeroQuantity}
+            >
+              Confirm
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };
