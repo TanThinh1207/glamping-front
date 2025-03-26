@@ -173,7 +173,7 @@ const EditCampType = () => {
         {campTypes.map((campType) => (
           <div
             key={campType.id}
-            className='w-64 border-1 rounded-xl shadow-xl cursor-pointer relative group'
+            className='w-64 h-min border-1 rounded-xl shadow-xl cursor-pointer relative group'
             onClick={() => handleEditCampType(campType)}
           >
             <div className='relative'>
@@ -308,7 +308,7 @@ const EditCampType = () => {
               <div className='relative w-1/2 h-full'>
                 <img src={updateCampType.image} alt='campsite' className='w-auto h-full object-cover rounded-l-xl ' />
               </div>
-              <div className='w-1/2 p-6 flex flex-col'>
+              <div className='w-1/2 p-6 flex flex-col overflow-y-auto'>
                 <div className='flex space-x-4 mb-4'>
                   <div className='w-1/2'>
                     <h1 className='text-2xl font-semibold mb-2'>Camp type Name</h1>

@@ -90,7 +90,7 @@ const Services = () => {
       </div>
       <div className='flex gap-4 flex-wrap'>
         {services.filter(service => service.name).map((service, index) => (
-          <div key={index} className='w-64 border-1 rounded-xl  shadow-xl relative'>
+          <div key={index} className='w-64 h-min border-1 rounded-xl  shadow-xl relative'>
             <div className='relative'>
               {service.image && (
                 <img

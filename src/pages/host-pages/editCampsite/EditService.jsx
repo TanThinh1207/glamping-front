@@ -106,7 +106,7 @@ const EditService = () => {
     }
 };
   return (
-    <div className='min-h-screen px-44 pb-20 relative'>
+    <div className='h-screen px-44 pb-20 relative'>
       <div className='flex justify-between items-center'>
         <div>
           <h1 className='text-3xl font-semibold'>Campsite's services</h1>
@@ -123,7 +123,7 @@ const EditService = () => {
         {services.map((service) => (
           <div
             key={service.id}
-            className='w-64 border-1 rounded-xl shadow-xl cursor-pointer relative group'
+            className='w-64 h-min border-1 rounded-xl shadow-xl cursor-pointer relative group'
             onClick={() => setUpdateService(service)}
           >
             <div className='relative'>
@@ -209,7 +209,7 @@ const EditService = () => {
             <div className='relative w-1/2 h-full'>
               <img src={updateService.image} alt='campsite' className='w-auto h-full object-cover rounded-l-xl ' />
             </div>
-            <div className='w-1/2 p-6 flex flex-col'>
+            <div className='w-1/2 p-6 flex flex-col overflow-y-auto'>
               <div className='mb-4'>
                 <h1 className='text-2xl font-semibold mb-2'>Service Name</h1>
                 <input

@@ -16,11 +16,11 @@ const DetailCampsite = () => {
 
     return (
         <CampsiteProvider>
-            <div className='w-full min-h-screen bg-white mt-10 flex'>
-                <div className='w-1/4 ml-20 min-h-screen overflow-y-auto'>
+            <div className='w-full bg-white mt-10 flex'>
+                <div className='w-1/4 ml-20'>
                     <ListingEditor />
                 </div>
-                <div className='w-3/4 min-h-screen overflow-y-auto'>
+                <div className='w-3/4'>
                     <Outlet />
                 </div>
             </div>

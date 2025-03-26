@@ -116,7 +116,7 @@ const CampType = () => {
       </div>
       <div className='flex gap-4 flex-wrap'>
         {campTypes.map((camp, index) => (
-          <div key={index} className='w-64 border-1 rounded-xl shadow-xl relative'>
+          <div key={index} className='w-64 h-min border-1 rounded-xl shadow-xl relative'>
             <div className="relative">
               {camp.image && (
                 <img
