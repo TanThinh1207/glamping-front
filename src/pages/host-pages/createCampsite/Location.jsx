@@ -23,7 +23,6 @@ const countries = [
 
 const Location = () => {
   const { campsiteData, updateCampsiteData } = useCampsite();
-  
   const [map, setMap] = useState(null);
   const [marker, setMarker] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");

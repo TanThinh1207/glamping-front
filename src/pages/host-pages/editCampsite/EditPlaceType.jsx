@@ -9,6 +9,7 @@ const EditPlaceType = () => {
   const { campsite, fetchCampsiteDetails } = useCampsite();
   const [campsitePlaceType, setCampsitePlaceType] = useState([]);
   const [hasChanges, setHasChanges] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (campsite.campSitePlaceTypeList) {
@@ -41,8 +42,8 @@ const EditPlaceType = () => {
 
   const handleSave = async () => {
     try {
+      setLoading(true);
       console.log('Saving place type data:', campsitePlaceType);
-
       await axios.put(
         `${import.meta.env.VITE_API_GET_CAMPSITES}/${id}/place-types/`, campsitePlaceType);
 
@@ -50,9 +51,11 @@ const EditPlaceType = () => {
       fetchCampsiteDetails();
     } catch (error) {
       console.error('Error saving place type data:', error);
+    } finally {
+      setLoading(false);
     }
   };
-
+  const isFormValid = campsitePlaceType.length > 0;
   return (
     <div className='min-h-screen px-44 pb-20 relative'>
       <h1 className='text-3xl font-semibold mb-4'>Campsite's Place Type</h1>
@@ -69,10 +72,21 @@ const EditPlaceType = () => {
       </div>
       {hasChanges && (
         <div className='fixed bottom-0 left-0 w-full bg-white border-t-2 p-4 flex justify-end z-50'>
-          <button className='bg-purple-900 text-white hover:bg-transparent border border-purple-900 hover:text-purple-900 transform transition duration-300 px-6 py-2 rounded-lg'
+          <button className={`px-6 py-2 rounded-lg ${isFormValid
+              ? 'bg-purple-900 text-white hover:bg-transparent border border-purple-900 hover:text-purple-900 transform transition duration-300'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }`}
+            disabled={!isFormValid}
             onClick={handleSave}
           >
-            Save
+            {loading ? (
+              <>
+                <div className="animate-spin rounded-full border-t-4 border-white border-solid h-5 w-5"></div>
+                <span>Saving . . .</span>
+              </>
+            ) : (
+              "Save"
+            )}
           </button>
         </div>
       )}

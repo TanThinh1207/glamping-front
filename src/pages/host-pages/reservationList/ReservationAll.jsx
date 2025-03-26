@@ -29,7 +29,8 @@ const ReservationAll = () => {
             'Content-Type': 'application/json'
           },
           params: {
-            hostId: user.id
+            hostId: user.id,
+            size: 50,
           }
         });
         setAllReservations(response.data.data.content);

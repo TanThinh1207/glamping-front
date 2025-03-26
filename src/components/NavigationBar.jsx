@@ -17,10 +17,11 @@ const getMenuItems = (path) => {
         case path.startsWith("/hosting"):
             return [
                 { name: "Today", link: "/hosting" },
-                { name: "Calendar", link: "/hosting/calendar" },
+                // { name: "Calendar", link: "/hosting/calendar" },
                 { name: "Listings", link: "/hosting/listings" },
                 { name: "Reservations", link: "/hosting/reservations" },
                 { name: "Earnings", link: "/hosting/earnings" },
+                { name: "Ratings", link: "/hosting/ratings" },
             ];
         default:
             return [

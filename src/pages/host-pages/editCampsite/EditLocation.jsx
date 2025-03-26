@@ -32,6 +32,7 @@ const EditLocation = () => {
   const mapContainer = useRef(null);
   const [map, setMap] = useState(null);
   const [marker, setMarker] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (campsite) {
@@ -142,6 +143,7 @@ const EditLocation = () => {
 
   const handleSave = async () => {
     try {
+      setLoading(true);
       console.log("Saving changes:", { city, address, latitude, longitude });
       await axios.patch(`${import.meta.env.VITE_API_GET_CAMPSITES}/${id}`, {
         city: city,
@@ -153,9 +155,11 @@ const EditLocation = () => {
       setHasChanges(false);
     } catch (error) {
       console.error("Error saving changes:", error);
+    } finally {
+      setLoading(false);
     }
   };
-
+  const isFormValid = city && address && latitude && longitude;
   return (
     <div className="min-h-screen px-44 pb-20 relative">
       <h1 className="text-3xl font-semibold mb-4">Edit Campsite Location</h1>
@@ -233,10 +237,23 @@ const EditLocation = () => {
       </div>
       {hasChanges && (
         <div className='fixed bottom-0 left-0 w-full bg-white border-t-2 p-4 flex justify-end z-50'>
-          <button className='bg-purple-900 text-white hover:bg-transparent border border-purple-900 hover:text-purple-900 transform transition duration-300 px-6 py-2 rounded-lg'
+          <button 
+            className={`px-6 py-2 rounded-lg ${
+              isFormValid
+                ? "bg-purple-900 text-white hover:bg-transparent border border-purple-900 hover:text-purple-900 transform transition duration-300"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }`}
             onClick={handleSave}
+            disabled={!isFormValid || loading}
           >
-            Save
+            {loading ? (
+              <>
+                <div className="animate-spin rounded-full border-t-4 border-white border-solid h-5 w-5"></div>
+                <span>Saving . . .</span>
+              </>
+            ) : (
+              "Save"
+            )}
           </button>
         </div>
       )}

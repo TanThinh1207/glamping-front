@@ -203,7 +203,7 @@ const BookingDetail = ({ selectedReservation, setSelectedReservation, refreshRes
       ) : (
         <div ref={modalRef} className='bg-white shadow-md w-3/5 h-4/5 relative rounded-xl'>
           <button
-            className="absolute -top-2 -right-2 bg-red-500 text-xl p-1 rounded-full"
+            className="absolute -top-0 -right-0 text-xl p-1"
             onClick={() => setSelectedReservation(null)}
           >
             ✖

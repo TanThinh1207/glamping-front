@@ -23,8 +23,9 @@ const SidebarFrame = () => {
   ];
 
   const managerSidebarItems = [
-    { title: "Dashboard", path: "/manager/dashboard", icon: faChartPie },
-    { title: "Request", path: "/manager/request", icon: faBuilding },
+    { title: 'Dashboard', path: '/manager/dashboard', icon: faChartPie },
+    { title: 'Request', path: '/manager/request', icon: faBuilding },
+    { title: 'Campsites', path: '/manager/campsites', icon: faMountainSun },
   ];
 
   let sidebarItems = [];

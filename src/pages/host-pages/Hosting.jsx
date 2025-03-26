@@ -13,11 +13,13 @@ const Hosting = () => {
   const [allReservations, setAllReservations] = useState([]);
   const [reservationsByStatus, setReservationsByStatus] = useState({});
   const navigate = useNavigate();
+  const [restrictedAcount, setRestrictedAccount] = useState(user.restricted);
 
   useEffect(() => {
     const fetchReservations = async () => {
       setLoading(true);
       try {
+        console.log('user', user);
         const response = await axios.get(`${import.meta.env.VITE_API_BOOKING}`, {
           headers: { 'Content-Type': 'application/json' },
           params: { hostId: user.id, size: 50 }
@@ -53,11 +55,41 @@ const Hosting = () => {
     setReservationsByStatus(groupedReservations);
   }, [allReservations]);
 
+  const handleConnectPayment = async () => {
+    try {
+      const respone = await axios.get(`${import.meta.env.VITE_API_PAYMENT_CONNECT}`, {
+        params: { hostId: user.id }
+      });
+      console.log('response', respone.data.redirectUrl);
+      window.location.href = respone.data.redirectUrl;
+
+    } catch (error) {
+      console.error('Error navigating to payment page:', error);
+    }
+  }
+  
   return (
     <div className="w-full h-screen bg-white">
       <div className="mx-auto px-30 max-w-7xl text-left">
         <h1 className="text-5xl font-semibold py-8">Welcome back, {user.firstname}</h1>
       </div>
+      {restrictedAcount && (
+        <div className="mx-auto px-30 max-w-7xl text-left">
+          <h1 className="text-4xl py-8">Announcements</h1>
+            <div className="border border-red-500 bg-red-100 rounded-lg p-4 w-1/3">
+              <h1 className="text-2xl font-semibold">Your account is restricted</h1>
+              <p className="text-lg">Please add your payment's method.</p>
+              <div className="mt-6 text-right">
+              <button
+                className="text-purple-900 underline hover:text-black-900 focus:outline-none"
+                onClick={handleConnectPayment}
+              >
+                Connect payment
+              </button>
+              </div>
+          </div>
+        </div>
+      )}
       <div className="mx-auto px-30 max-w-7xl text-left">
         <h1 className="text-4xl py-8">Your reservations</h1>
         {loading ? (
@@ -104,7 +136,10 @@ const Hosting = () => {
                             Check-out: {info.checkOut}
                           </p>
                           <div className="mt-6 text-right">
-                            <button className="text-purple-900 underline hover:text-black-900 focus:outline-none" onClick={() => navigate(getReservationPath(info.status))}>
+                            <button
+                              className="text-purple-900 underline hover:text-black-900 focus:outline-none"
+                              onClick={() => navigate(getReservationPath(info.status))}
+                            >
                               View reservation
                             </button>
                           </div>

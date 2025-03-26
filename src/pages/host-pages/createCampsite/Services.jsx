@@ -74,10 +74,12 @@ const Services = () => {
   // Format VND
   const formatVND = (price) => {
     const numPrice = Number(price);
-    return !isNaN(numPrice) 
-      ? numPrice.toLocaleString("vi-VN", { style: "currency", currency: "VND" }) 
+    return !isNaN(numPrice)
+      ? numPrice.toLocaleString("vi-VN", { style: "currency", currency: "VND" })
       : "Invalid price";
   };
+  const isFormValid = serviceName.trim() && serviceDesc.trim() && servicePrice && serviceImage;
+
   return (
     <div className='w-full bg-white py-24 px-96'>
       <div className='mb-8'>
@@ -171,7 +173,13 @@ const Services = () => {
               </div>
             </div>
             <div className='text-right'>
-              <button className='bg-black text-white px-4 py-2 rounded-xl' onClick={handleAddService}>Add service</button>
+              <button
+                className={`px-4 py-2 rounded-xl ${isFormValid ? 'bg-black text-white' : 'bg-gray-300 text-gray-600 cursor-not-allowed'}`}
+                onClick={handleAddService}
+                disabled={!isFormValid}
+              >
+                Add service
+              </button>
               <button className='bg-red-500 text-white px-4 py-2 rounded-xl ml-4' onClick={handleClosePopUp}>Cancel</button>
             </div>
           </div>

@@ -9,12 +9,13 @@ import { useUser } from '../../context/UserContext';
 
 const Listings = () => {
     const navigate = useNavigate();
-
-
-    //Table Pagination
+    const [campsiteList, setCampsiteList] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const { user } = useUser();
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
 
+    //Table Pagination
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
@@ -25,9 +26,6 @@ const Listings = () => {
     };
 
     //Call api for campsite listings
-    const [campsiteList, setCampsiteList] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const { user } = useUser();
     useEffect(() => {
         const fetchCampsiteList = async (user) => {
             setLoading(true);
