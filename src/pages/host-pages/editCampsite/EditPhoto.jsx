@@ -57,7 +57,7 @@ const EditPhoto = () => {
   };
 
   // Save changes 
-  const saveChanges = () => {
+  const handleSave = () => {
     try {
       axios.patch(`${import.meta.env.VITE_API_GET_CAMPSITES}/${id}`, { imageList: images });
       setModified(false);
@@ -74,7 +74,7 @@ const EditPhoto = () => {
       <div className='min-h-screen px-44 pb-20 relative'>
         <div className='flex justify-between items-center'>
           <div>
-            <h1 className='text-3xl font-semibold'>Campsite photos</h1>
+            <h1 className='text-3xl font-semibold'>Campsite's photos</h1>
             <h2 className='text-lg text-gray-400'>Manage photos.</h2>
           </div>
           <label className='w-10 h-10 flex items-center justify-center text-xl text-black bg-gray-100 rounded-full cursor-pointer'>
@@ -118,7 +118,7 @@ const EditPhoto = () => {
       {modified && (
         <div className='fixed bottom-0 left-0 w-full bg-white border-t-2 p-4 flex justify-end'>
           <button className='bg-purple-900 text-white hover:bg-transparent border border-purple-900 hover:text-purple-900 transform transition duration-300 px-6 py-2 rounded-lg'
-            onClick={saveChanges}
+            onClick={handleSave}
           >
             Save
           </button>

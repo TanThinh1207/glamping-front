@@ -48,7 +48,7 @@ const ReservationAll = () => {
       case 'Accepted':
         return 'text-green-500';
       case 'Completed':
-        return 'text-blue-500';
+        return 'text-purple-900';
       case 'Refund':
         return 'text-red-500';
       case 'Deposit':

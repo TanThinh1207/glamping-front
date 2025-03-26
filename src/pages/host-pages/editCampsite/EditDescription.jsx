@@ -16,7 +16,7 @@ const EditDescription = () => {
 
   const handleSave = async () => {
     try {
-      axios.patch(`${import.meta.env.VITE_API_GET_CAMPSITES}/${id}`, { description: description });
+      await axios.patch(`${import.meta.env.VITE_API_GET_CAMPSITES}/${id}`, { description: description });
       fetchCampsiteDetails();
     } catch (error) {
       console.error('Error saving changes:', error);

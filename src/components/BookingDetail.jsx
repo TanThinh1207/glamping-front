@@ -191,7 +191,7 @@ const BookingDetail = ({ selectedReservation, setSelectedReservation, refreshRes
           <div className="animate-spin rounded-full border-t-4 border-teal-400 border-solid h-16 w-16"></div>
         </div>
       ) : (
-        <div ref={modalRef} className='bg-white shadow-md  w-3/5 h-4/5 relative rounded-xl'>
+        <div ref={modalRef} className='bg-white shadow-md w-3/5 h-4/5 relative rounded-xl'>
           <button
             className="absolute -top-2 -right-2 bg-red-500 text-xl p-1 rounded-full"
             onClick={() => setSelectedReservation(null)}

@@ -16,7 +16,7 @@ const EditTitle = () => {
 
   const handleSave = async () => {
     try {
-      axios.patch(`${import.meta.env.VITE_API_GET_CAMPSITES}/${id}`, { name: title });
+      await axios.patch(`${import.meta.env.VITE_API_GET_CAMPSITES}/${id}`, { name: title });
       fetchCampsiteDetails();
       console.log(campsite);
     } catch (error) {
