@@ -44,16 +44,28 @@ const Account = () => {
         console.log("Current URL:", location.search);
         const params = new URLSearchParams(location.search);
         const status = params.get("status");
-        console.log("Params:", params.toString());
         console.log("Status:", status);
-        console.log("Restricted:", localStorage.getItem("restricted"));
-        if (status === "fail") {
-            localStorage.setItem("restricted", "true");
-            toast.error("Connect payment failed!");
-        } else if (status === "success") {
-            localStorage.setItem("restricted", "false");
-            toast.success("Connect payment success!");
+        const updateUserData = async () => {
+            setLoading(true);
+            try {
+                const newUserData = await fetchUserData(user.id);
+                localStorage.removeItem("user");
+                localStorage.setItem("user", JSON.stringify(newUserData));
+                if (status === "fail") {
+                    toast.error("Connect payment failed!");
+                } else if (status === "success") {
+                    toast.success("Connect payment success!");
+                }
+            } catch (error) {
+                toast.error(`Failed to fetch user data: ${error.message}`);
+            } finally {
+                setLoading(false);
+            }
+        };
+        if (status) {
+            updateUserData();
         }
+        console.log(localStorage.getItem("user"));
     }, [location]);
 
     useEffect(() => {
