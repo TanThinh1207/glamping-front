@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useCampsite } from '../context/CampsiteContext';
@@ -9,6 +9,7 @@ const ListingEditor = () => {
     const { campsite, loading } = useCampsite();
     const [activeSection, setActiveSection] = useState("photo");
     const googleMapUrl = `https://www.google.com/maps?q=${campsite.latitude},${campsite.longitude}&hl=es;z=14&output=embed`;
+    const modalRef = useRef();
 
     const handleClick = (section) => {
         setActiveSection(section);
@@ -20,7 +21,39 @@ const ListingEditor = () => {
     }, [campsite]);
 
     return (
-        <div className='flex flex-col h-screen'>
+        <div className='flex flex-col'>
+            {campsite.status === "Pending" ? (
+                <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+                    <div ref={modalRef} className='border border-orange-500 bg-orange-100 p-5 rounded-xl'>
+                        <h1 className='text-4xl font-bold'>Your campsite is pending approval</h1>
+                        <h2 className='text-2xl text-gray-500'>Please wait for the approvement</h2>
+                        <div className="mt-6 text-right">
+                            <button
+                                className="text-purple-900 underline hover:text-black-900 focus:outline-none"
+                                onClick={() => navigate('/hosting/listings')}
+                            >
+                                Back to listings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            ) : campsite.status === "Denied" ? (
+                <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+                    <div ref={modalRef} className='border border-red-500 bg-red-100 p-5 rounded-xl'>
+                        <h1 className='text-4xl font-bold'>Your campsite is denied</h1>
+                        <h2 className='text-2xl text-gray-500'>Reason: {campsite.message}</h2>
+                        <div className="mt-6 text-right">
+                            <button
+                                className="text-purple-900 underline hover:text-black-900 focus:outline-none"
+                                onClick={() => navigate('/hosting/listings')}
+                            >
+                                Back to listings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )
+                : null}
             <div className='flex items-center'>
                 <button
                     className='w-10 h-10 flex items-center justify-center text-xl text-black bg-gray-100 rounded-full'
@@ -115,7 +148,7 @@ const ListingEditor = () => {
                 >
                     <h1 className='text-xl'>Amenities</h1>
                     {loading ? (
-                       <div className="flex justify-center items-center h-16 w-full">
+                        <div className="flex justify-center items-center h-16 w-full">
                             <div className="animate-spin rounded-full border-t-4 border-teal-400 border-solid h-8 w-8"></div>
                         </div>
                     ) : (

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import ListingEditor from '../../components/ListingEditor'
 import { useParams, useNavigate, Outlet, useLocation } from 'react-router-dom'
 import { CampsiteProvider } from '../../context/CampsiteContext'
